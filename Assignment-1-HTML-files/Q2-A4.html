@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Array Methods | Newspaper Ink Theme</title>
+        <style>
+            /* Theme: ivory newsprint + black ink + crimson accent, serif type (plain CSS, no Bootstrap) */
+            :root {
+                --paper: #f5f0e1;
+                --ink: #1b1b1b;
+                --crimson: #b3202a;
+                --grey: #8a8577;
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                background: var(--paper);
+                color: var(--ink);
+                font-family: "Times New Roman", serif;
+            }
+            header {
+                text-align: center;
+                padding: 18px 12px 10px;
+                border-bottom: 4px double var(--ink);
+                max-width: 900px;
+                margin: 0 auto;
+            }
+            header h1 {
+                margin: 0;
+                font-size: 2rem;
+                letter-spacing: 2px;
+                text-transform: uppercase;
+            }
+            header p {
+                margin: 4px 0 0;
+                color: var(--crimson);
+                font-style: italic;
+            }
+            #app {
+                max-width: 900px;
+                margin: 0 auto;
+                padding: 14px;
+            }
+            h2.section {
+                border-bottom: 2px solid var(--crimson);
+                color: var(--crimson);
+                font-size: 1.15rem;
+                margin: 22px 0 8px;
+                text-transform: uppercase;
+            }
+            /* Each step is a "news column" row; wraps on small screens */
+            .step {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px 14px;
+                border-bottom: 1px dotted var(--grey);
+                padding: 8px 0;
+            }
+            .code {
+                flex: 1 1 250px;
+                font-family: "Courier New", monospace;
+                font-weight: bold;
+                font-size: 0.9rem;
+                word-break: break-word;
+            }
+            .note {
+                flex: 1 1 100%;
+                font-size: 0.85rem;
+                color: var(--grey);
+                font-style: italic;
+            }
+            .out {
+                flex: 2 1 280px;
+            }
+            .label {
+                font-size: 0.75rem;
+                text-transform: uppercase;
+                color: var(--crimson);
+                font-weight: bold;
+            }
+            /* Array items shown as small boxes */
+            .item {
+                display: inline-block;
+                border: 1.5px solid var(--ink);
+                padding: 0 8px;
+                margin: 2px 3px 2px 0;
+                background: #fff;
+                font-family: "Courier New", monospace;
+                font-size: 0.85rem;
+            }
+            .val {
+                font-family: "Courier New", monospace;
+                background: var(--ink);
+                color: var(--paper);
+                padding: 0 6px;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>The Array Gazette</h1>
+            <p>Unit 2 | JavaScript Basics | Creating and manipulating arrays</p>
+        </header>
+
+        <!-- Only one empty container; JavaScript builds everything -->
+        <div id="app"></div>
+
+        <script>
+            const app = document.getElementById("app");
+
+            // Helper: shows an array as small boxes
+            function boxes(arr) {
+                return arr.length
+                    ? arr.map((x) => `<span class="item">${x}</span>`).join("")
+                    : `<span class="item">(empty)</span>`;
+            }
+
+            // Helper: adds a section heading
+            function section(title) {
+                const h = document.createElement("h2");
+                h.className = "section";
+                h.textContent = title;
+                app.appendChild(h);
+            }
+
+            // Helper: adds one step row (code text, optional note, result HTML)
+            function step(code, result, note) {
+                const row = document.createElement("div");
+                row.className = "step";
+                row.innerHTML =
+                    `<div class="code">${code}</div>` +
+                    `<div class="out"><span class="label">Result</span><br>${result}</div>` +
+                    (note ? `<div class="note">${note}</div>` : "");
+                app.appendChild(row);
+            }
+
+            // ================= 1. DECLARATION AND ACCESS =================
+            section("1. Declaring and accessing arrays");
+
+            let fruits = ["apple", "banana", "mango"]; // array literal (recommended)
+            let numbers = new Array(10, 20, 30, 40, 50); // Array constructor
+            let mixed = ["text", 25, true, null]; // mixed data types
+
+            step("let fruits = [...]", boxes(fruits), "Array literal");
+            step(
+                "new Array(10, 20, 30, 40, 50)",
+                boxes(numbers),
+                "Array constructor",
+            );
+            step(
+                "mixed array",
+                boxes(mixed),
+                "An array can hold different data types",
+            );
+            step(
+                "fruits[0]",
+                `<span class="val">${fruits[0]}</span>`,
+                "Index starts at 0",
+            );
+            step(
+                "fruits[fruits.length - 1]",
+                `<span class="val">${fruits[fruits.length - 1]}</span>`,
+                "Last element",
+            );
+            step(
+                "fruits.length",
+                `<span class="val">${fruits.length}</span>`,
+                "Number of elements",
+            );
+
+            // ================= 2. ADD AND REMOVE (these change the array) =================
+            section("2. Adding and removing elements");
+
+            fruits.push("orange"); // add to END
+            step('fruits.push("orange")', boxes(fruits), "Adds to the end");
+
+            fruits.unshift("grape"); // add to START
+            step(
+                'fruits.unshift("grape")',
+                boxes(fruits),
+                "Adds to the beginning",
+            );
+
+            let removedEnd = fruits.pop(); // remove from END, returns the removed item
+            step(
+                "fruits.pop()",
+                boxes(fruits) +
+                    ` removed: <span class="val">${removedEnd}</span>`,
+                "Removes the last element",
+            );
+
+            let removedStart = fruits.shift(); // remove from START
+            step(
+                "fruits.shift()",
+                boxes(fruits) +
+                    ` removed: <span class="val">${removedStart}</span>`,
+                "Removes the first element",
+            );
+
+            // ================= 3. SEARCH =================
+            section("3. Searching");
+
+            step(
+                'fruits.indexOf("banana")',
+                `<span class="val">${fruits.indexOf("banana")}</span>`,
+                "Position of the element (-1 if not found)",
+            );
+            step(
+                'fruits.includes("mango")',
+                `<span class="val">${fruits.includes("mango")}</span>`,
+                "true or false",
+            );
+            step(
+                'fruits.indexOf("pear")',
+                `<span class="val">${fruits.indexOf("pear")}</span>`,
+                "Not in the array, so -1",
+            );
+
+            // ================= 4. SPLICE (destructive) vs SLICE (non-destructive) =================
+            section("4. splice() changes the array, slice() does not");
+
+            fruits.splice(1, 0, "kiwi"); // at index 1, remove 0, insert "kiwi"
+            step(
+                'fruits.splice(1, 0, "kiwi")',
+                boxes(fruits),
+                "Insert: remove 0 items, add kiwi at index 1",
+            );
+
+            fruits.splice(2, 1, "papaya"); // at index 2, remove 1, insert "papaya"
+            step(
+                'fruits.splice(2, 1, "papaya")',
+                boxes(fruits),
+                "Replace: remove 1 item at index 2, add papaya",
+            );
+
+            let removed = fruits.splice(0, 1); // at index 0, remove 1
+            step(
+                "fruits.splice(0, 1)",
+                boxes(fruits) + ` removed: ${boxes(removed)}`,
+                "Delete: remove 1 item at index 0",
+            );
+
+            let part = fruits.slice(0, 2); // copy index 0 and 1 (end index not included)
+            step(
+                "fruits.slice(0, 2)",
+                `${boxes(part)}<br>original still: ${boxes(fruits)}`,
+                "Original array is NOT changed",
+            );
+
+            // ================= 5. ITERATION AND TRANSFORMATION =================
+            section("5. Looping and transforming");
+
+            let lines = [];
+            fruits.forEach((f, i) => lines.push(`${i}:${f}`));
+            step(
+                "fruits.forEach(...)",
+                boxes(lines),
+                "Runs a function for every element",
+            );
+
+            step(
+                "fruits.map(f => f.toUpperCase())",
+                boxes(fruits.map((f) => f.toUpperCase())),
+                "Makes a NEW array",
+            );
+            step(
+                "fruits.filter(f => f.length > 5)",
+                boxes(fruits.filter((f) => f.length > 5)),
+                "Keeps only matching elements",
+            );
+            step(
+                "numbers.reduce((acc, n) => acc + n, 0)",
+                `<span class="val">${numbers.reduce((acc, n) => acc + n, 0)}</span>`,
+                "Adds all numbers into one value",
+            );
+
+            // ================= 6. SORT, REVERSE, JOIN =================
+            section("6. Sorting, reversing and joining");
+
+            let sorted = [...fruits].sort(); // copy first, so 'fruits' keeps its order
+            step(
+                "[...fruits].sort()",
+                boxes(sorted),
+                "Alphabetical order (on a copy)",
+            );
+
+            let reversed = [...fruits].reverse();
+            step(
+                "[...fruits].reverse()",
+                boxes(reversed),
+                "Reverse order (on a copy)",
+            );
+
+            step(
+                'fruits.join(", ")',
+                `<span class="val">${fruits.join(", ")}</span>`,
+                "Array converted to a string",
+            );
+            step(
+                "final fruits array",
+                boxes(fruits),
+                `Length is now ${fruits.length}`,
+            );
+        </script>
+    </body>
+</html>

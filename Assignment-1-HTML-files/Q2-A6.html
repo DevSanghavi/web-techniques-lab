@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>RegExp Validation | Pastel Candy Theme</title>
+        <style>
+            /* Theme: lavender background, candy pink + mint accents, rounded soft cards (plain CSS, no Bootstrap) */
+            :root {
+                --lav: #ede7f6;
+                --pink: #f06292;
+                --mint: #26a69a;
+                --ink: #4a3b63;
+                --peach: #ffe0b2;
+                --bad: #d81b60;
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                background: var(--lav);
+                color: var(--ink);
+                font-family: "Comic Sans MS", "Trebuchet MS", sans-serif;
+            }
+            header {
+                background: var(--pink);
+                color: #fff;
+                text-align: center;
+                padding: 20px 12px;
+                border-radius: 0 0 30px 30px;
+                box-shadow: 0 5px 0 var(--mint);
+            }
+            header h1 {
+                margin: 0;
+                font-size: 1.5rem;
+            }
+            header p {
+                margin: 6px 0 0;
+                font-size: 0.9rem;
+            }
+            /* Responsive: two columns on wide screens, one on phones */
+            #app {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 18px;
+                max-width: 1050px;
+                margin: 20px auto;
+                padding: 0 14px;
+            }
+            .card {
+                background: #fff;
+                border-radius: 22px;
+                padding: 16px;
+                box-shadow: 0 5px 0 rgba(74, 59, 99, 0.15);
+            }
+            .card h2 {
+                margin: 0 0 10px;
+                font-size: 1.1rem;
+                color: var(--pink);
+            }
+            label {
+                display: block;
+                font-weight: bold;
+                margin-top: 10px;
+                font-size: 0.9rem;
+            }
+            input {
+                width: 100%;
+                padding: 9px 12px;
+                border: 3px solid var(--lav);
+                border-radius: 14px;
+                font-size: 1rem;
+                color: var(--ink);
+                outline: none;
+            }
+            input.ok {
+                border-color: var(--mint);
+                background: #e0f2f1;
+            }
+            input.bad {
+                border-color: var(--bad);
+                background: #fce4ec;
+            }
+            .hint {
+                font-size: 0.78rem;
+                margin: 3px 0 0 4px;
+                color: #7a6a96;
+            }
+            .hint.ok {
+                color: var(--mint);
+                font-weight: bold;
+            }
+            .hint.bad {
+                color: var(--bad);
+                font-weight: bold;
+            }
+            .pat {
+                font-family: Consolas, monospace;
+                background: var(--peach);
+                border-radius: 8px;
+                padding: 1px 6px;
+                font-size: 0.78rem;
+                word-break: break-all;
+            }
+            button {
+                margin-top: 14px;
+                width: 100%;
+                padding: 11px;
+                border: none;
+                border-radius: 16px;
+                background: var(--mint);
+                color: #fff;
+                font-size: 1rem;
+                font-weight: bold;
+                cursor: pointer;
+            }
+            button:hover {
+                background: var(--pink);
+            }
+            #summary {
+                margin-top: 12px;
+                padding: 10px;
+                border-radius: 14px;
+                font-weight: bold;
+                display: none;
+            }
+            #summary.ok {
+                display: block;
+                background: #e0f2f1;
+                color: #00695c;
+            }
+            #summary.bad {
+                display: block;
+                background: #fce4ec;
+                color: var(--bad);
+            }
+            .demo {
+                border-bottom: 2px dotted var(--lav);
+                padding: 6px 0;
+                font-size: 0.85rem;
+                word-break: break-word;
+            }
+            .demo:last-child {
+                border-bottom: none;
+            }
+            .demo b {
+                color: var(--mint);
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>Regular Expression Validator</h1>
+            <p>Unit 2 | JavaScript Basics | Patterns and modifiers</p>
+        </header>
+
+        <!-- Only one empty container; JavaScript builds everything -->
+        <div id="app"></div>
+
+        <script>
+            const app = document.getElementById("app");
+
+            // Helper: makes text safe before putting it into innerHTML
+            function esc(s) {
+                return String(s)
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;");
+            }
+
+            // ================= 1. PATTERNS (literal and constructor notation) =================
+            const fields = [
+                {
+                    id: "name",
+                    label: "Full name",
+                    placeholder: "Rahul Sharma",
+                    hint: "Letters and spaces only, 3 to 30 characters",
+                    pattern: /^[A-Za-z ]{3,30}$/,
+                }, // literal notation
+                {
+                    id: "username",
+                    label: "Username",
+                    placeholder: "Rahul101",
+                    hint: "Letters and digits only, 4 to 10 characters (i flag)",
+                    pattern: new RegExp("^[a-z0-9]{4,10}$", "i"),
+                }, // constructor notation + i modifier
+                {
+                    id: "email",
+                    label: "Email address",
+                    placeholder: "user@example.com",
+                    hint: "name@domain.com format",
+                    pattern: /^[\w.-]+@[\w-]+\.[a-zA-Z]{2,}$/,
+                },
+                {
+                    id: "phone",
+                    label: "Mobile number",
+                    placeholder: "9876543210",
+                    hint: "Exactly 10 digits",
+                    pattern: /^\d{10}$/,
+                },
+                {
+                    id: "pin",
+                    label: "PIN code",
+                    placeholder: "411001",
+                    hint: "Exactly 6 digits",
+                    pattern: /^\d{6}$/,
+                },
+            ];
+
+            // ================= 2. BUILD THE FORM WITH JAVASCRIPT =================
+            const formCard = document.createElement("div");
+            formCard.className = "card";
+            formCard.innerHTML = "<h2>1. Live input validation</h2>";
+
+            fields.forEach(function (f) {
+                const lab = document.createElement("label");
+                lab.textContent = f.label;
+                lab.htmlFor = f.id;
+
+                const inp = document.createElement("input");
+                inp.type = "text";
+                inp.id = f.id;
+                inp.placeholder = f.placeholder;
+
+                const msg = document.createElement("div");
+                msg.className = "hint";
+                msg.id = f.id + "Msg";
+                msg.innerHTML =
+                    esc(f.hint) +
+                    '<br><span class="pat">' +
+                    esc(f.pattern.toString()) +
+                    "</span>";
+
+                // validate while the user types
+                inp.addEventListener("input", function () {
+                    check(f);
+                });
+
+                formCard.appendChild(lab);
+                formCard.appendChild(inp);
+                formCard.appendChild(msg);
+            });
+
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.textContent = "Validate all inputs";
+            const summary = document.createElement("div");
+            summary.id = "summary";
+            formCard.appendChild(btn);
+            formCard.appendChild(summary);
+            app.appendChild(formCard);
+
+            // ================= 3. VALIDATION USING test() =================
+            // Returns true/false and updates the colours and message
+            function check(f) {
+                const inp = document.getElementById(f.id);
+                const msg = document.getElementById(f.id + "Msg");
+                const value = inp.value.trim(); // trim() removes extra spaces at both ends
+                const valid = f.pattern.test(value); // test() gives true or false
+
+                inp.className = valid ? "ok" : "bad";
+                msg.className = valid ? "hint ok" : "hint bad";
+                msg.innerHTML =
+                    (valid ? "Valid" : "Invalid: " + esc(f.hint)) +
+                    '<br><span class="pat">' +
+                    esc(f.pattern.toString()) +
+                    "</span>";
+                return valid;
+            }
+
+            btn.addEventListener("click", function () {
+                let errors = [];
+                fields.forEach(function (f) {
+                    if (!check(f)) errors.push(f.label);
+                });
+                if (errors.length === 0) {
+                    summary.className = "ok";
+                    summary.textContent =
+                        "Success! All inputs passed validation.";
+                } else {
+                    summary.className = "bad";
+                    summary.textContent = "Please fix: " + errors.join(", ");
+                }
+            });
+
+            // ================= 4. MODIFIERS AND METHODS DEMO =================
+            const demoCard = document.createElement("div");
+            demoCard.className = "card";
+            demoCard.innerHTML = "<h2>2. Modifiers (flags) and methods</h2>";
+
+            // Helper: adds one demo line (code, result)
+            function demo(code, result) {
+                const d = document.createElement("div");
+                d.className = "demo";
+                d.innerHTML =
+                    '<span class="pat">' +
+                    esc(code) +
+                    "</span><br><b>Result:</b> " +
+                    esc(result);
+                demoCard.appendChild(d);
+            }
+
+            const text = "Hello hello HELLO 123 and 456";
+            const lines = "line1\nline2\nline3";
+
+            // Modifiers
+            demo(
+                "text.match(/hello/)",
+                JSON.stringify(text.match(/hello/)[0]) +
+                    "  (first match only, case-sensitive)",
+            );
+            demo(
+                "text.match(/hello/i)",
+                JSON.stringify(text.match(/hello/i)[0]) + "  (i = ignore case)",
+            );
+            demo(
+                "text.match(/hello/gi)",
+                JSON.stringify(text.match(/hello/gi)) + "  (g = all matches)",
+            );
+            demo(
+                "text.match(/\\d+/g)",
+                JSON.stringify(text.match(/\d+/g)) + "  (all digit groups)",
+            );
+            demo(
+                "lines.match(/^line/g).length",
+                lines.match(/^line/g).length +
+                    "  (^ matches only the start of the string)",
+            );
+            demo(
+                "lines.match(/^line/gm).length",
+                lines.match(/^line/gm).length +
+                    "  (m = ^ matches each line start)",
+            );
+
+            // Methods
+            const re = /\d+/;
+            demo("/\\d+/.test(text)", re.test(text));
+            const found = /(\d{3})-(\d{4})/.exec("Call 555-1234 now");
+            demo(
+                '/(\\d{3})-(\\d{4})/.exec("Call 555-1234 now")',
+                "match " +
+                    found[0] +
+                    ", group1 " +
+                    found[1] +
+                    ", group2 " +
+                    found[2] +
+                    ", index " +
+                    found.index,
+            );
+            demo(
+                "text.search(/\\d+/)",
+                text.search(/\d+/) + "  (position of first match)",
+            );
+            demo('text.replace(/\\d+/g, "#")', text.replace(/\d+/g, "#"));
+            demo(
+                '"a,b;c".split(/[,;]/)',
+                JSON.stringify("a,b;c".split(/[,;]/)),
+            );
+
+            app.appendChild(demoCard);
+        </script>
+    </body>
+</html>

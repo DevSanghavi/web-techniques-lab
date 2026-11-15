@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Event Listeners and Event Flow | Arcade Theme</title>
+        <style>
+            /* Theme: arcade cabinet - black screen, gold, red and cyan, thick pixel-style borders (plain CSS, no Bootstrap) */
+            :root {
+                --black: #0b0b12;
+                --gold: #ffd400;
+                --red: #ff3b3b;
+                --cyan: #27e1ff;
+                --grey: #2a2a3c;
+                --white: #f4f4f4;
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                background: var(--black);
+                color: var(--white);
+                font-family: "Courier New", monospace;
+            }
+            header {
+                text-align: center;
+                padding: 18px 10px;
+                border-bottom: 4px solid var(--gold);
+                background: var(--grey);
+            }
+            header h1 {
+                margin: 0;
+                font-size: 1.5rem;
+                color: var(--gold);
+                letter-spacing: 3px;
+                text-transform: uppercase;
+            }
+            header p {
+                margin: 6px 0 0;
+                color: var(--cyan);
+                font-size: 0.85rem;
+            }
+            /* Responsive: panels wrap into columns by available width */
+            main {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+                gap: 16px;
+                max-width: 1250px;
+                margin: auto;
+                padding: 16px;
+            }
+            .panel {
+                border: 4px solid var(--gold);
+                background: #14141f;
+                padding: 12px;
+                box-shadow: 6px 6px 0 var(--red);
+            }
+            .panel h2 {
+                margin: 0 0 10px;
+                font-size: 1rem;
+                color: var(--gold);
+                text-transform: uppercase;
+            }
+            .opt {
+                display: block;
+                margin: 6px 0;
+                font-size: 0.85rem;
+                cursor: pointer;
+            }
+            button {
+                background: var(--gold);
+                color: var(--black);
+                border: 3px solid var(--white);
+                padding: 7px 10px;
+                margin: 4px 4px 4px 0;
+                font-family: inherit;
+                font-weight: bold;
+                cursor: pointer;
+            }
+            button:hover {
+                background: var(--cyan);
+            }
+            /* Three nested boxes for the event-flow arena */
+            .arena {
+                margin: 10px 0;
+            }
+            #outer {
+                background: #3b2a8f;
+                border: 3px solid var(--cyan);
+                padding: 14px;
+            }
+            #middle {
+                background: #8f2a3b;
+                border: 3px solid var(--gold);
+                padding: 14px;
+                margin-top: 8px;
+            }
+            #inner {
+                background: var(--gold);
+                color: var(--black);
+                display: block;
+                width: 100%;
+                margin: 8px 0 0;
+                padding: 10px;
+            }
+            .tag {
+                font-size: 0.8rem;
+                font-weight: bold;
+            }
+            #log {
+                background: var(--black);
+                border: 2px dashed var(--cyan);
+                height: 300px;
+                overflow-y: auto;
+                padding: 8px;
+                font-size: 0.78rem;
+            }
+            #log div {
+                padding: 2px 0;
+                word-break: break-word;
+            }
+            .cap {
+                color: var(--cyan);
+            }
+            .tgt {
+                color: var(--gold);
+            }
+            .bub {
+                color: var(--red);
+            }
+            .inf {
+                color: var(--white);
+            }
+            ul {
+                padding-left: 18px;
+                margin: 6px 0;
+            }
+            li {
+                cursor: pointer;
+                margin: 3px 0;
+            }
+            li.done {
+                text-decoration: line-through;
+                color: #888;
+            }
+            input[type="text"] {
+                width: 100%;
+                padding: 7px;
+                background: var(--black);
+                color: var(--gold);
+                border: 2px solid var(--cyan);
+                font-family: inherit;
+            }
+            .small {
+                font-size: 0.78rem;
+                color: #bbb;
+                margin: 4px 0;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>Event Listener Arcade</h1>
+            <p>Unit 3 | DOM | addEventListener and event flow</p>
+        </header>
+
+        <!-- Only an empty <main>; JavaScript builds every panel -->
+        <main id="app"></main>
+
+        <script>
+            const app = document.getElementById("app");
+
+            // ---------- small helpers (createElement + appendChild) ----------
+            // el("div", "panel", "text") creates one element
+            function el(tag, cls, text) {
+                const e = document.createElement(tag);
+                if (cls) e.className = cls;
+                if (text) e.textContent = text;
+                return e;
+            }
+            // Makes a panel with a heading and adds it to the page
+            function makePanel(title) {
+                const p = el("section", "panel");
+                p.appendChild(el("h2", "", title));
+                app.appendChild(p);
+                return p;
+            }
+            // Makes a checkbox with a label
+            function makeCheck(parent, text) {
+                const lab = el("label", "opt");
+                const cb = document.createElement("input");
+                cb.type = "checkbox";
+                lab.appendChild(cb);
+                lab.appendChild(document.createTextNode(" " + text));
+                parent.appendChild(lab);
+                return cb;
+            }
+            // Makes a button and attaches a click listener
+            function makeButton(parent, text, handler) {
+                const b = el("button", "", text);
+                b.addEventListener("click", handler);
+                parent.appendChild(b);
+                return b;
+            }
+
+            // ================= PANEL 4 FIRST (the log, used by every demo) =================
+            let step = 0;
+            let logBox;
+            function log(msg, cls) {
+                step++;
+                const d = el("div", cls || "inf");
+                d.innerHTML = step + ". " + msg;
+                logBox.appendChild(d);
+                logBox.scrollTop = logBox.scrollHeight; // keep newest line visible
+            }
+
+            // ================= PANEL 1: EVENT FLOW (capturing, target, bubbling) =================
+            const p1 = makePanel("1. Event flow: capture, target, bubble");
+            const stopTarget = makeCheck(
+                p1,
+                "stopPropagation() in the button (target)",
+            );
+            const stopCapture = makeCheck(
+                p1,
+                "stopPropagation() in MIDDLE capture listener",
+            );
+
+            const outer = el("div");
+            outer.id = "outer";
+            outer.appendChild(el("span", "tag", "OUTER"));
+            const middle = el("div");
+            middle.id = "middle";
+            middle.appendChild(el("span", "tag", "MIDDLE"));
+            const inner = el("button", "", "INNER BUTTON (click me)");
+            inner.id = "inner";
+            middle.appendChild(inner);
+            outer.appendChild(middle);
+            const arena = el("div", "arena");
+            arena.appendChild(outer);
+            p1.appendChild(arena);
+            p1.appendChild(
+                el(
+                    "p",
+                    "small",
+                    "Click INNER, then MIDDLE, then OUTER and compare the log.",
+                ),
+            );
+
+            // e.eventPhase: 1 = capturing, 2 = target, 3 = bubbling
+            const phaseName = { 1: "CAPTURE", 2: "TARGET", 3: "BUBBLE" };
+            const phaseClass = { 1: "cap", 2: "tgt", 3: "bub" };
+
+            // One reusable handler. e.target = where the click started,
+            // e.currentTarget (same as 'this') = element whose listener is running now.
+            function flowHandler(e) {
+                log(
+                    "[" +
+                        phaseName[e.eventPhase] +
+                        "] listener on <b>" +
+                        e.currentTarget.id +
+                        "</b> | target: " +
+                        e.target.id,
+                    phaseClass[e.eventPhase],
+                );
+            }
+
+            // Third argument true = capturing listener, false (default) = bubbling listener
+            outer.addEventListener("click", flowHandler, true); // capture on OUTER
+            middle.addEventListener(
+                "click",
+                function (e) {
+                    // capture on MIDDLE
+                    flowHandler(e);
+                    if (stopCapture.checked) {
+                        e.stopPropagation(); // event never reaches the button
+                        log(
+                            "stopPropagation() in MIDDLE capture: event stops here",
+                            "inf",
+                        );
+                    }
+                },
+                true,
+            );
+            inner.addEventListener("click", function (e) {
+                // target listener
+                flowHandler(e);
+                if (stopTarget.checked) {
+                    e.stopPropagation(); // stops the bubbling phase
+                    log(
+                        "stopPropagation() at target: no bubbling to parents",
+                        "inf",
+                    );
+                }
+            });
+            middle.addEventListener("click", flowHandler); // bubble on MIDDLE
+            outer.addEventListener("click", flowHandler); // bubble on OUTER
+
+            // ================= PANEL 2: LISTENER TYPES AND REMOVAL =================
+            const p2 = makePanel("2. addEventListener vs onclick");
+            p2.appendChild(
+                el(
+                    "p",
+                    "small",
+                    "Same button: 2 listeners added, and onclick assigned twice.",
+                ),
+            );
+
+            const multi = el("button", "", "Click: multiple handlers");
+            p2.appendChild(multi);
+
+            function listenerA() {
+                log("addEventListener A ran", "inf");
+            }
+            function listenerB() {
+                log("addEventListener B ran", "inf");
+            }
+            multi.addEventListener("click", listenerA); // both listeners are kept
+            multi.addEventListener("click", listenerB);
+            multi.onclick = function () {
+                log("onclick FIRST (will be overwritten)", "inf");
+            };
+            multi.onclick = function () {
+                log("onclick SECOND (only this one runs)", "inf");
+            };
+
+            makeButton(p2, "removeEventListener(B)", function () {
+                multi.removeEventListener("click", listenerB); // needs the SAME named function
+                log("listener B removed. Click the first button again.", "tgt");
+            });
+
+            const onceBtn = el("button", "", "Click: runs only once");
+            p2.appendChild(onceBtn);
+            onceBtn.addEventListener(
+                "click",
+                function () {
+                    log(
+                        "{ once: true } listener ran, now it is removed automatically",
+                        "inf",
+                    );
+                },
+                { once: true },
+            );
+
+            // ================= PANEL 3: EVENT OBJECT, preventDefault, KEY EVENTS =================
+            const p3 = makePanel("3. Event object and default actions");
+
+            const blockCb = makeCheck(
+                p3,
+                "Block the box below with preventDefault()",
+            );
+            const tick = makeCheck(p3, "Try to tick me");
+            tick.addEventListener("click", function (e) {
+                if (blockCb.checked) {
+                    e.preventDefault(); // cancels the default action (the tick)
+                    log(
+                        "preventDefault(): default tick action cancelled",
+                        "tgt",
+                    );
+                } else {
+                    log(
+                        "default action allowed, box is now " +
+                            (tick.checked ? "ticked" : "unticked"),
+                        "inf",
+                    );
+                }
+            });
+
+            p3.appendChild(el("p", "small", "Keyboard event: type below."));
+            const typeBox = document.createElement("input");
+            typeBox.type = "text";
+            typeBox.placeholder = "type here";
+            p3.appendChild(typeBox);
+            typeBox.addEventListener("keyup", function (e) {
+                log(
+                    "keyup | e.key = <b>" +
+                        e.key +
+                        '</b> | value = "' +
+                        typeBox.value +
+                        '"',
+                    "inf",
+                );
+            });
+
+            const hover = el("button", "", "Hover and leave me");
+            p3.appendChild(hover);
+            hover.addEventListener("mouseover", function () {
+                log("mouseover on the hover button", "inf");
+            });
+            hover.addEventListener("mouseout", function () {
+                log("mouseout on the hover button", "inf");
+            });
+
+            // ================= PANEL 4: LOG + EVENT DELEGATION =================
+            const p4 = makePanel("4. Event log and delegation");
+            logBox = el("div");
+            logBox.id = "log";
+            p4.appendChild(logBox);
+            makeButton(p4, "Clear log", function () {
+                logBox.textContent = "";
+                step = 0;
+            });
+
+            p4.appendChild(
+                el(
+                    "p",
+                    "small",
+                    "Delegation: ONE listener on the list handles every item, even new ones.",
+                ),
+            );
+            const list = document.createElement("ul");
+            ["Learn capturing", "Learn bubbling"].forEach(function (t) {
+                list.appendChild(el("li", "", t));
+            });
+            p4.appendChild(list);
+            let n = 2;
+            makeButton(p4, "Add item", function () {
+                n++;
+                list.appendChild(el("li", "", "New task " + n)); // no new listener needed
+            });
+            list.addEventListener("click", function (e) {
+                if (e.target.tagName === "LI") {
+                    // e.target is the clicked <li>
+                    e.target.classList.toggle("done");
+                    log(
+                        "delegation: <b>" +
+                            e.target.textContent +
+                            "</b> toggled by the single UL listener",
+                        "tgt",
+                    );
+                }
+            });
+
+            log(
+                "Ready. Click the INNER button to see the complete event flow.",
+                "inf",
+            );
+        </script>
+    </body>
+</html>

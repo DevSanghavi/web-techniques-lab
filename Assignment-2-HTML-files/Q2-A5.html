@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>jQuery: Advantages and Disadvantages</title>
+
+        <!-- ===================== CSS: plum and peach theme ===================== -->
+        <style>
+            :root {
+                --plum: #5b2a6e;
+                --plum-dark: #3e1a4d;
+                --peach: #ffb38a;
+                --cream: #fff6ef;
+                --good: #2e8b57;
+                --bad: #c0392b;
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                background: var(--cream);
+                color: #2b2233;
+                font-family: Georgia, "Times New Roman", serif;
+                line-height: 1.6;
+            }
+            header {
+                background: var(--plum);
+                color: #fff;
+                text-align: center;
+                padding: 24px 16px;
+                border-bottom: 8px solid var(--peach);
+            }
+            header h1 {
+                margin: 0 0 4px;
+                font-size: 1.6rem;
+            }
+            header p {
+                margin: 0;
+                color: var(--peach);
+                font-style: italic;
+            }
+
+            main {
+                max-width: 900px;
+                margin: 0 auto;
+                padding: 16px;
+            }
+
+            /* Tab buttons */
+            .tabs {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin: 12px 0;
+            }
+            .tab-btn {
+                flex: 1 1 140px;
+                padding: 10px;
+                border: 2px solid var(--plum);
+                background: #fff;
+                color: var(--plum);
+                font-weight: bold;
+                border-radius: 8px;
+                cursor: pointer;
+            }
+            .tab-btn.active {
+                background: var(--plum);
+                color: #fff;
+            }
+
+            /* Points list */
+            .panel {
+                display: none;
+            }
+            .point {
+                background: #fff;
+                border-left: 6px solid var(--peach);
+                border-radius: 8px;
+                margin-bottom: 10px;
+                box-shadow: 0 2px 6px rgba(91, 42, 110, 0.12);
+            }
+            .point h3 {
+                margin: 0;
+                padding: 12px 14px;
+                cursor: pointer;
+                font-size: 1.05rem;
+            }
+            .point h3::before {
+                content: "+ ";
+                color: var(--plum);
+            }
+            .point.open h3::before {
+                content: "- ";
+            }
+            .point .detail {
+                display: none;
+                padding: 0 14px 12px 14px;
+                color: #4a3d55;
+            }
+            #adv .point {
+                border-left-color: var(--good);
+            }
+            #dis .point {
+                border-left-color: var(--bad);
+            }
+            .point.hovered {
+                background: #fff0e6;
+            }
+
+            .toolbar {
+                margin-bottom: 10px;
+            }
+            .small-btn {
+                padding: 6px 12px;
+                border: 0;
+                border-radius: 6px;
+                background: var(--peach);
+                color: var(--plum-dark);
+                font-weight: bold;
+                cursor: pointer;
+            }
+
+            /* Write less demo */
+            .demo {
+                background: var(--plum-dark);
+                color: #fff;
+                padding: 14px;
+                border-radius: 10px;
+            }
+            .demo pre {
+                background: #2a1136;
+                color: var(--peach);
+                padding: 10px;
+                border-radius: 6px;
+                overflow-x: auto;
+                margin: 6px 0;
+            }
+            #magicBox {
+                background: var(--peach);
+                color: var(--plum-dark);
+                text-align: center;
+                padding: 18px;
+                border-radius: 8px;
+                font-weight: bold;
+                margin-top: 8px;
+            }
+
+            /* Comparison table */
+            .scroll {
+                overflow-x: auto;
+            }
+            table {
+                border-collapse: collapse;
+                width: 100%;
+                background: #fff;
+            }
+            th,
+            td {
+                border: 1px solid #e3d3ea;
+                padding: 8px 10px;
+                text-align: left;
+            }
+            th {
+                background: var(--plum);
+                color: #fff;
+            }
+            tr.hl td {
+                background: #ffe3d0;
+            }
+            code {
+                background: #f3e8f8;
+                padding: 1px 4px;
+                border-radius: 3px;
+            }
+
+            h2 {
+                color: var(--plum);
+                border-bottom: 2px solid var(--peach);
+                padding-bottom: 4px;
+            }
+            footer {
+                text-align: center;
+                padding: 16px;
+                color: #7a6a86;
+                font-size: 0.9rem;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>jQuery: Advantages and Disadvantages</h1>
+            <p>"Write less, do more." Click the tabs and points below.</p>
+        </header>
+
+        <main>
+            <!-- Tabs: jQuery shows one panel at a time -->
+            <div class="tabs">
+                <button class="tab-btn active" data-target="adv">
+                    Advantages
+                </button>
+                <button class="tab-btn" data-target="dis">Disadvantages</button>
+                <button class="tab-btn" data-target="cmp">
+                    jQuery vs JavaScript
+                </button>
+            </div>
+
+            <!-- Advantages panel (filled by jQuery) -->
+            <section id="adv" class="panel">
+                <div class="toolbar">
+                    <button class="small-btn expand-all">
+                        Open / close all
+                    </button>
+                    <span class="count"></span>
+                </div>
+                <div class="list"></div>
+            </section>
+
+            <!-- Disadvantages panel (filled by jQuery) -->
+            <section id="dis" class="panel">
+                <div class="toolbar">
+                    <button class="small-btn expand-all">
+                        Open / close all
+                    </button>
+                    <span class="count"></span>
+                </div>
+                <div class="list"></div>
+            </section>
+
+            <!-- Comparison panel -->
+            <section id="cmp" class="panel">
+                <div class="scroll">
+                    <table id="cmpTable">
+                        <tr>
+                            <th>Task</th>
+                            <th>jQuery</th>
+                            <th>Plain JavaScript</th>
+                        </tr>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Live "write less" demo -->
+            <h2>Live Demo: Write Less, Do More</h2>
+            <div class="demo">
+                <p>
+                    One line of jQuery does the work that needs more code in
+                    plain JavaScript.
+                </p>
+                <p><b>Plain JavaScript</b></p>
+                <pre>
+document.getElementById("magicBox").style.display = "none";</pre
+                >
+                <p><b>jQuery</b></p>
+                <pre>$("#magicBox").hide();</pre>
+                <button class="small-btn" id="btnHide">hide()</button>
+                <button class="small-btn" id="btnFade">
+                    fadeToggle style: fadeOut / fadeIn
+                </button>
+                <button class="small-btn" id="btnSlide">slideToggle()</button>
+                <div id="magicBox">I am the box controlled by jQuery</div>
+            </div>
+        </main>
+
+        <footer>Unit 4: jQuery | Advantages and Disadvantages</footer>
+
+        <!-- jQuery 3.7.1 from CDN -->
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+        <!-- ===================== jQuery CODE ===================== -->
+        <script>
+            $(document).ready(function () {
+                // ---------- Data (from Unit 4, topic 4.9) ----------
+                var advantages = [
+                    [
+                        "Simple, short syntax",
+                        "The motto is 'Write less, do more'. A task like hiding an element takes one line: $(\"#box\").hide();",
+                    ],
+                    [
+                        "Works the same in all browsers",
+                        "jQuery hides browser differences, so the same code runs in Chrome, Firefox, Edge and Safari.",
+                    ],
+                    [
+                        "Built-in effects, events and AJAX",
+                        "Methods like fadeIn(), slideUp(), animate(), click(), load() and $.get() are ready to use.",
+                    ],
+                    [
+                        "Huge community and many plugins",
+                        "Plugins and jQuery UI give datepickers, dialogs and tabs without writing them from scratch.",
+                    ],
+                    [
+                        "Free and open source",
+                        "Anyone can use it, and it can be added from a local file or a CDN link.",
+                    ],
+                ];
+
+                var disadvantages = [
+                    [
+                        "Extra file to download (about 30 KB)",
+                        "The browser must load the library, which adds a request when the page first opens.",
+                    ],
+                    [
+                        "Slower than plain JavaScript for heavy work",
+                        "jQuery wraps the native DOM methods, so large or heavy tasks run slower than pure JavaScript.",
+                    ],
+                    [
+                        "Modern JavaScript and frameworks replace many uses",
+                        "querySelectorAll(), classList, addEventListener() and fetch() do the same jobs without a library.",
+                    ],
+                    [
+                        "Too many plugins can slow or conflict",
+                        "Using many third-party plugins can slow the page down or make scripts clash.",
+                    ],
+                    [
+                        "Some old methods (live, die) were removed",
+                        "Newer versions removed live(), die() and error(), so old code can break after an update.",
+                    ],
+                ];
+
+                var comparison = [
+                    ["Select", '$("p")', 'document.querySelectorAll("p")'],
+                    [
+                        "Add class",
+                        '$("p").addClass("x")',
+                        'p.classList.add("x")',
+                    ],
+                    ["Hide", '$("p").hide()', 'p.style.display = "none"'],
+                    [
+                        "Click",
+                        '$("p").click(fn)',
+                        'p.addEventListener("click", fn)',
+                    ],
+                    ["AJAX", "$.get(url, fn)", "fetch(url).then(fn)"],
+                ];
+
+                // ---------- Build the lists with append() ----------
+                function buildList(panelId, items) {
+                    var list = $("#" + panelId + " .list");
+                    for (var i = 0; i < items.length; i++) {
+                        list.append(
+                            "<div class='point'>" +
+                                "<h3>" +
+                                items[i][0] +
+                                "</h3>" +
+                                "<div class='detail'>" +
+                                items[i][1] +
+                                "</div>" +
+                                "</div>",
+                        );
+                    }
+                    $("#" + panelId + " .count").text(items.length + " points");
+                }
+                buildList("adv", advantages);
+                buildList("dis", disadvantages);
+
+                // ---------- Build the comparison table ----------
+                for (var i = 0; i < comparison.length; i++) {
+                    $("#cmpTable").append(
+                        "<tr><td>" +
+                            comparison[i][0] +
+                            "</td>" +
+                            "<td><code>" +
+                            comparison[i][1] +
+                            "</code></td>" +
+                            "<td><code>" +
+                            comparison[i][2] +
+                            "</code></td></tr>",
+                    );
+                }
+
+                // ---------- Tabs: click a button, fade in its panel ----------
+                $(".tab-btn").click(function () {
+                    $(".tab-btn").removeClass("active");
+                    $(this).addClass("active"); // $(this) is the clicked button
+                    $(".panel").hide();
+                    $("#" + $(this).attr("data-target")).fadeIn(400);
+                });
+
+                // Show the first panel when the page loads
+                $("#adv").show();
+
+                // ---------- Click a point to open or close its detail ----------
+                // The points are added by jQuery, so the handler uses on() with a selector
+                $(".list").on("click", ".point h3", function () {
+                    $(this).parent().toggleClass("open");
+                    $(this).next(".detail").slideToggle(300); // next() moves to the sibling
+                });
+
+                // ---------- Highlight a point on hover ----------
+                $(".list").on("mouseenter", ".point", function () {
+                    $(this).addClass("hovered");
+                });
+                $(".list").on("mouseleave", ".point", function () {
+                    $(this).removeClass("hovered");
+                });
+
+                // ---------- Open or close all points in the current panel ----------
+                $(".expand-all").click(function () {
+                    var panel = $(this).closest(".panel");
+                    var anyClosed = panel.find(".detail:hidden").length > 0;
+                    if (anyClosed) {
+                        panel.find(".detail").slideDown(300);
+                        panel.find(".point").addClass("open");
+                    } else {
+                        panel.find(".detail").slideUp(300);
+                        panel.find(".point").removeClass("open");
+                    }
+                });
+
+                // ---------- Highlight a table row on hover ----------
+                $("#cmpTable").on("mouseenter", "tr", function () {
+                    $(this).addClass("hl");
+                });
+                $("#cmpTable").on("mouseleave", "tr", function () {
+                    $(this).removeClass("hl");
+                });
+
+                // ---------- Live demo buttons ----------
+                $("#btnHide").click(function () {
+                    $("#magicBox").hide();
+                    $(this).text("show()");
+                    // second click shows it again
+                    $(this)
+                        .off("click")
+                        .click(function () {
+                            $("#magicBox").show();
+                            $(this).text("hide()");
+                            location.reload === undefined; // no effect, keeps the code short
+                        });
+                });
+
+                $("#btnFade").click(function () {
+                    $("#magicBox").fadeOut(600).fadeIn(600); // method chaining
+                });
+
+                $("#btnSlide").click(function () {
+                    $("#magicBox").slideToggle(500);
+                });
+            });
+        </script>
+    </body>
+</html>

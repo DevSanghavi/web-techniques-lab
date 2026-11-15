@@ -1,0 +1,2580 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Web Techniques Lab | Assignments 1 & 2</title>
+        <meta
+            name="description"
+            content="Live showcase of Web Techniques Assignment 1 and 2: HTML5, Bootstrap, JavaScript, DOM, jQuery and JSON programs. Run each program and read its source code."
+        />
+
+        <!-- ===================== CSS: "Aurora Midnight" theme ===================== -->
+        <style>
+            :root {
+                --bg: #080b16;
+                --bg2: #0f1426;
+                --surface: rgba(255, 255, 255, 0.05);
+                --surface2: rgba(255, 255, 255, 0.09);
+                --line: rgba(255, 255, 255, 0.11);
+                --text: #eef1ff;
+                --muted: #9aa3c7;
+                --glass: rgba(8, 11, 22, 0.72);
+                --a1: #7c5cff;
+                --a2: #22d3ee;
+                --a3: #ff6bcb;
+                --grad: linear-gradient(135deg, #7c5cff, #22d3ee);
+                --shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+                --hh: 64px;
+                --sw: 260px;
+            }
+            [data-theme="light"] {
+                --bg: #f3f5ff;
+                --bg2: #ffffff;
+                --surface: rgba(255, 255, 255, 0.85);
+                --surface2: #e9edff;
+                --line: rgba(30, 40, 90, 0.13);
+                --text: #141a35;
+                --muted: #5a6289;
+                --glass: rgba(243, 245, 255, 0.8);
+                --shadow: 0 12px 34px rgba(60, 70, 140, 0.18);
+            }
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+            html {
+                scroll-behavior: smooth;
+            }
+            body {
+                font-family:
+                    Inter,
+                    "Segoe UI",
+                    system-ui,
+                    -apple-system,
+                    Roboto,
+                    sans-serif;
+                background: var(--bg);
+                color: var(--text);
+                min-height: 100vh;
+                overflow-x: hidden;
+                line-height: 1.5;
+            }
+            body::before {
+                content: "";
+                position: fixed;
+                inset: 0;
+                z-index: -1;
+                background:
+                    radial-gradient(
+                        900px 500px at 8% -10%,
+                        rgba(124, 92, 255, 0.26),
+                        transparent 60%
+                    ),
+                    radial-gradient(
+                        800px 500px at 100% 0,
+                        rgba(34, 211, 238, 0.16),
+                        transparent 55%
+                    ),
+                    radial-gradient(
+                        700px 500px at 60% 110%,
+                        rgba(255, 107, 203, 0.13),
+                        transparent 60%
+                    );
+            }
+            a {
+                color: inherit;
+                text-decoration: none;
+            }
+            button {
+                font: inherit;
+                color: inherit;
+                cursor: pointer;
+                border: 0;
+                background: none;
+            }
+            .ic {
+                width: 22px;
+                height: 22px;
+                flex: none;
+            }
+            ::-webkit-scrollbar {
+                width: 10px;
+                height: 10px;
+            }
+            ::-webkit-scrollbar-thumb {
+                background: var(--line);
+                border-radius: 8px;
+            }
+
+            /* ---------- Top bar ---------- */
+            .topbar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: var(--hh);
+                z-index: 60;
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                padding: 0 16px;
+                background: var(--glass);
+                backdrop-filter: blur(16px);
+                -webkit-backdrop-filter: blur(16px);
+                border-bottom: 1px solid var(--line);
+            }
+            .icon-btn {
+                width: 42px;
+                height: 42px;
+                border-radius: 50%;
+                display: grid;
+                place-items: center;
+                transition: 0.2s;
+            }
+            .icon-btn:hover {
+                background: var(--surface2);
+            }
+            .brand {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-weight: 800;
+                font-size: 1.15rem;
+                letter-spacing: 0.2px;
+            }
+            .brand b {
+                background: var(--grad);
+                -webkit-background-clip: text;
+                background-clip: text;
+                color: transparent;
+            }
+            .logo {
+                width: 36px;
+                height: 36px;
+                border-radius: 11px;
+                background: var(--grad);
+                display: grid;
+                place-items: center;
+                color: #fff;
+                box-shadow: 0 6px 18px rgba(124, 92, 255, 0.5);
+            }
+            .search {
+                position: relative;
+                flex: 1;
+                max-width: 620px;
+                margin: 0 auto;
+                display: flex;
+                align-items: center;
+                background: var(--surface);
+                border: 1px solid var(--line);
+                border-radius: 999px;
+                padding: 0 14px;
+                height: 44px;
+                transition: 0.2s;
+            }
+            .search:focus-within {
+                border-color: var(--a1);
+                box-shadow: 0 0 0 4px rgba(124, 92, 255, 0.2);
+            }
+            .search input {
+                flex: 1;
+                min-width: 0;
+                background: none;
+                border: 0;
+                outline: 0;
+                color: var(--text);
+                font: inherit;
+                padding: 0 10px;
+                height: 100%;
+            }
+            .search input::placeholder {
+                color: var(--muted);
+            }
+            .search kbd {
+                font:
+                    12px Consolas,
+                    monospace;
+                border: 1px solid var(--line);
+                border-radius: 6px;
+                padding: 1px 7px;
+                color: var(--muted);
+            }
+            .sugg {
+                position: absolute;
+                top: 52px;
+                left: 0;
+                right: 0;
+                background: var(--bg2);
+                border: 1px solid var(--line);
+                border-radius: 16px;
+                box-shadow: var(--shadow);
+                padding: 6px;
+                display: none;
+                z-index: 70;
+            }
+            .sugg.on {
+                display: block;
+            }
+            .sugg a {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 9px 10px;
+                border-radius: 10px;
+            }
+            .sugg a:hover {
+                background: var(--surface2);
+            }
+            .sugg small {
+                display: block;
+                color: var(--muted);
+                font-size: 0.78rem;
+            }
+            .sugg .none {
+                padding: 12px;
+                color: var(--muted);
+            }
+            .sb {
+                font:
+                    700 0.68rem Consolas,
+                    monospace;
+                color: #fff;
+                border-radius: 8px;
+                padding: 6px 8px;
+                white-space: nowrap;
+            }
+
+            /* ---------- Sidebar ---------- */
+            .sidebar {
+                position: fixed;
+                top: var(--hh);
+                left: 0;
+                bottom: 0;
+                width: var(--sw);
+                z-index: 50;
+                overflow-y: auto;
+                padding: 14px 12px 30px;
+                background: var(--glass);
+                backdrop-filter: blur(16px);
+                -webkit-backdrop-filter: blur(16px);
+                border-right: 1px solid var(--line);
+                transform: translateX(-100%);
+                transition: transform 0.28s;
+            }
+            body:not(.watching):not(.collapsed) .sidebar {
+                transform: none;
+            }
+            body.sbopen .sidebar {
+                transform: none !important;
+            }
+            main {
+                margin-left: 0;
+                padding-top: var(--hh);
+                min-height: 100vh;
+                transition: margin 0.28s;
+            }
+            body:not(.watching):not(.collapsed) main {
+                margin-left: var(--sw);
+            }
+            @media (max-width: 960px) {
+                body:not(.watching):not(.collapsed) .sidebar {
+                    transform: translateX(-100%);
+                }
+                body:not(.watching):not(.collapsed) main {
+                    margin-left: 0;
+                }
+                .brand-t {
+                    display: none;
+                }
+            }
+            .scrim {
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.55);
+                z-index: 45;
+                display: none;
+            }
+            body.sbopen .scrim {
+                display: block;
+            }
+            @media (min-width: 961px) {
+                body:not(.watching).sbopen .scrim {
+                    display: none;
+                }
+            }
+            .nav-h {
+                font-size: 0.72rem;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: var(--muted);
+                padding: 16px 12px 6px;
+                font-weight: 700;
+            }
+            .nav {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                padding: 10px 12px;
+                border-radius: 12px;
+                font-size: 0.93rem;
+                transition: 0.2s;
+                position: relative;
+            }
+            .nav:hover {
+                background: var(--surface2);
+            }
+            .nav.on {
+                background: var(--surface2);
+                font-weight: 700;
+            }
+            .nav.on::before {
+                content: "";
+                position: absolute;
+                left: 0;
+                top: 9px;
+                bottom: 9px;
+                width: 3px;
+                border-radius: 3px;
+                background: var(--grad);
+            }
+            .nav small {
+                margin-left: auto;
+                color: var(--muted);
+                font-size: 0.78rem;
+            }
+            .dot {
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                margin: 0 6px;
+            }
+
+            /* ---------- Layout blocks ---------- */
+            .page {
+                padding: 22px 28px 40px;
+            }
+            @media (max-width: 600px) {
+                .page {
+                    padding: 16px;
+                }
+            }
+            .hero {
+                display: grid;
+                grid-template-columns: 1.3fr 1fr;
+                gap: 28px;
+                align-items: center;
+                padding: 42px;
+                border-radius: 30px;
+                margin-bottom: 26px;
+                position: relative;
+                overflow: hidden;
+                background: linear-gradient(
+                    135deg,
+                    rgba(124, 92, 255, 0.28),
+                    rgba(34, 211, 238, 0.14) 55%,
+                    rgba(255, 107, 203, 0.18)
+                );
+                border: 1px solid var(--line);
+            }
+            @media (max-width: 980px) {
+                .hero {
+                    grid-template-columns: 1fr;
+                    padding: 28px;
+                }
+                .hero-r {
+                    display: none;
+                }
+            }
+            .pill {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                background: var(--surface);
+                border: 1px solid var(--line);
+                border-radius: 999px;
+                padding: 6px 14px;
+                font-size: 0.82rem;
+                color: var(--muted);
+            }
+            .pill .ic {
+                width: 16px;
+                height: 16px;
+            }
+            .hero h1 {
+                font-size: clamp(1.9rem, 4vw, 3.1rem);
+                line-height: 1.12;
+                margin: 16px 0;
+                font-weight: 800;
+                letter-spacing: -0.5px;
+            }
+            .gt {
+                background: linear-gradient(90deg, #a78bfa, #22d3ee, #ff6bcb);
+                -webkit-background-clip: text;
+                background-clip: text;
+                color: transparent;
+            }
+            .hero p {
+                color: var(--muted);
+                max-width: 620px;
+                font-size: 1.02rem;
+            }
+            .hero p b {
+                color: var(--text);
+            }
+            .cta {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
+                margin: 22px 0;
+            }
+            .btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 11px 20px;
+                border-radius: 999px;
+                font-weight: 700;
+                border: 1px solid var(--line);
+                background: var(--surface);
+                transition: 0.2s;
+            }
+            .btn:hover {
+                transform: translateY(-2px);
+                background: var(--surface2);
+            }
+            .btn .ic {
+                width: 18px;
+                height: 18px;
+            }
+            .btn.primary {
+                background: var(--grad);
+                color: #fff;
+                border-color: transparent;
+                box-shadow: 0 8px 24px rgba(124, 92, 255, 0.45);
+            }
+            .stats {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 26px;
+                margin-top: 10px;
+            }
+            .stats div b {
+                display: block;
+                font-size: 1.9rem;
+                font-weight: 800;
+            }
+            .stats div span {
+                color: var(--muted);
+                font-size: 0.82rem;
+            }
+            .orbit {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 14px;
+            }
+            .tile {
+                aspect-ratio: 1;
+                border-radius: 22px;
+                display: grid;
+                place-items: center;
+                font-weight: 800;
+                font-size: 0.95rem;
+                color: #fff;
+                box-shadow: var(--shadow);
+                animation: float 5s ease-in-out infinite;
+            }
+            .tile:nth-child(2n) {
+                animation-delay: -1.6s;
+            }
+            .tile:nth-child(3n) {
+                animation-delay: -3.1s;
+            }
+            @keyframes float {
+                50% {
+                    transform: translateY(-12px) rotate(2deg);
+                }
+            }
+            .how {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+                gap: 14px;
+                margin-bottom: 26px;
+            }
+            .how div {
+                background: var(--surface);
+                border: 1px solid var(--line);
+                border-radius: 20px;
+                padding: 18px;
+            }
+            .how .ic {
+                width: 26px;
+                height: 26px;
+                color: var(--a2);
+                margin-bottom: 8px;
+            }
+            .how h4 {
+                margin-bottom: 4px;
+            }
+            .how p {
+                color: var(--muted);
+                font-size: 0.88rem;
+            }
+
+            .asgcards {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 16px;
+                margin-bottom: 26px;
+            }
+            .asgcard {
+                display: block;
+                border-radius: 22px;
+                padding: 22px;
+                border: 1px solid var(--line);
+                background: var(--surface);
+                transition: 0.25s;
+                position: relative;
+                overflow: hidden;
+            }
+            .asgcard:hover {
+                transform: translateY(-4px);
+                border-color: var(--a1);
+            }
+            .asgcard::after {
+                content: "";
+                position: absolute;
+                right: -40px;
+                top: -40px;
+                width: 150px;
+                height: 150px;
+                border-radius: 50%;
+                background: var(--grad);
+                opacity: 0.18;
+            }
+            .asgcard small {
+                color: var(--a2);
+                font-weight: 700;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                font-size: 0.72rem;
+            }
+            .asgcard h3 {
+                font-size: 1.25rem;
+                margin: 6px 0 10px;
+            }
+            .asgcard ul {
+                list-style: none;
+                display: grid;
+                gap: 6px;
+                color: var(--muted);
+                font-size: 0.88rem;
+            }
+            .asgcard li b {
+                color: var(--text);
+            }
+
+            .chips {
+                display: flex;
+                gap: 10px;
+                overflow-x: auto;
+                padding: 4px 0 18px;
+                position: sticky;
+                top: var(--hh);
+                z-index: 20;
+                background: linear-gradient(var(--bg) 70%, transparent);
+            }
+            .chip {
+                white-space: nowrap;
+                padding: 8px 16px;
+                border-radius: 10px;
+                background: var(--surface2);
+                font-size: 0.88rem;
+                font-weight: 600;
+                transition: 0.2s;
+                border: 1px solid transparent;
+            }
+            .chip:hover {
+                border-color: var(--a1);
+            }
+            .chip.on {
+                background: var(--text);
+                color: var(--bg);
+            }
+            .block {
+                margin-bottom: 34px;
+            }
+            .bh {
+                display: flex;
+                align-items: baseline;
+                gap: 12px;
+                margin-bottom: 14px;
+                flex-wrap: wrap;
+            }
+            .bh h2 {
+                font-size: 1.3rem;
+            }
+            .bh span {
+                color: var(--muted);
+                font-size: 0.88rem;
+            }
+            .bh a {
+                margin-left: auto;
+                color: var(--a2);
+                font-weight: 600;
+                font-size: 0.88rem;
+            }
+            .grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+                gap: 22px 18px;
+            }
+
+            /* ---------- Cards ---------- */
+            .card {
+                position: relative;
+                transition: transform 0.25s;
+            }
+            .card:hover {
+                transform: translateY(-5px);
+            }
+            .thumb {
+                display: block;
+                position: relative;
+                aspect-ratio: 16/9;
+                border-radius: 16px;
+                overflow: hidden;
+                background: var(--g);
+                border: 1px solid var(--line);
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+                isolation: isolate;
+            }
+            .thumb::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                z-index: 2;
+                background: linear-gradient(
+                    transparent 55%,
+                    rgba(0, 0, 0, 0.4)
+                );
+            }
+            .thumb iframe {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 1280px;
+                height: 720px;
+                border: 0;
+                transform-origin: 0 0;
+                transform: scale(var(--s, 0.3));
+                pointer-events: none;
+                background: #fff;
+                opacity: 0;
+                transition: opacity 0.5s;
+                z-index: 1;
+            }
+            .thumb.ready iframe {
+                opacity: 1;
+            }
+            .thumb .shim {
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(
+                    100deg,
+                    transparent 30%,
+                    rgba(255, 255, 255, 0.22) 50%,
+                    transparent 70%
+                );
+                background-size: 200% 100%;
+                animation: shim 1.4s infinite;
+            }
+            .thumb.ready .shim {
+                display: none;
+            }
+            @keyframes shim {
+                from {
+                    background-position: 200% 0;
+                }
+                to {
+                    background-position: -200% 0;
+                }
+            }
+            .badge,
+            .marks {
+                position: absolute;
+                z-index: 3;
+                bottom: 8px;
+                font:
+                    700 0.72rem Consolas,
+                    monospace;
+                padding: 3px 8px;
+                border-radius: 7px;
+                background: rgba(0, 0, 0, 0.78);
+                color: #fff;
+            }
+            .badge {
+                right: 8px;
+            }
+            .marks {
+                left: 8px;
+                background: var(--grad);
+            }
+            .qno {
+                position: absolute;
+                z-index: 3;
+                top: 8px;
+                left: 8px;
+                font:
+                    700 0.72rem Consolas,
+                    monospace;
+                padding: 3px 8px;
+                border-radius: 7px;
+                background: rgba(0, 0, 0, 0.78);
+                color: #fff;
+            }
+            .play {
+                position: absolute;
+                z-index: 3;
+                inset: 0;
+                display: grid;
+                place-items: center;
+                opacity: 0;
+                transition: 0.25s;
+            }
+            .play span {
+                width: 54px;
+                height: 54px;
+                border-radius: 50%;
+                background: rgba(0, 0, 0, 0.65);
+                display: grid;
+                place-items: center;
+                color: #fff;
+                backdrop-filter: blur(4px);
+            }
+            .card:hover .play {
+                opacity: 1;
+            }
+            .txtthumb {
+                position: absolute;
+                inset: 0;
+                z-index: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 9px;
+                justify-content: center;
+                padding: 18px 24px;
+            }
+            .txtthumb b {
+                color: #fff;
+                font-size: 1.05rem;
+                margin-bottom: 4px;
+            }
+            .txtthumb i {
+                height: 7px;
+                border-radius: 5px;
+                background: rgba(255, 255, 255, 0.55);
+            }
+            .txtthumb i:nth-child(3) {
+                width: 80%;
+            }
+            .txtthumb i:nth-child(4) {
+                width: 60%;
+            }
+            .txtthumb i:nth-child(5) {
+                width: 70%;
+            }
+            .meta {
+                display: flex;
+                gap: 12px;
+                padding: 12px 4px 0;
+                align-items: flex-start;
+            }
+            .avatar {
+                width: 38px;
+                height: 38px;
+                border-radius: 50%;
+                background: var(--g);
+                display: grid;
+                place-items: center;
+                font:
+                    800 0.68rem Consolas,
+                    monospace;
+                color: #fff;
+                flex: none;
+            }
+            .meta h3 {
+                font-size: 0.98rem;
+                line-height: 1.3;
+                font-weight: 700;
+            }
+            .meta h3 a:hover {
+                color: var(--a2);
+            }
+            .meta p {
+                color: var(--muted);
+                font-size: 0.8rem;
+                margin-top: 2px;
+            }
+            .tagrow {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                margin-top: 6px;
+            }
+            .tagrow span {
+                font-size: 0.68rem;
+                padding: 2px 8px;
+                border-radius: 6px;
+                background: var(--surface2);
+                color: var(--muted);
+            }
+            .fav {
+                margin-left: auto;
+                width: 34px;
+                height: 34px;
+                border-radius: 50%;
+                display: grid;
+                place-items: center;
+                color: var(--muted);
+                flex: none;
+                transition: 0.2s;
+            }
+            .fav:hover {
+                background: var(--surface2);
+                color: var(--a3);
+            }
+            .fav .ic {
+                width: 19px;
+                height: 19px;
+            }
+            .fav.on {
+                color: var(--a3);
+            }
+            .fav.on .ic {
+                fill: currentColor;
+            }
+            .empty {
+                text-align: center;
+                padding: 70px 20px;
+                color: var(--muted);
+                background: var(--surface);
+                border: 1px dashed var(--line);
+                border-radius: 22px;
+            }
+            .empty .ic {
+                width: 44px;
+                height: 44px;
+                margin-bottom: 10px;
+                color: var(--a1);
+            }
+
+            /* ---------- Watch page ---------- */
+            .watch {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) 370px;
+                gap: 26px;
+                padding: 20px 28px 40px;
+            }
+            @media (max-width: 1150px) {
+                .watch {
+                    grid-template-columns: 1fr;
+                }
+            }
+            @media (max-width: 600px) {
+                .watch {
+                    padding: 12px;
+                }
+            }
+            .devbar {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 12px;
+                flex-wrap: wrap;
+            }
+            .devbar .seg {
+                display: flex;
+                background: var(--surface);
+                border: 1px solid var(--line);
+                border-radius: 12px;
+                padding: 4px;
+            }
+            .devbar .seg button {
+                padding: 7px 12px;
+                border-radius: 9px;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 0.85rem;
+                color: var(--muted);
+            }
+            .devbar .seg button.on {
+                background: var(--grad);
+                color: #fff;
+            }
+            .devbar .seg .ic {
+                width: 17px;
+                height: 17px;
+            }
+            .devbar .sp {
+                flex: 1;
+            }
+            .frame {
+                margin: 0 auto;
+                width: 100%;
+                max-width: 100%;
+                transition: width 0.4s;
+                border-radius: 18px;
+                overflow: hidden;
+                border: 1px solid var(--line);
+                background: var(--bg2);
+                box-shadow: var(--shadow);
+            }
+            .chrome {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 10px 14px;
+                background: var(--bg2);
+                border-bottom: 1px solid var(--line);
+            }
+            .chrome i {
+                width: 11px;
+                height: 11px;
+                border-radius: 50%;
+                background: #ff5f57;
+            }
+            .chrome i:nth-child(2) {
+                background: #febc2e;
+            }
+            .chrome i:nth-child(3) {
+                background: #28c840;
+            }
+            .chrome .url {
+                flex: 1;
+                margin: 0 8px;
+                background: var(--surface);
+                border: 1px solid var(--line);
+                border-radius: 999px;
+                padding: 4px 14px;
+                font:
+                    0.78rem Consolas,
+                    monospace;
+                color: var(--muted);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .chrome button {
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                display: grid;
+                place-items: center;
+                color: var(--muted);
+            }
+            .chrome button:hover {
+                background: var(--surface2);
+                color: var(--text);
+            }
+            .chrome .ic {
+                width: 16px;
+                height: 16px;
+            }
+            .screen {
+                position: relative;
+                height: min(72vh, 720px);
+                min-height: 420px;
+                background: #fff;
+            }
+            .frame:fullscreen .screen {
+                height: calc(100vh - 50px);
+            }
+            .screen iframe {
+                position: absolute;
+                inset: 0;
+                width: 100%;
+                height: 100%;
+                border: 0;
+                background: #fff;
+            }
+            .skel {
+                position: absolute;
+                inset: 0;
+                z-index: 2;
+                display: grid;
+                place-items: center;
+                background: var(--bg2);
+                color: var(--muted);
+            }
+            .spin {
+                width: 38px;
+                height: 38px;
+                border-radius: 50%;
+                border: 4px solid var(--line);
+                border-top-color: var(--a1);
+                animation: spin 0.8s linear infinite;
+                margin: 0 auto 10px;
+            }
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+            .wtitle {
+                font-size: 1.5rem;
+                font-weight: 800;
+                margin: 18px 0 10px;
+                line-height: 1.25;
+            }
+            .wq {
+                color: var(--a2);
+                font-size: 0.82rem;
+                font-weight: 700;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                margin-top: 18px;
+            }
+            .actions {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                align-items: center;
+            }
+            .act {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 9px 16px;
+                border-radius: 999px;
+                background: var(--surface2);
+                font-size: 0.88rem;
+                font-weight: 600;
+                transition: 0.2s;
+            }
+            .act:hover {
+                background: var(--a1);
+                color: #fff;
+            }
+            .act .ic {
+                width: 18px;
+                height: 18px;
+            }
+            .act.on {
+                color: var(--a3);
+            }
+            .act.on .ic {
+                fill: currentColor;
+            }
+            .tabs {
+                display: flex;
+                gap: 6px;
+                margin: 22px 0 14px;
+                border-bottom: 1px solid var(--line);
+            }
+            .tabs button {
+                padding: 10px 18px;
+                font-weight: 700;
+                color: var(--muted);
+                border-bottom: 3px solid transparent;
+                margin-bottom: -1px;
+            }
+            .tabs button.on {
+                color: var(--text);
+                border-color: var(--a1);
+            }
+            .about {
+                background: var(--surface);
+                border: 1px solid var(--line);
+                border-radius: 18px;
+                padding: 20px;
+            }
+            .about h4 {
+                margin: 16px 0 8px;
+            }
+            .about h4:first-child {
+                margin-top: 0;
+            }
+            .about p {
+                color: var(--muted);
+            }
+            .about ul {
+                list-style: none;
+                display: grid;
+                gap: 8px;
+            }
+            .about li {
+                display: flex;
+                gap: 10px;
+                color: var(--text);
+            }
+            .about li::before {
+                content: "";
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: var(--grad);
+                margin-top: 8px;
+                flex: none;
+            }
+            .qbox {
+                background: var(--surface2);
+                border-left: 4px solid var(--a1);
+                border-radius: 10px;
+                padding: 10px 14px;
+                color: var(--text) !important;
+                font-style: italic;
+            }
+            .tip {
+                background: var(--surface2);
+                border-left: 4px solid var(--a2);
+                border-radius: 10px;
+                padding: 10px 14px;
+                color: var(--text) !important;
+            }
+            .path {
+                font:
+                    0.82rem Consolas,
+                    monospace;
+                background: var(--surface2);
+                padding: 8px 12px;
+                border-radius: 10px;
+                display: inline-block;
+                margin-top: 6px;
+                word-break: break-all;
+            }
+            .codebar {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 10px;
+                color: var(--muted);
+                font-size: 0.85rem;
+            }
+            .codebar .act {
+                margin-left: auto;
+            }
+            .code {
+                background: #0a0f20;
+                color: #dbe4ff;
+                border-radius: 16px;
+                padding: 14px 0;
+                overflow: auto;
+                max-height: 72vh;
+                font:
+                    13px/1.65 Consolas,
+                    "Fira Code",
+                    monospace;
+                counter-reset: ln;
+                border: 1px solid var(--line);
+            }
+            .code .l {
+                display: block;
+                white-space: pre;
+                padding-right: 18px;
+                counter-increment: ln;
+            }
+            .code .l::before {
+                content: counter(ln);
+                display: inline-block;
+                width: 52px;
+                padding-right: 16px;
+                text-align: right;
+                color: #56628f;
+                user-select: none;
+            }
+            .code .msg {
+                padding: 20px;
+                color: #ffd58a;
+                white-space: normal;
+                font-family: inherit;
+            }
+            .upnext h4 {
+                margin-bottom: 12px;
+                font-size: 1.05rem;
+            }
+            .up {
+                display: flex;
+                gap: 12px;
+                padding: 8px;
+                border-radius: 14px;
+                transition: 0.2s;
+                margin-bottom: 4px;
+            }
+            .up:hover {
+                background: var(--surface2);
+            }
+            .up .mini {
+                width: 132px;
+                aspect-ratio: 16/9;
+                border-radius: 10px;
+                background: var(--g);
+                display: grid;
+                place-items: center;
+                font:
+                    700 0.72rem Consolas,
+                    monospace;
+                color: #fff;
+                flex: none;
+                position: relative;
+            }
+            .up h5 {
+                font-size: 0.88rem;
+                line-height: 1.3;
+            }
+            .up p {
+                color: var(--muted);
+                font-size: 0.76rem;
+                margin-top: 3px;
+            }
+            .foot {
+                margin-top: 40px;
+                padding-top: 22px;
+                border-top: 1px solid var(--line);
+                text-align: center;
+                color: var(--muted);
+                font-size: 0.85rem;
+            }
+            .toast {
+                position: fixed;
+                left: 50%;
+                bottom: 28px;
+                transform: translate(-50%, 30px);
+                background: var(--text);
+                color: var(--bg);
+                padding: 11px 20px;
+                border-radius: 12px;
+                font-weight: 600;
+                opacity: 0;
+                pointer-events: none;
+                transition: 0.3s;
+                z-index: 100;
+            }
+            .toast.on {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+            noscript {
+                display: block;
+                padding: 90px 20px;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <noscript>Please enable JavaScript to use this showcase.</noscript>
+
+        <!-- ===================== TOP BAR ===================== -->
+        <header class="topbar">
+            <button
+                class="icon-btn"
+                id="menuBtn"
+                aria-label="Open menu"
+                data-ic="menu"
+            ></button>
+            <a class="brand" href="#/"
+                ><span class="logo" data-ic="code"></span
+                ><span class="brand-t">WebTech<b>Lab</b></span></a
+            >
+            <div class="search" id="searchBox">
+                <span data-ic="search"></span>
+                <input
+                    id="q"
+                    type="search"
+                    placeholder="Search programs: carousel, regex, JSON, jQuery..."
+                    autocomplete="off"
+                    aria-label="Search"
+                />
+                <kbd>/</kbd>
+                <div class="sugg" id="sugg"></div>
+            </div>
+            <a
+                class="icon-btn"
+                href="#/fav"
+                title="Favorites"
+                data-ic="heart"
+            ></a>
+            <button
+                class="icon-btn"
+                id="themeBtn"
+                aria-label="Toggle theme"
+            ></button>
+        </header>
+
+        <div class="scrim" id="scrim"></div>
+        <aside class="sidebar" id="sidebar"></aside>
+        <main id="view"></main>
+        <div class="toast" id="toast"></div>
+
+        <!-- ===================== JAVASCRIPT ===================== -->
+        <script>
+            /* ---------- EDIT THIS: your details ---------- */
+            const CONFIG = {
+                site: "Web Techniques Lab",
+                course: "F.Y. M.Sc. (IT) | Web Techniques | 2417MJCT101",
+                college:
+                    "MAEER's MIT Arts, Commerce and Science College, Alandi (D), Pune",
+                author: "Dev P. Sanghavi",
+            };
+
+            /* ---------- Icons (inline SVG) ---------- */
+            const ICONS = {
+                menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
+                search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
+                home: '<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+                heart: '<path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z"/>',
+                clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+                doc: '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
+                sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5"/>',
+                moon: '<path d="M21 13A9 9 0 1 1 11 3a7 7 0 0 0 10 10z"/>',
+                ext: '<path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6"/>',
+                copy: '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/>',
+                code: '<path d="M8 8l-5 4 5 4M16 8l5 4-5 4M14 5l-4 14"/>',
+                prev: '<path d="M15 5l-7 7 7 7"/>',
+                next: '<path d="M9 5l7 7-7 7"/>',
+                laptop: '<rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2 20h20"/>',
+                tablet: '<rect x="6" y="3" width="12" height="18" rx="2"/><path d="M11 18h2"/>',
+                phone: '<rect x="8" y="3" width="8" height="18" rx="2"/><path d="M11 18h2"/>',
+                full: '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
+                reload: '<path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/>',
+                play: '<path d="M8 5v14l11-7z" fill="currentColor" stroke="none"/>',
+                layers: '<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/>',
+                eye: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+            };
+            const ic = (n, c = "") =>
+                `<svg class="ic ${c}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]}</svg>`;
+
+            /* ---------- Data: assignments (from the question papers) ---------- */
+            const ASG = {
+                1: { title: "HTML5, Bootstrap and JavaScript", max: 25 },
+                2: { title: "DOM, jQuery and JSON", max: 25 },
+            };
+
+            /* ---------- Data: sections (Q1, Q2, Q3 of each assignment) ---------- */
+            const SEC = {
+                a1q1: {
+                    asg: 1,
+                    q: 1,
+                    folder: "Assignment-1-HTML-files",
+                    title: "HTML5 and Bootstrap",
+                    short: "HTML5 & Bootstrap",
+                    unit: "Unit 1",
+                    total: 12,
+                    u: "U1",
+                    c: "#7c5cff",
+                    g: "linear-gradient(135deg,#7c5cff,#22d3ee)",
+                },
+                a1q2: {
+                    asg: 1,
+                    q: 2,
+                    folder: "Assignment-1-HTML-files",
+                    title: "JavaScript",
+                    short: "JavaScript",
+                    unit: "Unit 2",
+                    total: 13,
+                    u: "U2",
+                    c: "#f59e0b",
+                    g: "linear-gradient(135deg,#f59e0b,#ef4444)",
+                },
+                a2q1: {
+                    asg: 2,
+                    q: 1,
+                    folder: "Assignment-2-HTML-files",
+                    title: "Document Object Model (DOM)",
+                    short: "DOM",
+                    unit: "Unit 3",
+                    total: 10,
+                    u: "U3",
+                    c: "#10b981",
+                    g: "linear-gradient(135deg,#10b981,#3b82f6)",
+                },
+                a2q2: {
+                    asg: 2,
+                    q: 2,
+                    folder: "Assignment-2-HTML-files",
+                    title: "jQuery",
+                    short: "jQuery",
+                    unit: "Unit 4",
+                    total: 8,
+                    u: "U4",
+                    c: "#ec4899",
+                    g: "linear-gradient(135deg,#ec4899,#8b5cf6)",
+                },
+                a2q3: {
+                    asg: 2,
+                    q: 3,
+                    folder: "Assignment-2-HTML-files",
+                    title: "JSON",
+                    short: "JSON",
+                    unit: "Unit 5",
+                    total: 7,
+                    u: "U5",
+                    c: "#06b6d4",
+                    g: "linear-gradient(135deg,#06b6d4,#22c55e)",
+                },
+            };
+            const NOTESEC = {
+                short: "Written answers",
+                u: "TXT",
+                g: "linear-gradient(135deg,#64748b,#334155)",
+                c: "#64748b",
+            };
+
+            /* ---------- Data: programs [title, exact question, what it shows, tags, marks, page theme, good-to-know note] ---------- */
+            const JQ_NOTE =
+                "jQuery is loaded from js/jquery-4.0.0.min.js and falls back to the official CDN if that file is missing, so keep the js folder in the project.";
+            const RAW = {
+                a1q1: [
+                    [
+                        "Semantic Elements with div and span",
+                        "Create a webpage using HTML5 semantic elements and demonstrate grouping using div and span.",
+                        [
+                            "header, nav, main, section, article and footer",
+                            "div groups block-level content (course overview card)",
+                            "span groups inline text (highlight and badge styles)",
+                        ],
+                        ["HTML5"],
+                        2,
+                        "Plain white page with grey borders",
+                        "",
+                    ],
+                    [
+                        "Images, alt Text, srcset and picture",
+                        "Add images with appropriate alt text and demonstrate responsive images using srcset and picture.",
+                        [
+                            "img with src and descriptive alt text",
+                            "srcset with width descriptors and the sizes attribute",
+                            "picture with source media queries and an img fallback",
+                        ],
+                        ["HTML5"],
+                        2,
+                        "Plain white page with bordered boxes",
+                        "The images come from picsum.photos, so an internet connection is needed.",
+                    ],
+                    [
+                        "Table with thead, tbody, tfoot, rowspan and colspan",
+                        "Create a table using thead, tbody, tfoot, rowspan and colspan.",
+                        [
+                            "thead, tbody and tfoot row groups",
+                            "rowspan merges cells downward (Roll No, Name, Grade)",
+                            "colspan merges cells sideways (Marks Obtained, footer)",
+                        ],
+                        ["HTML5"],
+                        2,
+                        "Plain page with a blue header row",
+                        "",
+                    ],
+                    [
+                        "HTML Form with Submission and File Upload",
+                        "Design an HTML form with submission and file upload functionality.",
+                        [
+                            "form with POST method and multipart/form-data encoding",
+                            "Text and email inputs with required",
+                            "File input with accept, and a second one with multiple",
+                        ],
+                        ["HTML5"],
+                        2,
+                        "Light grey card with a green submit button",
+                        "There is no server script behind this form, so pressing Submit opens a 404 page. The form markup is what is being demonstrated.",
+                    ],
+                    [
+                        "Bootstrap Grid, Themes and Carousel",
+                        "Implement Bootstrap grid, themes and a carousel.",
+                        [
+                            "12-column grid rows: 8+4, 6+6 and 4+4+4",
+                            "Contextual colours (bg-primary, bg-success, bg-warning) in responsive cards",
+                            "Carousel with indicators, captions, controls and auto-play",
+                            "Light and dark theme toggle using data-bs-theme",
+                        ],
+                        ["Bootstrap", "JavaScript"],
+                        2,
+                        "Blue and dark gradient (Bootstrap 5.3.3)",
+                        "Needs an internet connection for Bootstrap and the picsum.photos images.",
+                    ],
+                    [
+                        "Bootstrap Horizontal Form Layout",
+                        "Demonstrate one Bootstrap form layout: vertical, horizontal or inline.",
+                        [
+                            "Horizontal layout: row with col-sm-3 label and col-sm-9 input",
+                            "col-form-label and offset-sm-3 alignment",
+                            "Regex validation with is-valid and is-invalid, and a show/hide password button",
+                        ],
+                        ["Bootstrap", "JavaScript"],
+                        1,
+                        "Teal and sand (Bootstrap 5.3.3)",
+                        "Needs an internet connection for Bootstrap.",
+                    ],
+                    [
+                        "iframe and the target Attribute",
+                        "Use iframe and demonstrate its target attribute.",
+                        [
+                            'iframe with name="contentFrame" inside a 16:9 ratio box',
+                            'Links and a search form using target="contentFrame"',
+                            "Table of target values: _self, _blank, _parent, _top",
+                        ],
+                        ["HTML5", "Bootstrap"],
+                        1,
+                        "Navy and amber (Bootstrap 5.3.3)",
+                        "Needs an internet connection. Some websites refuse to open inside a frame, so a blank frame means that site blocks embedding.",
+                    ],
+                ],
+                a1q2: [
+                    [
+                        "Data Types, Keywords and Operators",
+                        "Demonstrate JavaScript data types, keywords and operators.",
+                        [
+                            "Keyword categories listed from an object with for...in",
+                            "7 primitive and 3 reference types checked with typeof",
+                            "Arithmetic, assignment, comparison, logical, bitwise, ternary and type operators",
+                        ],
+                        ["JavaScript"],
+                        2,
+                        "Dark terminal (green and magenta)",
+                        "",
+                    ],
+                    [
+                        "Conditional Statements and Loops",
+                        "Implement conditional statements and loops.",
+                        [
+                            "if / else if / else and switch, plus the ternary operator",
+                            "for, while and do...while loops",
+                            "for...in, for...of, break and continue",
+                        ],
+                        ["JavaScript"],
+                        2,
+                        "Sunset Plum (plum, coral and cream)",
+                        "",
+                    ],
+                    [
+                        "Functions, Parameters, Return and Variable Scope",
+                        "Create functions using parameters and return values. Demonstrate local and global variables.",
+                        [
+                            "Parameters, arguments, default parameters and return",
+                            "Function expression and arrow function",
+                            "Global variable changed inside a function, local variable error and shadowing",
+                        ],
+                        ["JavaScript"],
+                        2,
+                        "Lemon and Charcoal",
+                        "",
+                    ],
+                    [
+                        "Arrays and Array Access Methods",
+                        "Create and manipulate arrays using array access methods.",
+                        [
+                            "Array literal, constructor and index access",
+                            "push, pop, unshift, shift, indexOf and includes",
+                            "splice versus slice, forEach, map, filter, reduce, sort, reverse and join",
+                        ],
+                        ["JavaScript"],
+                        2,
+                        "Newspaper Ink (ivory, black and crimson)",
+                        "",
+                    ],
+                    [
+                        "JavaScript Objects and Properties",
+                        "Create JavaScript objects and access their properties.",
+                        [
+                            "Object literal, new Object(), constructor function and ES6 class",
+                            "Dot, bracket and dynamic-key access, nested objects",
+                            "Methods with this, add, modify and delete properties, the in operator",
+                        ],
+                        ["JavaScript"],
+                        2,
+                        "Blueprint (blue paper with a grid)",
+                        "",
+                    ],
+                    [
+                        "Regular Expressions for Input Validation",
+                        "Implement regular expressions for validating user input, including suitable patterns and modifiers.",
+                        [
+                            "Live validation of name, username, email, mobile and PIN code",
+                            "RegExp literal and constructor, with the g, i and m modifiers",
+                            "test(), exec() with groups, search(), replace() and split()",
+                        ],
+                        ["JavaScript"],
+                        3,
+                        "Pastel Candy (lavender, pink and mint)",
+                        "",
+                    ],
+                ],
+                a2q1: [
+                    [
+                        "DOM Access and Manipulation Methods",
+                        "Explain DOM and demonstrate DOM access and manipulation methods.",
+                        [
+                            "getElementById, getElementsByTagName, getElementsByClassName, querySelector and querySelectorAll",
+                            "Tree navigation: parentNode, siblings, children and childNodes",
+                            "innerHTML versus textContent, style, classList and attributes",
+                            "createElement, appendChild, insertBefore, replaceChild, remove and removeChild, with a live DOM tree",
+                        ],
+                        ["DOM", "JavaScript"],
+                        2,
+                        "Woodland (forest green, bark and orange)",
+                        "",
+                    ],
+                    [
+                        "Event Listeners and Event Flow",
+                        "Implement event listeners and demonstrate event flow.",
+                        [
+                            "Nested boxes showing capture, target and bubble phases",
+                            "stopPropagation, preventDefault and the event object",
+                            "addEventListener versus onclick, removeEventListener and once",
+                            "Event delegation on a list",
+                        ],
+                        ["DOM", "JavaScript"],
+                        2,
+                        "Arcade (black, gold and red)",
+                        "",
+                    ],
+                    [
+                        "Event Bubbling and Capturing",
+                        "Demonstrate event bubbling and capturing.",
+                        [
+                            "Capturing only, bubbling only, or both",
+                            "Choose where stopPropagation() stops the event",
+                            "Animated path of the event through the stations",
+                            "focus does not bubble, but focusin does",
+                        ],
+                        ["DOM", "JavaScript"],
+                        2,
+                        "Metro Line (transit-map colours)",
+                        "",
+                    ],
+                    [
+                        "DOM Events: onclick, onload, onmouseover, onmouseout, onmouseup, onmousedown",
+                        "Implement any four DOM events from the syllabus: onclick, onload, onmouseover, onmouseout, onmouseup and onmousedown.",
+                        [
+                            "All six events are implemented, which is more than the four required",
+                            "Event zone with a counter card and a time stamp for each event",
+                            "Image onload and window.onload",
+                            "A log that shows the order of the events",
+                        ],
+                        ["DOM", "JavaScript"],
+                        2,
+                        "Terracotta Pottery (clay and sage green)",
+                        "",
+                    ],
+                    [
+                        "Form Processing and Validation",
+                        "Implement form processing, accessing form data and form validation.",
+                        [
+                            "Form built with the DOM: text, number, password, select, radio and checkboxes",
+                            "Regex validation, confirm password and live checks using event delegation",
+                            "Form data read in several ways (forms[], getElementById, elements[], querySelector)",
+                            "Result shown in a table and saved to a records list",
+                        ],
+                        ["DOM", "JavaScript"],
+                        1,
+                        "Ruled Notebook (cream paper and blue ink)",
+                        "",
+                    ],
+                    [
+                        "alert(), confirm() and prompt()",
+                        "Demonstrate alert(), confirm() and prompt() popup boxes.",
+                        [
+                            "Return values: undefined, true or false, and a string or null",
+                            "The script pauses until the popup is closed",
+                            "Practical task list that uses all three popups",
+                        ],
+                        ["DOM", "JavaScript"],
+                        1,
+                        "Retro Desktop (teal desktop and grey windows)",
+                        "Popup boxes pause the page. Use the buttons inside the player to open them.",
+                    ],
+                ],
+                a2q2: [
+                    [
+                        "jQuery Introduction, Installation and Syntax",
+                        "Explain jQuery and demonstrate its installation and syntax.",
+                        [
+                            "Installation from a local file with a CDN fallback, and a version check",
+                            "$(selector).action() syntax and both forms of the ready event",
+                            "Selectors, get and set content, css and classes",
+                            "Effects, animate(), method chaining, traversal, each(), on(), off() and trigger()",
+                        ],
+                        ["jQuery"],
+                        1,
+                        "Swiss Poster (off-white, black and signal red)",
+                        JQ_NOTE,
+                    ],
+                    [
+                        "jQuery Selectors: *, element, #id, .class",
+                        "Implement *, element, #id and .class selectors.",
+                        [
+                            "Universal *, element, #id and .class selectors, each highlighted in its own colour",
+                            "Counters and a table of every matched element",
+                            "Try your own selector box",
+                        ],
+                        ["jQuery"],
+                        2,
+                        "Cork Board (cork, sticky notes and pins)",
+                        JQ_NOTE,
+                    ],
+                    [
+                        "jQuery Event Methods",
+                        "Demonstrate any four jQuery event methods from the syllabus, including blur(), change(), click(), dblclick(), die() and error().",
+                        [
+                            "click(), dblclick(), blur(), focus() and change()",
+                            "die() replaced by off(), and live() replaced by delegated on()",
+                            'error() replaced by .on("error") with an image that fails to load',
+                            "Table that checks which methods exist in this jQuery version",
+                        ],
+                        ["jQuery"],
+                        2,
+                        "Galaxy (deep indigo, violet and lime)",
+                        JQ_NOTE,
+                    ],
+                    [
+                        "DOM Manipulation with jQuery",
+                        "Demonstrate DOM manipulation using jQuery methods.",
+                        [
+                            "text(), html(), val(), attr(), prop() and data()",
+                            "css(), addClass(), removeClass() and toggleClass()",
+                            "append, prepend, before, after, wrap, replaceWith and clone",
+                            "remove(), empty(), detach(), each() and map(), with a live HTML view",
+                        ],
+                        ["jQuery"],
+                        2,
+                        "Chalkboard (green board, wooden frame and chalk)",
+                        JQ_NOTE,
+                    ],
+                    [
+                        "Advantages and Disadvantages of jQuery",
+                        "Explain advantages and disadvantages of jQuery.",
+                        [
+                            "Advantages and disadvantages built with jQuery",
+                            "Tabs, accordion points and live demo buttons",
+                            "jQuery compared with plain JavaScript",
+                        ],
+                        ["jQuery"],
+                        1,
+                        "Plum and Peach",
+                        "This page loads jQuery 3.7.1 from the CDN, so an internet connection is needed.",
+                    ],
+                ],
+                a2q3: [
+                    [
+                        "JSON and Its Characteristics",
+                        "Explain JSON and its characteristics.",
+                        [
+                            "Facts, characteristics and value types loaded from a JSON string",
+                            "Clickable characteristic cards",
+                            "Live editor: validate, pretty print, minify and read values",
+                            "JSON compared with XML",
+                        ],
+                        ["JSON"],
+                        1,
+                        "Crimson, ivory and gold",
+                        "",
+                    ],
+                    [
+                        "JSON Dataset with 15 Records",
+                        "Create a JSON dataset containing at least 15 records relevant to your application.",
+                        [
+                            "15 student objects inside one JSON document",
+                            "Nested objects, arrays, null and boolean values",
+                            "Summary and table generated from the data",
+                        ],
+                        ["JSON"],
+                        2,
+                        "Brown, orange and cream",
+                        "",
+                    ],
+                    [
+                        "JSON Objects, Arrays, Values and Syntax Rules",
+                        "Demonstrate JSON objects, arrays, values and syntax rules.",
+                        [
+                            "Objects, arrays and all six value types",
+                            "Every value listed with its path and type",
+                            "Eight syntax rules tested live with JSON.parse",
+                        ],
+                        ["JSON"],
+                        1,
+                        "Graphite and lime",
+                        "",
+                    ],
+                    [
+                        "JSON.parse() and JSON.stringify()",
+                        "Implement JSON.parse() and JSON.stringify().",
+                        [
+                            "Text to object and object to text",
+                            "Replacer array, replacer function and reviver",
+                            "Deep copy and what stringify skips or changes",
+                            "Error messages for invalid JSON",
+                        ],
+                        ["JSON"],
+                        2,
+                        "Olive, terracotta and bone",
+                        "",
+                    ],
+                    [
+                        "Advantages and Disadvantages of JSON",
+                        "Explain the advantages and disadvantages of JSON.",
+                        [
+                            "Points loaded from a JSON document",
+                            "Size and parse speed compared with XML",
+                            "Strict syntax, limited types and missing schema proved live",
+                        ],
+                        ["JSON"],
+                        1,
+                        "Violet and mint",
+                        "",
+                    ],
+                ],
+            };
+
+            /* ---------- Build the list of items ---------- */
+            const ITEMS = [];
+            Object.keys(RAW).forEach((sid) => {
+                const s = SEC[sid];
+                RAW[sid].forEach((r, i) => {
+                    const n = i + 1,
+                        file = `Q${s.q}-A${n}.html`;
+                    ITEMS.push({
+                        id: `${sid}-${n}`,
+                        sec: sid,
+                        asg: s.asg,
+                        n,
+                        qlabel: `Q${s.q}.${n}`,
+                        file,
+                        path: `${s.folder}/${file}`,
+                        title: r[0],
+                        question: r[1],
+                        desc: r[1],
+                        concepts: r[2],
+                        tags: r[3],
+                        marks: r[4] || null,
+                        theme: r[5] || "",
+                        note: r[6] || "",
+                        type: "page",
+                    });
+                });
+            });
+            const PAGES = ITEMS.slice();
+            [1, 2].forEach((a) =>
+                ITEMS.push({
+                    id: `notes-${a}`,
+                    sec: "notes",
+                    asg: a,
+                    n: a,
+                    qlabel: "TXT",
+                    file: `Assignment-${a}-Answers.txt`,
+                    path: `Assignment-${a}-Answers.txt`,
+                    title: `Assignment ${a}: Written Answers`,
+                    question: `Written theory answers for Assignment ${a} (${ASG[a].title}).`,
+                    desc: `The written theory answers for Assignment ${a} in plain text.`,
+                    concepts: [
+                        "Plain text file",
+                        "Opens directly in the browser",
+                        "Copy the text from the Source code tab",
+                    ],
+                    tags: ["Notes"],
+                    marks: null,
+                    theme: "Plain text",
+                    note: "",
+                    type: "text",
+                }),
+            );
+            const NOTES = ITEMS.filter((i) => i.type === "text");
+
+            /* ---------- Helpers ---------- */
+            const $ = (s) => document.querySelector(s);
+            const esc = (s) =>
+                String(s).replace(
+                    /[&<>"']/g,
+                    (c) =>
+                        ({
+                            "&": "&amp;",
+                            "<": "&lt;",
+                            ">": "&gt;",
+                            '"': "&quot;",
+                            "'": "&#39;",
+                        })[c],
+                );
+            const byId = (id) => ITEMS.find((i) => i.id === id);
+            const secOf = (i) => SEC[i.sec] || NOTESEC;
+            const store = {
+                get(k, d) {
+                    try {
+                        const v = JSON.parse(localStorage.getItem(k));
+                        return v == null ? d : v;
+                    } catch {
+                        return d;
+                    }
+                },
+                set(k, v) {
+                    try {
+                        localStorage.setItem(k, JSON.stringify(v));
+                    } catch {}
+                },
+            };
+            let favs = new Set(store.get("wtl-fav", []));
+            let hist = store.get("wtl-hist", []);
+            let chip = "All";
+            const view = $("#view");
+
+            function toast(msg) {
+                const t = $("#toast");
+                t.textContent = msg;
+                t.classList.add("on");
+                clearTimeout(toast.t);
+                toast.t = setTimeout(() => t.classList.remove("on"), 1800);
+            }
+            function words(it) {
+                return (
+                    it.title +
+                    " " +
+                    it.question +
+                    " " +
+                    it.concepts.join(" ") +
+                    " " +
+                    it.tags.join(" ") +
+                    " " +
+                    it.theme +
+                    " " +
+                    it.file +
+                    " " +
+                    it.qlabel +
+                    " " +
+                    secOf(it).short
+                ).toLowerCase();
+            }
+            function searchItems(q) {
+                const w = q.toLowerCase().split(/\s+/).filter(Boolean);
+                return ITEMS.filter((i) => {
+                    const h = words(i);
+                    return w.every((x) => h.includes(x));
+                });
+            }
+
+            /* ---------- Static icon placeholders ---------- */
+            document
+                .querySelectorAll("[data-ic]")
+                .forEach((e) => (e.innerHTML = ic(e.dataset.ic)));
+
+            /* ---------- Theme ---------- */
+            function setTheme(t) {
+                document.documentElement.dataset.theme = t;
+                store.set("wtl-theme", t);
+                $("#themeBtn").innerHTML = ic(t === "dark" ? "sun" : "moon");
+            }
+            setTheme(
+                store.get(
+                    "wtl-theme",
+                    matchMedia("(prefers-color-scheme: light)").matches
+                        ? "light"
+                        : "dark",
+                ),
+            );
+            $("#themeBtn").onclick = () =>
+                setTheme(
+                    document.documentElement.dataset.theme === "dark"
+                        ? "light"
+                        : "dark",
+                );
+
+            /* ---------- Sidebar ---------- */
+            function buildSidebar() {
+                const link = (href, nav, icon, label, count, dot) =>
+                    `<a class="nav" href="${href}" data-nav="${nav}">${dot ? `<span class="dot" style="background:${dot}"></span>` : ic(icon)}<span>${label}</span>${count != null ? `<small>${count}</small>` : ""}</a>`;
+                const cnt = (id) => PAGES.filter((i) => i.sec === id).length;
+                const secLink = (id) =>
+                    link(
+                        "#/s/" + id,
+                        "s/" + id,
+                        "",
+                        `Q${SEC[id].q}. ${SEC[id].short}`,
+                        cnt(id),
+                        SEC[id].c,
+                    );
+                $("#sidebar").innerHTML =
+                    link("#/", "home", "home", "Home") +
+                    link(
+                        "#/a1",
+                        "a1",
+                        "layers",
+                        "Assignment 1",
+                        PAGES.filter((i) => i.asg === 1).length,
+                    ) +
+                    link(
+                        "#/a2",
+                        "a2",
+                        "layers",
+                        "Assignment 2",
+                        PAGES.filter((i) => i.asg === 2).length,
+                    ) +
+                    '<div class="nav-h">Assignment 1 &bull; ' +
+                    ASG[1].max +
+                    " marks</div>" +
+                    ["a1q1", "a1q2"].map(secLink).join("") +
+                    '<div class="nav-h">Assignment 2 &bull; ' +
+                    ASG[2].max +
+                    " marks</div>" +
+                    ["a2q1", "a2q2", "a2q3"].map(secLink).join("") +
+                    '<div class="nav-h">Library</div>' +
+                    link("#/fav", "fav", "heart", "Favorites") +
+                    link("#/history", "history", "clock", "Recently opened") +
+                    link(
+                        "#/notes",
+                        "notes",
+                        "doc",
+                        "Written answers",
+                        NOTES.length,
+                    );
+            }
+            function setActiveNav(n) {
+                document
+                    .querySelectorAll(".nav")
+                    .forEach((a) =>
+                        a.classList.toggle("on", a.dataset.nav === n),
+                    );
+            }
+
+            const drawerMode = () =>
+                matchMedia("(max-width:960px)").matches ||
+                document.body.classList.contains("watching");
+            $("#menuBtn").onclick = () => {
+                if (drawerMode()) document.body.classList.toggle("sbopen");
+                else document.body.classList.toggle("collapsed");
+            };
+            $("#scrim").onclick = () =>
+                document.body.classList.remove("sbopen");
+            $("#sidebar").addEventListener("click", (e) => {
+                if (e.target.closest(".nav"))
+                    document.body.classList.remove("sbopen");
+            });
+
+            /* ---------- Thumbnails (live mini previews) ---------- */
+            const ro = new ResizeObserver((es) =>
+                es.forEach((e) =>
+                    e.target.style.setProperty(
+                        "--s",
+                        e.contentRect.width / 1280,
+                    ),
+                ),
+            );
+            const io = new IntersectionObserver(
+                (es) =>
+                    es.forEach((e) => {
+                        if (!e.isIntersecting) return;
+                        io.unobserve(e.target);
+                        const t = e.target;
+                        if (t.dataset.type === "text") {
+                            t.classList.add("ready");
+                            return;
+                        }
+                        const f = document.createElement("iframe");
+                        f.src = t.dataset.src;
+                        f.loading = "lazy";
+                        f.tabIndex = -1;
+                        f.title = "Preview";
+                        f.setAttribute("sandbox", "allow-scripts");
+                        f.setAttribute("aria-hidden", "true");
+                        f.onload = () => t.classList.add("ready");
+                        t.prepend(f);
+                    }),
+                { rootMargin: "250px" },
+            );
+            function initThumbs() {
+                ro.disconnect();
+                view.querySelectorAll(".thumb[data-src]").forEach((t) => {
+                    ro.observe(t);
+                    io.observe(t);
+                });
+            }
+
+            /* ---------- Cards ---------- */
+            function card(it) {
+                const s = secOf(it);
+                const inner =
+                    it.type === "text"
+                        ? `<div class="txtthumb"><b>Assignment ${it.asg}</b><i></i><i></i><i></i><i></i><i></i></div>`
+                        : '<div class="shim"></div>';
+                return `<article class="card" style="--g:${s.g}">
+    <a class="thumb" href="#/watch/${it.id}" data-src="${it.path}" data-type="${it.type}" aria-label="Open ${esc(it.title)}">
+      ${inner}<span class="qno">${it.qlabel}</span><span class="play"><span>${ic("play")}</span></span>
+      ${it.marks ? `<span class="marks">${it.marks} mark${it.marks > 1 ? "s" : ""}</span>` : ""}
+      <span class="badge">${it.file}</span>
+    </a>
+    <div class="meta">
+      <div class="avatar">${s.u}</div>
+      <div><h3><a href="#/watch/${it.id}">${esc(it.title)}</a></h3>
+        <p>${esc(s.short)} &bull; Assignment ${it.asg}</p>
+        <div class="tagrow">${it.tags.map((t) => `<span>${t}</span>`).join("")}</div></div>
+      <button class="fav ${favs.has(it.id) ? "on" : ""}" data-fav="${it.id}" aria-label="Favorite">${ic("heart")}</button>
+    </div></article>`;
+            }
+            const block = (title, sub, list, link) =>
+                `<section class="block"><div class="bh"><h2>${title}</h2><span>${sub}</span>${link ? `<a href="${link}">See all</a>` : ""}</div><div class="grid">${list.map(card).join("")}</div></section>`;
+            const footer = () =>
+                `<div class="foot">${CONFIG.course}<br>${CONFIG.college}<br>Built by ${esc(CONFIG.author)} with plain HTML, CSS and JavaScript in a single file</div>`;
+            function listView(title, sub, list, emptyMsg) {
+                return `<div class="page"><div class="bh"><h2>${title}</h2><span>${sub}</span></div>
+    ${list.length ? `<div class="grid">${list.map(card).join("")}</div>` : `<div class="empty">${ic("search")}<h3>Nothing here yet</h3><p>${emptyMsg}</p></div>`}
+    ${footer()}</div>`;
+            }
+
+            /* ---------- Home ---------- */
+            function chipsHTML() {
+                return `<div class="chips">${["All", "HTML5", "Bootstrap", "JavaScript", "DOM", "jQuery", "JSON"].map((c) => `<button class="chip ${c === chip ? "on" : ""}" data-chip="${c}">${c}</button>`).join("")}</div>`;
+            }
+            function asgCard(a) {
+                const secs = Object.keys(SEC).filter((id) => SEC[id].asg === a);
+                return `<a class="asgcard" href="#/a${a}"><small>Assignment ${a} &bull; ${ASG[a].max} marks</small><h3>${ASG[a].title}</h3>
+    <ul>${secs.map((id) => `<li><b>Q${SEC[id].q}. ${SEC[id].title}</b> (${SEC[id].total} marks, ${PAGES.filter((i) => i.sec === id).length} programs)</li>`).join("")}</ul></a>`;
+            }
+            function viewHome() {
+                const recent = hist.map(byId).filter(Boolean).slice(0, 4);
+                const techs = [
+                    ["HTML5", "#e34f26"],
+                    ["Bootstrap", "#7952b3"],
+                    ["JavaScript", "#f0a500"],
+                    ["DOM", "#10b981"],
+                    ["jQuery", "#0868ac"],
+                    ["JSON", "#06b6d4"],
+                ];
+                let h =
+                    `<div class="page">
+  <section class="hero">
+    <div>
+      <span class="pill">${ic("layers")} ${CONFIG.course}</span>
+      <h1>Every assignment program, <span class="gt">running live</span> in your browser.</h1>
+      <p>This is the practical showcase for <b>Assignment 1 (HTML5, Bootstrap and JavaScript)</b> and <b>Assignment 2 (DOM, jQuery and JSON)</b> at ${CONFIG.college}. Open any card to run the program, test it on desktop, tablet and phone sizes, and read its complete source code.</p>
+      <div class="cta"><a class="btn primary" href="#/a1">${ic("play")} Start with Assignment 1</a><a class="btn" href="#/a2">Browse Assignment 2</a></div>
+      <div class="stats">
+        <div><b data-count="${PAGES.length}">0</b><span>Live programs</span></div>
+        <div><b data-count="2">0</b><span>Assignments</span></div>
+        <div><b data-count="${ASG[1].max + ASG[2].max}">0</b><span>Total marks</span></div>
+        <div><b data-count="5">0</b><span>Syllabus units</span></div>
+      </div>
+    </div>
+    <div class="hero-r"><div class="orbit">${techs.map((t) => `<div class="tile" style="background:${t[1]}">${t[0]}</div>`).join("")}</div></div>
+  </section>
+  <section class="asgcards">${asgCard(1)}${asgCard(2)}</section>
+  <section class="how">
+    <div>${ic("eye")}<h4>Run it live</h4><p>Every card is a real page from the assignment, running inside the player.</p></div>
+    <div>${ic("laptop")}<h4>Try any screen size</h4><p>Switch between desktop, tablet and phone to check that each page is responsive.</p></div>
+    <div>${ic("code")}<h4>Read the source</h4><p>Open the Source code tab to see the full HTML, CSS and JavaScript, then copy it.</p></div>
+  </section>` + chipsHTML();
+                if (chip !== "All") {
+                    const l = PAGES.filter((i) => i.tags.includes(chip));
+                    h += block(chip, `${l.length} programs`, l);
+                } else {
+                    if (recent.length)
+                        h += block(
+                            "Continue exploring",
+                            "Recently opened by you",
+                            recent,
+                            "#/history",
+                        );
+                    Object.keys(SEC).forEach((id) => {
+                        const l = PAGES.filter((i) => i.sec === id),
+                            s = SEC[id];
+                        h += block(
+                            `Assignment ${s.asg} &bull; Q${s.q}. ${s.title}`,
+                            `${s.unit} &bull; ${l.length} programs &bull; ${s.total} marks`,
+                            l,
+                            "#/s/" + id,
+                        );
+                    });
+                }
+                return h + footer() + "</div>";
+            }
+            function countUp() {
+                view.querySelectorAll("[data-count]").forEach((el) => {
+                    const end = +el.dataset.count,
+                        t0 = performance.now();
+                    (function step(t) {
+                        const p = Math.min((t - t0) / 900, 1);
+                        el.textContent = Math.round(
+                            end * (1 - Math.pow(1 - p, 3)),
+                        );
+                        if (p < 1) requestAnimationFrame(step);
+                    })(t0);
+                });
+            }
+
+            /* ---------- Watch page ---------- */
+            let srcLoaded = false,
+                currentSrc = "";
+            function viewWatch(it) {
+                const s = secOf(it);
+                const pool = it.type === "page" ? PAGES : NOTES;
+                const pi = pool.indexOf(it);
+                const prev = pool[pi - 1],
+                    next = pool[pi + 1];
+                const others = [
+                    ...pool.filter((i) => i.sec === it.sec && i !== it),
+                    ...pool.filter((i) => i.sec !== it.sec),
+                ].slice(0, 10);
+                const secLink =
+                    it.type === "page" ? `#/s/${it.sec}` : "#/notes";
+                const crumb =
+                    it.type === "page"
+                        ? `Assignment ${it.asg} &bull; Q${s.q}. ${s.title} &bull; Question ${it.qlabel}`
+                        : `Assignment ${it.asg}`;
+                return `<div class="watch">
+  <section>
+    <div class="devbar">
+      <div class="seg" id="devSeg">
+        <button class="on" data-w="100%">${ic("laptop")} Desktop</button>
+        <button data-w="768px">${ic("tablet")} Tablet</button>
+        <button data-w="390px">${ic("phone")} Phone</button>
+      </div><span class="sp"></span>
+      <span style="color:var(--muted);font-size:.82rem">Tip: use the left and right arrow keys to move between programs</span>
+    </div>
+    <div class="frame" id="frame">
+      <div class="chrome"><i></i><i></i><i></i><span class="url">${esc(it.path)}</span>
+        <button data-act="reload" title="Reload">${ic("reload")}</button><button data-act="full" title="Fullscreen">${ic("full")}</button></div>
+      <div class="screen"><div class="skel" id="skel"><div><div class="spin"></div>Loading program...</div></div>
+        <iframe id="player" title="${esc(it.title)}" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups"></iframe></div>
+    </div>
+    <div class="wq">${crumb}</div>
+    <h1 class="wtitle" style="margin-top:6px">${esc(it.title)}</h1>
+    <div class="actions">
+      <a class="act" href="${secLink}"><span class="sb" style="background:${s.g}">${s.u}</span> ${esc(s.short)}</a>
+      <button class="act ${favs.has(it.id) ? "on" : ""}" data-fav="${it.id}">${ic("heart")} Favorite</button>
+      <a class="act" href="${it.path}" target="_blank" rel="noopener">${ic("ext")} Open in new tab</a>
+      <button class="act" data-act="link">${ic("copy")} Copy share link</button>
+      ${prev ? `<a class="act" href="#/watch/${prev.id}">${ic("prev")} Previous</a>` : ""}
+      ${next ? `<a class="act" href="#/watch/${next.id}">Next ${ic("next")}</a>` : ""}
+    </div>
+    <div class="tabs"><button class="on" data-tab="about">About this program</button><button data-tab="src">Source code</button></div>
+    <div id="tabAbout" class="about">
+      <h4>Assignment question</h4><p class="qbox">${esc(it.question)}</p>
+      <h4>What it demonstrates</h4><ul>${it.concepts.map((c) => `<li>${esc(c)}</li>`).join("")}</ul>
+      ${it.theme ? `<h4>Page theme</h4><p>${esc(it.theme)}</p>` : ""}
+      ${it.note ? `<h4>Good to know</h4><p class="tip">${esc(it.note)}</p>` : ""}
+      <h4>Details</h4>
+      <div class="tagrow">${it.tags.map((t) => `<span>${t}</span>`).join("")}${it.marks ? `<span>${it.marks} mark${it.marks > 1 ? "s" : ""}</span>` : ""}<span>Assignment ${it.asg}</span></div>
+      <div class="path">${esc(it.path)}</div>
+    </div>
+    <div id="tabSrc" hidden>
+      <div class="codebar"><span id="srcInfo">Loading source...</span><button class="act" data-act="copysrc">${ic("copy")} Copy code</button></div>
+      <div class="code" id="codeBox"></div>
+    </div>
+  </section>
+  <aside class="upnext"><h4>Up next</h4>
+    ${others
+        .map((o) => {
+            const os = secOf(o);
+            return `<a class="up" href="#/watch/${o.id}"><div class="mini" style="--g:${os.g}">${o.file.replace(".html", "").replace(".txt", "")}</div><div><h5>${esc(o.title)}</h5><p>${esc(os.short)}${o.marks ? " &bull; " + o.marks + " mark" + (o.marks > 1 ? "s" : "") : ""}</p></div></a>`;
+        })
+        .join("")}
+  </aside></div>${footer()}`;
+            }
+            function bindWatch(it) {
+                const player = $("#player"),
+                    skel = $("#skel");
+                player.onload = () => skel.remove();
+                player.src = it.path;
+                srcLoaded = false;
+                currentSrc = "";
+                $("#devSeg").onclick = (e) => {
+                    const b = e.target.closest("button");
+                    if (!b) return;
+                    document
+                        .querySelectorAll("#devSeg button")
+                        .forEach((x) => x.classList.toggle("on", x === b));
+                    $("#frame").style.width = b.dataset.w;
+                };
+                document.querySelectorAll(".tabs button").forEach(
+                    (b) =>
+                        (b.onclick = () => {
+                            document
+                                .querySelectorAll(".tabs button")
+                                .forEach((x) =>
+                                    x.classList.toggle("on", x === b),
+                                );
+                            $("#tabAbout").hidden = b.dataset.tab !== "about";
+                            $("#tabSrc").hidden = b.dataset.tab !== "src";
+                            if (b.dataset.tab === "src" && !srcLoaded)
+                                loadSource(it);
+                        }),
+                );
+            }
+            async function loadSource(it) {
+                srcLoaded = true;
+                const box = $("#codeBox"),
+                    info = $("#srcInfo");
+                try {
+                    const r = await fetch(it.path);
+                    if (!r.ok) throw new Error("not found");
+                    const text = await r.text();
+                    currentSrc = text;
+                    const lines = text.replace(/\r\n/g, "\n").split("\n");
+                    box.innerHTML = lines
+                        .map((l) => `<span class="l">${esc(l) || " "}</span>`)
+                        .join("");
+                    info.textContent = `${it.file} \u2022 ${lines.length} lines \u2022 ${(text.length / 1024).toFixed(1)} KB`;
+                } catch {
+                    box.innerHTML =
+                        '<span class="l msg">The source can be shown only when this site is opened through a web address (for example on Vercel or a local server). Use "Open in new tab" and press Ctrl+U to see it from a file.</span>';
+                    info.textContent = it.file;
+                }
+            }
+
+            /* ---------- Router (keep = true keeps the scroll position) ---------- */
+            function route(keep) {
+                const parts = location.hash
+                    .replace(/^#\/?/, "")
+                    .split("/")
+                    .map(decodeURIComponent);
+                const r = parts[0],
+                    p = parts.slice(1).join("/");
+                const watching = r === "watch";
+                document.body.classList.remove("sbopen");
+                document.body.classList.toggle("watching", watching);
+                let html = "",
+                    nav = "home",
+                    title = CONFIG.site,
+                    it = null;
+                const search = $("#q");
+
+                if (!r) {
+                    html = viewHome();
+                } else if (r === "a1" || r === "a2") {
+                    const a = r === "a1" ? 1 : 2,
+                        l = PAGES.filter((i) => i.asg === a);
+                    html = listView(
+                        `Assignment ${a}: ${ASG[a].title}`,
+                        `${l.length} programs &bull; ${ASG[a].max} marks`,
+                        l,
+                        "",
+                    );
+                    nav = r;
+                    title = `Assignment ${a}`;
+                } else if (r === "s" && SEC[p]) {
+                    const l = PAGES.filter((i) => i.sec === p),
+                        s = SEC[p];
+                    html = listView(
+                        `Assignment ${s.asg} &bull; Q${s.q}. ${s.title}`,
+                        `${s.unit} &bull; ${l.length} programs &bull; ${s.total} marks`,
+                        l,
+                        "",
+                    );
+                    nav = "s/" + p;
+                    title = s.title;
+                } else if (r === "fav") {
+                    html = listView(
+                        "Favorites",
+                        `${favs.size} saved`,
+                        ITEMS.filter((i) => favs.has(i.id)),
+                        "Tap the heart on any card to save it here.",
+                    );
+                    nav = "fav";
+                    title = "Favorites";
+                } else if (r === "history") {
+                    html = listView(
+                        "Recently opened",
+                        "Your last viewed programs",
+                        hist.map(byId).filter(Boolean),
+                        "Programs you open will appear here.",
+                    );
+                    nav = "history";
+                    title = "Recently opened";
+                } else if (r === "notes") {
+                    html = listView("Written answers", "Text files", NOTES, "");
+                    nav = "notes";
+                    title = "Written answers";
+                } else if (r === "search") {
+                    const l = searchItems(p);
+                    html = listView(
+                        `Results for "${esc(p)}"`,
+                        `${l.length} found`,
+                        l,
+                        "Try a different word such as form, loop, carousel or JSON.",
+                    );
+                    nav = "";
+                    title = "Search: " + p;
+                    search.value = p;
+                } else if (r === "watch" && byId(p)) {
+                    it = byId(p);
+                    html = viewWatch(it);
+                    nav = it.type === "page" ? "s/" + it.sec : "notes";
+                    title = it.title;
+                    hist = [it.id, ...hist.filter((x) => x !== it.id)].slice(
+                        0,
+                        20,
+                    );
+                    store.set("wtl-hist", hist);
+                } else {
+                    html = viewHome();
+                }
+
+                if (r !== "search") search.value = "";
+                document.title = title + " | " + CONFIG.site;
+                view.innerHTML = html;
+                setActiveNav(nav);
+                if (keep !== true) window.scrollTo(0, 0);
+                if (it) bindWatch(it);
+                else initThumbs();
+                countUp();
+            }
+            window.addEventListener("hashchange", () => route());
+
+            /* ---------- Clicks inside the main view ---------- */
+            view.addEventListener("click", (e) => {
+                const f = e.target.closest("[data-fav]");
+                if (f) {
+                    const id = f.dataset.fav;
+                    if (favs.has(id)) {
+                        favs.delete(id);
+                        toast("Removed from favorites");
+                    } else {
+                        favs.add(id);
+                        toast("Added to favorites");
+                    }
+                    store.set("wtl-fav", [...favs]);
+                    document
+                        .querySelectorAll(`[data-fav="${id}"]`)
+                        .forEach((b) => b.classList.toggle("on", favs.has(id)));
+                    if (location.hash.startsWith("#/fav")) {
+                        const y = window.scrollY;
+                        route(true);
+                        window.scrollTo(0, y);
+                    }
+                    return;
+                }
+                const c = e.target.closest("[data-chip]");
+                if (c) {
+                    chip = c.dataset.chip;
+                    const y = window.scrollY;
+                    route(true);
+                    window.scrollTo(0, y);
+                    return;
+                }
+                const a = e.target.closest("[data-act]");
+                if (!a) return;
+                const act = a.dataset.act;
+                if (act === "reload") {
+                    const pl = $("#player");
+                    pl.src = pl.src;
+                }
+                if (act === "full") {
+                    const fr = $("#frame");
+                    (
+                        fr.requestFullscreen ||
+                        fr.webkitRequestFullscreen ||
+                        (() => toast("Fullscreen not supported"))
+                    ).call(fr);
+                }
+                if (act === "link") {
+                    copy(location.href, "Share link copied");
+                }
+                if (act === "copysrc") {
+                    currentSrc
+                        ? copy(currentSrc, "Code copied")
+                        : toast("Source is not loaded");
+                }
+            });
+            function copy(text, msg) {
+                if (navigator.clipboard && window.isSecureContext)
+                    navigator.clipboard.writeText(text).then(
+                        () => toast(msg),
+                        () => toast("Copy failed"),
+                    );
+                else {
+                    const t = document.createElement("textarea");
+                    t.value = text;
+                    document.body.appendChild(t);
+                    t.select();
+                    try {
+                        document.execCommand("copy");
+                        toast(msg);
+                    } catch {
+                        toast("Copy failed");
+                    }
+                    t.remove();
+                }
+            }
+
+            /* ---------- Search box ---------- */
+            const q = $("#q"),
+                sugg = $("#sugg");
+            q.addEventListener("input", () => {
+                const v = q.value.trim();
+                if (!v) {
+                    sugg.classList.remove("on");
+                    if (location.hash.startsWith("#/search"))
+                        location.hash = "#/";
+                    return;
+                }
+                const res = searchItems(v).slice(0, 6);
+                sugg.innerHTML =
+                    res
+                        .map(
+                            (i) =>
+                                `<a href="#/watch/${i.id}"><span class="sb" style="background:${secOf(i).g}">${i.file.replace(".html", "").replace(".txt", "")}</span><span>${esc(i.title)}<small>${esc(secOf(i).short)}</small></span></a>`,
+                        )
+                        .join("") ||
+                    '<div class="none">No matching program</div>';
+                sugg.classList.add("on");
+            });
+            q.addEventListener("keydown", (e) => {
+                if (e.key === "Enter" && q.value.trim()) {
+                    location.hash =
+                        "#/search/" + encodeURIComponent(q.value.trim());
+                    sugg.classList.remove("on");
+                    q.blur();
+                }
+            });
+            q.addEventListener("focus", () => {
+                if (q.value.trim()) sugg.classList.add("on");
+            });
+            document.addEventListener("click", (e) => {
+                if (
+                    !e.target.closest("#searchBox") ||
+                    e.target.closest(".sugg a")
+                )
+                    sugg.classList.remove("on");
+            });
+
+            /* ---------- Keyboard shortcuts ---------- */
+            document.addEventListener("keydown", (e) => {
+                const typing = /INPUT|TEXTAREA/.test(
+                    document.activeElement.tagName,
+                );
+                if (e.key === "/" && !typing) {
+                    e.preventDefault();
+                    q.focus();
+                }
+                if (e.key === "Escape") {
+                    sugg.classList.remove("on");
+                    document.body.classList.remove("sbopen");
+                    if (typing) document.activeElement.blur();
+                    else if (location.hash.startsWith("#/watch")) {
+                        const it = byId(location.hash.split("/")[2]);
+                        if (it)
+                            location.hash =
+                                it.type === "page"
+                                    ? "#/s/" + it.sec
+                                    : "#/notes";
+                    }
+                }
+                if (
+                    (e.key === "ArrowLeft" || e.key === "ArrowRight") &&
+                    !typing &&
+                    location.hash.startsWith("#/watch")
+                ) {
+                    const it = byId(location.hash.split("/")[2]);
+                    if (!it) return;
+                    const pool = it.type === "page" ? PAGES : NOTES,
+                        n =
+                            pool[
+                                pool.indexOf(it) +
+                                    (e.key === "ArrowRight" ? 1 : -1)
+                            ];
+                    if (n) location.hash = "#/watch/" + n.id;
+                }
+            });
+
+            /* ---------- Start ---------- */
+            buildSidebar();
+            route();
+        </script>
+    </body>
+</html>

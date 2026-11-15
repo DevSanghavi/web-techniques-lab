@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>HTML5 Form with File Upload</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 30px;
+                line-height: 1.6;
+            }
+            .form-container {
+                max-width: 500px;
+                padding: 20px;
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                background-color: #f9f9f9;
+            }
+            .form-group {
+                margin-bottom: 15px;
+            }
+            label {
+                display: block;
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+            input[type="text"],
+            input[type="email"],
+            input[type="file"] {
+                width: 100%;
+                padding: 8px;
+                box-sizing: border-box;
+            }
+            input[type="submit"] {
+                background-color: #28a745;
+                color: white;
+                padding: 10px 15px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+            input[type="submit"]:hover {
+                background-color: #218838;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="form-container">
+            <h2>Student Document Submission Form</h2>
+
+            <!-- Form with POST method and multipart encoding for file upload -->
+            <form
+                action="/upload_page.php"
+                method="POST"
+                enctype="multipart/form-data"
+            >
+                <!-- Text Input -->
+                <div class="form-group">
+                    <label for="fullName">Full Name:</label>
+                    <input
+                        type="text"
+                        id="fullName"
+                        name="fullName"
+                        placeholder="Enter your full name"
+                        required
+                    />
+                </div>
+
+                <!-- Email Input -->
+                <div class="form-group">
+                    <label for="userEmail">Email Address:</label>
+                    <input
+                        type="email"
+                        id="userEmail"
+                        name="userEmail"
+                        placeholder="Enter your email"
+                        required
+                    />
+                </div>
+
+                <!-- File Upload Input (Single File) -->
+                <div class="form-group">
+                    <label for="identityDoc"
+                        >Upload Identity Proof (PDF/Image):</label
+                    >
+                    <input
+                        type="file"
+                        id="identityDoc"
+                        name="identityDoc"
+                        accept=".pdf, image/*"
+                        required
+                    />
+                </div>
+
+                <!-- File Upload Input (Multiple Files) -->
+                <div class="form-group">
+                    <label for="certificates"
+                        >Upload Academic Certificates (Multiple):</label
+                    >
+                    <input
+                        type="file"
+                        id="certificates"
+                        name="certificates"
+                        multiple
+                    />
+                </div>
+
+                <!-- Submit Button -->
+                <div class="form-group">
+                    <input type="submit" value="Submit Application" />
+                </div>
+            </form>
+        </div>
+    </body>
+</html>

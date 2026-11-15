@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Form Processing and Validation | Ruled Notebook Theme</title>
+        <style>
+            /* Theme: ruled school notebook - cream lined paper, red margin line, blue ink, mint sticky note (plain CSS, no Bootstrap) */
+            :root {
+                --paper: #fdf8e8;
+                --line: #c5d9ea;
+                --margin: #e57373;
+                --ink: #1a3a8a;
+                --pen: #c62828;
+                --ok: #2e7d32;
+                --sticky: #c8e6c9;
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                color: var(--ink);
+                font-family: "Segoe UI", Tahoma, sans-serif;
+                background-color: var(--paper);
+                background-image: repeating-linear-gradient(
+                    transparent 0,
+                    transparent 27px,
+                    var(--line) 28px
+                );
+            }
+            header {
+                text-align: center;
+                padding: 18px 10px 12px;
+                border-bottom: 3px solid var(--margin);
+                background: rgba(253, 248, 232, 0.95);
+            }
+            header h1 {
+                margin: 0;
+                font-family:
+                    "Segoe Print", "Bradley Hand", "Chalkboard SE", cursive;
+                font-size: 1.6rem;
+            }
+            header p {
+                margin: 6px 0 0;
+                font-size: 0.85rem;
+                color: var(--margin);
+            }
+            /* Responsive: form and result sit side by side, stack on phones */
+            main {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+                gap: 20px;
+                max-width: 1150px;
+                margin: 20px auto;
+                padding: 0 14px;
+                align-items: start;
+            }
+            .page {
+                background: var(--paper);
+                border: 2px solid var(--ink);
+                border-left: 10px double var(--margin);
+                border-radius: 6px;
+                padding: 14px 16px;
+                box-shadow: 5px 5px 0 rgba(26, 58, 138, 0.25);
+            }
+            .page h2 {
+                margin: 0 0 10px;
+                font-family: "Segoe Print", "Bradley Hand", cursive;
+                font-size: 1.1rem;
+                border-bottom: 2px dashed var(--margin);
+                padding-bottom: 4px;
+            }
+            .field {
+                margin-bottom: 10px;
+            }
+            label.main,
+            .grouptitle {
+                display: block;
+                font-weight: bold;
+                font-size: 0.88rem;
+                margin-bottom: 3px;
+            }
+            input[type="text"],
+            input[type="password"],
+            input[type="number"],
+            select {
+                width: 100%;
+                padding: 8px;
+                font-size: 0.95rem;
+                color: var(--ink);
+                background: #fff;
+                border: none;
+                border-bottom: 2px solid var(--ink);
+                outline: none;
+            }
+            input.ok,
+            select.ok {
+                border-bottom-color: var(--ok);
+                background: #f1f8e9;
+            }
+            input.bad,
+            select.bad {
+                border-bottom-color: var(--pen);
+                background: #ffebee;
+            }
+            .choice {
+                display: inline-block;
+                margin: 2px 12px 2px 0;
+                font-size: 0.9rem;
+            }
+            .err {
+                color: var(--pen);
+                font-size: 0.78rem;
+                min-height: 1em;
+                margin-top: 2px;
+                font-style: italic;
+            }
+            button {
+                background: var(--ink);
+                color: #fff;
+                border: none;
+                border-radius: 4px;
+                padding: 9px 16px;
+                margin: 6px 8px 0 0;
+                font-size: 0.95rem;
+                cursor: pointer;
+            }
+            button.alt {
+                background: #fff;
+                color: var(--ink);
+                border: 2px solid var(--ink);
+            }
+            button:hover {
+                background: var(--margin);
+                color: #fff;
+                border-color: var(--margin);
+            }
+            /* Result sticky note */
+            .sticky {
+                background: var(--sticky);
+                border: 2px solid var(--ok);
+                border-radius: 4px;
+                padding: 12px;
+                transform: rotate(-0.6deg);
+                box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.15);
+            }
+            .sticky h3 {
+                margin: 0 0 8px;
+                color: var(--ok);
+                font-family: "Segoe Print", "Bradley Hand", cursive;
+                font-size: 1rem;
+            }
+            .sticky.fail {
+                background: #ffcdd2;
+                border-color: var(--pen);
+            }
+            .sticky.fail h3 {
+                color: var(--pen);
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 0.8rem;
+            }
+            td,
+            th {
+                text-align: left;
+                padding: 4px 5px;
+                border-bottom: 1px dashed var(--ink);
+                vertical-align: top;
+                word-break: break-word;
+            }
+            th {
+                font-size: 0.72rem;
+                text-transform: uppercase;
+            }
+            code {
+                font-family: Consolas, monospace;
+                font-size: 0.74rem;
+                color: #6a1b9a;
+            }
+            .small {
+                font-size: 0.8rem;
+                margin: 8px 0 0;
+            }
+            #records li {
+                font-size: 0.82rem;
+                margin: 3px 0;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>Student Registration Notebook</h1>
+            <p>
+                Unit 3 | DOM | Form processing, accessing form data and
+                validation
+            </p>
+        </header>
+
+        <!-- Only an empty <main>; JavaScript builds the form and the result page -->
+        <main id="app"></main>
+
+        <script>
+            const app = document.getElementById("app");
+
+            // ---------- helper: create one element ----------
+            function el(tag, cls, text) {
+                const e = document.createElement(tag);
+                if (cls) e.className = cls;
+                if (text) e.textContent = text;
+                return e;
+            }
+
+            // ================= 1. BUILD THE FORM WITH THE DOM =================
+            const formPage = el("section", "page");
+            formPage.appendChild(el("h2", "", "1. Fill the form"));
+
+            const form = document.createElement("form");
+            form.name = "studentForm"; // lets us use document.forms["studentForm"]
+            form.noValidate = true; // we do the validation ourselves in JavaScript
+
+            const rules = []; // every validation rule is stored here
+
+            // Adds one field row. fn() returns "" when valid or an error message
+            function addRule(key, wrapper, fn, inputs) {
+                const err = el("div", "err");
+                wrapper.appendChild(err);
+                rules.push({
+                    key: key,
+                    fn: fn,
+                    err: err,
+                    inputs: inputs,
+                    touched: false,
+                });
+            }
+
+            // Text-like input (text, password, number)
+            function addInput(id, label, type, placeholder, fn) {
+                const w = el("div", "field");
+                const lab = el("label", "main", label);
+                lab.htmlFor = id;
+                const inp = document.createElement("input");
+                inp.type = type;
+                inp.id = id;
+                inp.name = id;
+                inp.placeholder = placeholder;
+                w.appendChild(lab);
+                w.appendChild(inp);
+                form.appendChild(w);
+                addRule(
+                    id,
+                    w,
+                    function () {
+                        return fn(inp.value.trim());
+                    },
+                    [inp],
+                );
+            }
+
+            // ---- text fields (regular expressions from Unit 2) ----
+            addInput("fullName", "Full name", "text", "Rahul Sharma", (v) =>
+                /^[A-Za-z ]{3,30}$/.test(v)
+                    ? ""
+                    : "Use 3 to 30 letters and spaces only",
+            );
+            addInput(
+                "email",
+                "Email address",
+                "text",
+                "user@example.com",
+                (v) =>
+                    /^[\w.-]+@[\w-]+\.[a-zA-Z]{2,}$/.test(v)
+                        ? ""
+                        : "Enter a valid email, e.g. user@example.com",
+            );
+            addInput("phone", "Mobile number", "text", "9876543210", (v) =>
+                /^\d{10}$/.test(v)
+                    ? ""
+                    : "Mobile number must be exactly 10 digits",
+            );
+            addInput("age", "Age", "number", "18 to 60", (v) =>
+                v !== "" && Number(v) >= 18 && Number(v) <= 60
+                    ? ""
+                    : "Age must be between 18 and 60",
+            );
+            addInput(
+                "password",
+                "Password",
+                "password",
+                "min 6 characters",
+                (v) =>
+                    v.length >= 6 && /\d/.test(v) && /[a-zA-Z]/.test(v)
+                        ? ""
+                        : "At least 6 characters with a letter and a digit",
+            );
+            addInput(
+                "confirm",
+                "Confirm password",
+                "password",
+                "type it again",
+                (v) =>
+                    v !== "" && v === form.elements["password"].value
+                        ? ""
+                        : "Passwords do not match",
+            );
+
+            // ---- drop-down (select) ----
+            const selWrap = el("div", "field");
+            const selLab = el("label", "main", "Course");
+            selLab.htmlFor = "course";
+            const sel = document.createElement("select");
+            sel.id = "course";
+            sel.name = "course";
+            [
+                "-- Choose a course --",
+                "M.Sc. Information Technology",
+                "M.Sc. Computer Science",
+                "MCA",
+            ].forEach(function (t, i) {
+                const o = document.createElement("option");
+                o.value = i === 0 ? "" : t;
+                o.textContent = t;
+                sel.appendChild(o);
+            });
+            selWrap.appendChild(selLab);
+            selWrap.appendChild(sel);
+            form.appendChild(selWrap);
+            addRule(
+                "course",
+                selWrap,
+                function () {
+                    return sel.selectedIndex > 0
+                        ? ""
+                        : "Please select a course"; // index 0 is the placeholder
+                },
+                [sel],
+            );
+
+            // ---- radio buttons ----
+            const gWrap = el("div", "field");
+            gWrap.appendChild(el("span", "grouptitle", "Gender"));
+            ["Male", "Female", "Other"].forEach(function (g) {
+                const lab = el("label", "choice");
+                const r = document.createElement("input");
+                r.type = "radio";
+                r.name = "gender";
+                r.value = g;
+                lab.appendChild(r);
+                lab.appendChild(document.createTextNode(" " + g));
+                gWrap.appendChild(lab);
+            });
+            form.appendChild(gWrap);
+            addRule(
+                "gender",
+                gWrap,
+                function () {
+                    return form.elements["gender"].value !== ""
+                        ? ""
+                        : "Select one option"; // RadioNodeList.value
+                },
+                [],
+            );
+
+            // ---- checkboxes (zero or more) ----
+            const iWrap = el("div", "field");
+            iWrap.appendChild(
+                el("span", "grouptitle", "Interests (choose at least one)"),
+            );
+            ["HTML5", "JavaScript", "DOM", "jQuery", "JSON"].forEach(
+                function (t) {
+                    const lab = el("label", "choice");
+                    const c = document.createElement("input");
+                    c.type = "checkbox";
+                    c.name = "interest";
+                    c.value = t;
+                    lab.appendChild(c);
+                    lab.appendChild(document.createTextNode(" " + t));
+                    iWrap.appendChild(lab);
+                },
+            );
+            form.appendChild(iWrap);
+            addRule(
+                "interest",
+                iWrap,
+                function () {
+                    return form.querySelectorAll(
+                        'input[name="interest"]:checked',
+                    ).length > 0
+                        ? ""
+                        : "Tick at least one interest";
+                },
+                [],
+            );
+
+            // ---- terms checkbox ----
+            const tWrap = el("div", "field");
+            const tLab = el("label", "choice");
+            const terms = document.createElement("input");
+            terms.type = "checkbox";
+            terms.name = "terms";
+            tLab.appendChild(terms);
+            tLab.appendChild(document.createTextNode(" I agree to the terms"));
+            tWrap.appendChild(tLab);
+            form.appendChild(tWrap);
+            addRule(
+                "terms",
+                tWrap,
+                function () {
+                    return terms.checked ? "" : "You must accept the terms";
+                },
+                [],
+            );
+
+            // ---- buttons ----
+            const submitBtn = el("button", "", "Submit form");
+            submitBtn.type = "submit";
+            const resetBtn = el("button", "alt", "Reset");
+            resetBtn.type = "reset";
+            form.appendChild(submitBtn);
+            form.appendChild(resetBtn);
+
+            formPage.appendChild(form);
+            app.appendChild(formPage);
+
+            // ================= 2. VALIDATION =================
+            // Runs one rule, shows or clears the message, returns true if valid
+            function runRule(r) {
+                const msg = r.fn();
+                r.err.textContent = msg; // textContent, never innerHTML
+                r.inputs.forEach(function (i) {
+                    i.classList.toggle("bad", msg !== "");
+                    i.classList.toggle("ok", msg === "");
+                });
+                return msg === "";
+            }
+
+            // Live validation using event delegation: ONE listener on the form
+            function liveCheck(e) {
+                const name = e.target.name;
+                if (!name) return;
+                rules.forEach(function (r) {
+                    if (r.key === name) {
+                        // validate while typing only after the user has left the field once
+                        if (e.type !== "input" || r.touched) runRule(r);
+                        if (e.type !== "input") r.touched = true;
+                    }
+                });
+                // confirm password depends on password, so re-check it too
+                if (name === "password") {
+                    const c = rules.filter(function (r) {
+                        return r.key === "confirm";
+                    })[0];
+                    if (c.touched) runRule(c);
+                }
+            }
+            form.addEventListener("input", liveCheck);
+            form.addEventListener("change", liveCheck);
+            form.addEventListener("focusout", liveCheck); // focusout bubbles, blur does not
+
+            // ================= 3. RESULT PAGE =================
+            const resultPage = el("section", "page");
+            resultPage.appendChild(el("h2", "", "2. Form processing result"));
+            const sticky = el("div", "sticky");
+            sticky.appendChild(el("h3", "", "Nothing submitted yet"));
+            sticky.appendChild(
+                el(
+                    "p",
+                    "small",
+                    "Fill the form and press Submit. Each value is read from the DOM using a different method.",
+                ),
+            );
+            resultPage.appendChild(sticky);
+            resultPage.appendChild(el("p", "small", "Saved records:"));
+            const records = document.createElement("ul");
+            records.id = "records";
+            resultPage.appendChild(records);
+            app.appendChild(resultPage);
+
+            // ================= 4. SUBMIT: preventDefault, ACCESS DATA, PROCESS =================
+            form.addEventListener("submit", function (e) {
+                e.preventDefault(); // stop the page from reloading
+
+                let firstBad = null;
+                rules.forEach(function (r) {
+                    r.touched = true;
+                    if (!runRule(r) && !firstBad) firstBad = r;
+                });
+
+                sticky.textContent = "";
+                if (firstBad) {
+                    sticky.className = "sticky fail";
+                    sticky.appendChild(el("h3", "", "Form NOT processed"));
+                    const bad = rules.filter(function (r) {
+                        return r.err.textContent !== "";
+                    });
+                    sticky.appendChild(
+                        el(
+                            "p",
+                            "small",
+                            bad.length +
+                                " field(s) need correction. Errors are shown in red under each field.",
+                        ),
+                    );
+                    const target = form.elements[firstBad.key];
+                    if (target && target.focus) target.focus(); // move the cursor to the first error
+                    return;
+                }
+
+                // ----- ACCESSING FORM DATA (a different DOM method for each value) -----
+                const data = [
+                    [
+                        "Full name",
+                        document.forms["studentForm"]["fullName"].value.trim(),
+                        'document.forms["studentForm"]["fullName"].value',
+                    ],
+                    [
+                        "Email",
+                        document.getElementById("email").value.trim(),
+                        'document.getElementById("email").value',
+                    ],
+                    [
+                        "Mobile",
+                        form.elements["phone"].value.trim(),
+                        'form.elements["phone"].value',
+                    ],
+                    [
+                        "Age",
+                        Number(form.querySelector("#age").value),
+                        'Number(form.querySelector("#age").value)',
+                    ],
+                    [
+                        "Gender",
+                        form.elements["gender"].value,
+                        'form.elements["gender"].value (radio group)',
+                    ],
+                    [
+                        "Course",
+                        sel.options[sel.selectedIndex].text,
+                        "select.options[select.selectedIndex].text",
+                    ],
+                    [
+                        "Interests",
+                        Array.from(
+                            form.querySelectorAll(
+                                'input[name="interest"]:checked',
+                            ),
+                        )
+                            .map(function (c) {
+                                return c.value;
+                            })
+                            .join(", "),
+                        "querySelectorAll('input[name=\"interest\"]:checked')",
+                    ],
+                    [
+                        "Terms",
+                        form.elements["terms"].checked,
+                        'form.elements["terms"].checked',
+                    ],
+                    [
+                        "Password",
+                        "(hidden, " +
+                            form.elements["password"].value.length +
+                            " characters)",
+                        "never display a password",
+                    ],
+                ];
+
+                // ----- PROCESSING: show the data in a table -----
+                sticky.className = "sticky";
+                sticky.appendChild(el("h3", "", "Form processed successfully"));
+                const table = document.createElement("table");
+                const head = document.createElement("tr");
+                ["Field", "Value", "How it was accessed"].forEach(function (t) {
+                    head.appendChild(el("th", "", t));
+                });
+                table.appendChild(head);
+                data.forEach(function (row) {
+                    const tr = document.createElement("tr");
+                    tr.appendChild(el("td", "", row[0]));
+                    tr.appendChild(el("td", "", String(row[1]))); // textContent, so tags typed by a user stay harmless
+                    const td = document.createElement("td");
+                    td.appendChild(el("code", "", row[2]));
+                    tr.appendChild(td);
+                    table.appendChild(tr);
+                });
+                sticky.appendChild(table);
+
+                // save a short record in the list below
+                const li = el(
+                    "li",
+                    "",
+                    data[0][1] +
+                        " | " +
+                        data[1][1] +
+                        " | " +
+                        data[5][1] +
+                        " | " +
+                        new Date().toLocaleTimeString(),
+                );
+                records.appendChild(li);
+
+                form.reset(); // clear the inputs (fires the reset event)
+            });
+
+            // Reset button: also clear the red/green marks and the messages
+            form.addEventListener("reset", function () {
+                rules.forEach(function (r) {
+                    r.touched = false;
+                    r.err.textContent = "";
+                    r.inputs.forEach(function (i) {
+                        i.classList.remove("ok", "bad");
+                    });
+                });
+            });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>JSON Dataset: Student Records</title>
+        <style>
+            :root {
+                --brown: #3b2a20;
+                --orange: #f28c28;
+                --cream: #fdf3e3;
+            }
+            body {
+                margin: 0;
+                background: var(--cream);
+                color: var(--brown);
+                font-family: Verdana, sans-serif;
+            }
+            header {
+                background: var(--brown);
+                color: var(--orange);
+                padding: 18px;
+                text-align: center;
+                border-bottom: 5px solid var(--orange);
+            }
+            main {
+                max-width: 1000px;
+                margin: auto;
+                padding: 14px;
+            }
+            h2 {
+                border-left: 6px solid var(--orange);
+                padding-left: 8px;
+            }
+            .scroll {
+                overflow-x: auto;
+            }
+            table {
+                border-collapse: collapse;
+                width: 100%;
+                background: #fff;
+                font-size: 0.85rem;
+            }
+            th,
+            td {
+                border: 1px solid #e6d3b8;
+                padding: 6px 8px;
+                text-align: left;
+            }
+            th {
+                background: var(--brown);
+                color: var(--orange);
+            }
+            pre {
+                background: var(--brown);
+                color: #ffd9a8;
+                padding: 12px;
+                border-radius: 8px;
+                overflow-x: auto;
+            }
+        </style>
+    </head>
+    <body>
+        <header><h1>{ } Student Records Dataset (JSON)</h1></header>
+        <main>
+            <h2>Dataset Details</h2>
+            <pre id="info"></pre>
+            <h2>Summary (calculated from the JSON)</h2>
+            <pre id="stats"></pre>
+            <h2>All 15 Records</h2>
+            <div class="scroll"><table id="tbl"></table></div>
+            <h2>One Record as Raw JSON</h2>
+            <pre id="raw"></pre>
+        </main>
+
+        <!-- ===================== THE JSON DATASET =====================
+       (Copy only the content of this block into students_dataset.json) -->
+        <script type="application/json" id="data">
+            {
+                "college": "MAEER's MIT Arts, Commerce and Science College, Alandi (D), Pune",
+                "department": "Department of Computer Science and Information Technology",
+                "courseName": "F.Y. M.Sc. Information Technology",
+                "subject": "Web Techniques",
+                "subjectCode": "2417MJCT101",
+                "academicYear": "2025-2026",
+                "maxAssignmentMarks": 25,
+                "totalRecords": 15,
+                "students": [
+                    {
+                        "rollNo": 101,
+                        "prn": "202501001",
+                        "fullName": "Rahul Sharma",
+                        "gender": "Male",
+                        "email": "rahul.sharma@example.com",
+                        "phone": "9876500101",
+                        "attendancePercentage": 92.5,
+                        "isFeePaid": true,
+                        "labBatch": "Batch A",
+                        "address": { "city": "Pune", "pin": "411001" },
+                        "assignmentMarks": {
+                            "assignment1": 24,
+                            "assignment2": 25
+                        },
+                        "skills": ["JavaScript", "HTML5", "jQuery", "JSON"],
+                        "mentor": "Prof. Kale"
+                    },
+                    {
+                        "rollNo": 102,
+                        "prn": "202501002",
+                        "fullName": "Priya Verma",
+                        "gender": "Female",
+                        "email": "priya.verma@example.com",
+                        "phone": "9876500102",
+                        "attendancePercentage": 88.0,
+                        "isFeePaid": true,
+                        "labBatch": "Batch A",
+                        "address": { "city": "Alandi", "pin": "412105" },
+                        "assignmentMarks": {
+                            "assignment1": 22,
+                            "assignment2": 23
+                        },
+                        "skills": ["DOM Manipulation", "CSS3", "JSON"],
+                        "mentor": "Prof. Kale"
+                    },
+                    {
+                        "rollNo": 103,
+                        "prn": "202501003",
+                        "fullName": "Amit Kulkarni",
+                        "gender": "Male",
+                        "email": "amit.kulkarni@example.com",
+                        "phone": "9876500103",
+                        "attendancePercentage": 76.5,
+                        "isFeePaid": false,
+                        "labBatch": "Batch A",
+                        "address": { "city": "Pimpri", "pin": "411018" },
+                        "assignmentMarks": {
+                            "assignment1": 18,
+                            "assignment2": 20
+                        },
+                        "skills": ["Bootstrap", "JavaScript", "AJAX"],
+                        "mentor": null
+                    },
+                    {
+                        "rollNo": 104,
+                        "prn": "202501004",
+                        "fullName": "Sneha Patil",
+                        "gender": "Female",
+                        "email": "sneha.patil@example.com",
+                        "phone": "9876500104",
+                        "attendancePercentage": 95.0,
+                        "isFeePaid": true,
+                        "labBatch": "Batch B",
+                        "address": { "city": "Chakan", "pin": "410501" },
+                        "assignmentMarks": {
+                            "assignment1": 25,
+                            "assignment2": 25
+                        },
+                        "skills": ["HTML5", "jQuery", "JSON", "Python"],
+                        "mentor": "Prof. Joshi"
+                    },
+                    {
+                        "rollNo": 105,
+                        "prn": "202501005",
+                        "fullName": "Rohan Deshmukh",
+                        "gender": "Male",
+                        "email": "rohan.d@example.com",
+                        "phone": null,
+                        "attendancePercentage": 64.0,
+                        "isFeePaid": true,
+                        "labBatch": "Batch B",
+                        "address": { "city": "Nashik", "pin": "422001" },
+                        "assignmentMarks": {
+                            "assignment1": 15,
+                            "assignment2": 17
+                        },
+                        "skills": ["JavaScript", "CSS3"],
+                        "mentor": null
+                    },
+                    {
+                        "rollNo": 106,
+                        "prn": "202501006",
+                        "fullName": "Ananya Joshi",
+                        "gender": "Female",
+                        "email": "ananya.j@example.com",
+                        "phone": "9876500106",
+                        "attendancePercentage": 91.2,
+                        "isFeePaid": true,
+                        "labBatch": "Batch B",
+                        "address": { "city": "Pune", "pin": "411004" },
+                        "assignmentMarks": {
+                            "assignment1": 23,
+                            "assignment2": 24
+                        },
+                        "skills": ["jQuery", "DOM Manipulation", "JSON"],
+                        "mentor": "Prof. Joshi"
+                    },
+                    {
+                        "rollNo": 107,
+                        "prn": "202501007",
+                        "fullName": "Vikas Shinde",
+                        "gender": "Male",
+                        "email": "vikas.s@example.com",
+                        "phone": "9876500107",
+                        "attendancePercentage": 82.4,
+                        "isFeePaid": false,
+                        "labBatch": "Batch A",
+                        "address": { "city": "Satara", "pin": "415001" },
+                        "assignmentMarks": {
+                            "assignment1": 20,
+                            "assignment2": 21
+                        },
+                        "skills": ["HTML5", "Bootstrap", "JavaScript"],
+                        "mentor": "Prof. Kale"
+                    },
+                    {
+                        "rollNo": 108,
+                        "prn": "202501008",
+                        "fullName": "Pooja Mehta",
+                        "gender": "Female",
+                        "email": "pooja.m@example.com",
+                        "phone": "9876500108",
+                        "attendancePercentage": 89.0,
+                        "isFeePaid": true,
+                        "labBatch": "Batch A",
+                        "address": { "city": "Pune", "pin": "411038" },
+                        "assignmentMarks": {
+                            "assignment1": 22,
+                            "assignment2": 24
+                        },
+                        "skills": ["JSON", "AJAX", "jQuery"],
+                        "mentor": "Prof. Kale"
+                    },
+                    {
+                        "rollNo": 109,
+                        "prn": "202501009",
+                        "fullName": "Karan Malhotra",
+                        "gender": "Male",
+                        "email": "karan.m@example.com",
+                        "phone": "9876500109",
+                        "attendancePercentage": 71.0,
+                        "isFeePaid": true,
+                        "labBatch": "Batch B",
+                        "address": { "city": "Pimpri", "pin": "411017" },
+                        "assignmentMarks": {
+                            "assignment1": 17,
+                            "assignment2": 19
+                        },
+                        "skills": ["JavaScript", "CSS3"],
+                        "mentor": null
+                    },
+                    {
+                        "rollNo": 110,
+                        "prn": "202501010",
+                        "fullName": "Neha Gadre",
+                        "gender": "Female",
+                        "email": "neha.g@example.com",
+                        "phone": "9876500110",
+                        "attendancePercentage": 94.6,
+                        "isFeePaid": true,
+                        "labBatch": "Batch B",
+                        "address": { "city": "Alandi", "pin": "412105" },
+                        "assignmentMarks": {
+                            "assignment1": 24,
+                            "assignment2": 25
+                        },
+                        "skills": [
+                            "HTML5",
+                            "DOM Manipulation",
+                            "JSON",
+                            "Bootstrap"
+                        ],
+                        "mentor": "Prof. Joshi"
+                    },
+                    {
+                        "rollNo": 111,
+                        "prn": "202501011",
+                        "fullName": "Aditya Pawar",
+                        "gender": "Male",
+                        "email": "aditya.p@example.com",
+                        "phone": "9876500111",
+                        "attendancePercentage": 79.5,
+                        "isFeePaid": true,
+                        "labBatch": "Batch A",
+                        "address": { "city": "Kolhapur", "pin": "416001" },
+                        "assignmentMarks": {
+                            "assignment1": 19,
+                            "assignment2": 20
+                        },
+                        "skills": ["jQuery", "JavaScript"],
+                        "mentor": "Prof. Kale"
+                    },
+                    {
+                        "rollNo": 112,
+                        "prn": "202501012",
+                        "fullName": "Divya Nambiar",
+                        "gender": "Female",
+                        "email": "divya.n@example.com",
+                        "phone": "9876500112",
+                        "attendancePercentage": 87.3,
+                        "isFeePaid": true,
+                        "labBatch": "Batch A",
+                        "address": { "city": "Pune", "pin": "411014" },
+                        "assignmentMarks": {
+                            "assignment1": 21,
+                            "assignment2": 22
+                        },
+                        "skills": ["JSON", "HTML5", "CSS3"],
+                        "mentor": "Prof. Kale"
+                    },
+                    {
+                        "rollNo": 113,
+                        "prn": "202501013",
+                        "fullName": "Siddharth Rao",
+                        "gender": "Male",
+                        "email": "siddharth.r@example.com",
+                        "phone": null,
+                        "attendancePercentage": 85.0,
+                        "isFeePaid": false,
+                        "labBatch": "Batch B",
+                        "address": { "city": "Chakan", "pin": "410501" },
+                        "assignmentMarks": {
+                            "assignment1": 20,
+                            "assignment2": 23
+                        },
+                        "skills": ["Bootstrap", "jQuery", "JSON"],
+                        "mentor": "Prof. Joshi"
+                    },
+                    {
+                        "rollNo": 114,
+                        "prn": "202501014",
+                        "fullName": "Tanvi Kulkarni",
+                        "gender": "Female",
+                        "email": "tanvi.k@example.com",
+                        "phone": "9876500114",
+                        "attendancePercentage": 96.2,
+                        "isFeePaid": true,
+                        "labBatch": "Batch B",
+                        "address": { "city": "Pune", "pin": "411052" },
+                        "assignmentMarks": {
+                            "assignment1": 25,
+                            "assignment2": 24
+                        },
+                        "skills": [
+                            "JavaScript",
+                            "jQuery",
+                            "DOM Manipulation",
+                            "JSON"
+                        ],
+                        "mentor": "Prof. Joshi"
+                    },
+                    {
+                        "rollNo": 115,
+                        "prn": "202501015",
+                        "fullName": "Gaurav Thorat",
+                        "gender": "Male",
+                        "email": "gaurav.t@example.com",
+                        "phone": "9876500115",
+                        "attendancePercentage": 78.0,
+                        "isFeePaid": true,
+                        "labBatch": "Batch A",
+                        "address": { "city": "Nashik", "pin": "422002" },
+                        "assignmentMarks": {
+                            "assignment1": 18,
+                            "assignment2": 19
+                        },
+                        "skills": ["HTML5", "CSS3", "JavaScript"],
+                        "mentor": null
+                    }
+                ]
+            }
+        </script>
+
+        <!-- ===================== SHORT JAVASCRIPT: only reads the JSON ===================== -->
+        <script>
+            var d = JSON.parse(document.getElementById("data").textContent); // text -> object
+            var s = d.students;
+
+            // Dataset details: every top-level key except the students array
+            var info = "";
+            for (var k in d) {
+                if (k !== "students") {
+                    info += k + ": " + d[k] + "\n";
+                }
+            }
+            document.getElementById("info").textContent = info;
+
+            // Summary calculated with array methods
+            var avg =
+                s.reduce(function (t, x) {
+                    return t + x.attendancePercentage;
+                }, 0) / s.length;
+            var top = s.reduce(function (a, b) {
+                return a.assignmentMarks.assignment1 +
+                    a.assignmentMarks.assignment2 >=
+                    b.assignmentMarks.assignment1 +
+                        b.assignmentMarks.assignment2
+                    ? a
+                    : b;
+            });
+            document.getElementById("stats").textContent =
+                "Records found     : " +
+                s.length +
+                " (totalRecords says " +
+                d.totalRecords +
+                ")\n" +
+                "Average attendance: " +
+                avg.toFixed(1) +
+                "%\n" +
+                "Fee not paid      : " +
+                s.filter(function (x) {
+                    return !x.isFeePaid;
+                }).length +
+                "\n" +
+                "Top scorer        : " +
+                top.fullName +
+                "\n" +
+                "No phone (null)   : " +
+                s.filter(function (x) {
+                    return x.phone === null;
+                }).length;
+
+            // Table: one row for each object in the array
+            document.getElementById("tbl").innerHTML =
+                "<tr><th>Roll</th><th>Name</th><th>City</th><th>Attendance</th><th>Fee</th><th>A1</th><th>A2</th><th>Skills</th><th>Mentor</th></tr>" +
+                s
+                    .map(function (x) {
+                        return (
+                            "<tr><td>" +
+                            x.rollNo +
+                            "</td><td>" +
+                            x.fullName +
+                            "</td><td>" +
+                            x.address.city +
+                            "</td><td>" +
+                            x.attendancePercentage +
+                            "</td><td>" +
+                            (x.isFeePaid ? "Paid" : "Due") +
+                            "</td><td>" +
+                            x.assignmentMarks.assignment1 +
+                            "</td><td>" +
+                            x.assignmentMarks.assignment2 +
+                            "</td><td>" +
+                            x.skills.join(", ") +
+                            "</td><td>" +
+                            (x.mentor || "-") +
+                            "</td></tr>"
+                        );
+                    })
+                    .join("");
+
+            // Raw JSON of the first record (object -> text)
+            document.getElementById("raw").textContent = JSON.stringify(
+                s[0],
+                null,
+                2,
+            );
+        </script>
+    </body>
+</html>

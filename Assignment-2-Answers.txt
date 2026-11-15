@@ -1,0 +1,3875 @@
+=================================================================================================================================================================================================================== 
+
+Q1. Document Object Model (DOM) (10 Marks)
+
+### **Assignment 2 – DOM, jQuery, and JSON**
+
+#### **Q1. Document Object Model (DOM) (10 Marks)**
+#### **Question 1: Explain DOM and demonstrate DOM access and manipulation methods.** *(2 Marks)*
+
+---
+
+### **1. Concept Explanation**
+
+* **What is the Document Object Model (DOM)?**
+  * The **Document Object Model (DOM)** is a standard W3C (World Wide Web Consortium) programming interface for web documents.
+  * It represents an HTML document as a hierarchical **tree structure of objects**, where every page element, attribute, and text snippet is converted into a accessible node object.
+  * The root of this tree is the `document` object. Through the DOM, JavaScript can dynamically access, modify, add, or delete HTML elements, attributes, and CSS styles in real time without reloading the page.
+
+* **DOM Access Methods (Finding Elements):**
+  1. `document.getElementById("id")`: Finds a single unique element by its ID attribute.
+  2. `document.getElementsByTagName("tag")`: Finds all elements with a specific HTML tag (returns a live `HTMLCollection`).
+  3. `document.getElementsByClassName("class")`: Finds all elements sharing a specific CSS class name (returns an `HTMLCollection`).
+  4. `document.querySelector("selector")` / `querySelectorAll("selector")`: Finds element(s) matching any standard CSS selector (e.g., `#id`, `.class`, `tag.class`).
+
+* **DOM Manipulation Methods & Properties (Modifying Content & Tree):**
+  1. `element.innerHTML`: Reads or updates HTML content inside an element.
+  2. `element.textContent`: Reads or sets plain text content (ignoring HTML tags).
+  3. `element.style.property`: Directly changes CSS styling properties (e.g., `style.color`, `style.backgroundColor`).
+  4. `element.setAttribute("attr", "value")`: Dynamically alters an element's attribute.
+  5. `document.createElement("tag")`: Creates a new element node in memory.
+  6. `parent.appendChild(child)`: Appends a node as the last child of a parent element.
+  7. `element.remove()` / `parent.removeChild(child)`: Removes an element node from the DOM tree.
+
+---
+
+### **2. Complete Webpage Code**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DOM Access and Manipulation | Woodland Theme</title>
+  <style>
+    /* Theme: dark forest green + bark brown + orange, cream paper (plain CSS, no Bootstrap) */
+    :root { --bg:#1c2b1e; --moss:#7cb342; --bark:#5d4037; --orange:#ff9800; --cream:#f4ecd4; --ink:#2b2b20; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--cream); font-family:"Segoe UI", Tahoma, sans-serif; }
+    header { text-align:center; padding:20px 12px; background:var(--bark); border-bottom:5px solid var(--orange); }
+    header h1 { margin:0; font-size:1.5rem; }
+    header p { margin:6px 0 0; color:var(--orange); font-size:.9rem; }
+    /* Responsive: 3 panels on wide screens, stacked on phones */
+    main { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:16px;
+           max-width:1250px; margin:auto; padding:16px; }
+    .panel { background:rgba(255,255,255,.06); border:2px solid var(--moss); border-radius:10px; padding:12px; }
+    .panel h2 { margin:0 0 10px; font-size:1rem; color:var(--moss); text-transform:uppercase; letter-spacing:1px; }
+    /* The stage is the page area that JavaScript will access and change */
+    #stage { background:var(--cream); color:var(--ink); border-radius:8px; padding:12px; border:4px solid var(--bark); }
+    #stage h2 { color:var(--bark); text-transform:none; letter-spacing:0; font-size:1.2rem; }
+    #stage h2.big { font-size:1.7rem; }
+    .hit { outline:3px dashed var(--orange); background:#ffe0b2; }
+    button { background:var(--moss); color:#12200f; border:none; border-radius:6px; padding:8px 10px;
+             margin:3px 3px 3px 0; font-weight:bold; cursor:pointer; }
+    button:hover { background:var(--orange); }
+    button.reset { background:#ef9a9a; }
+    #log { font-size:.85rem; min-height:90px; }
+    #log div { border-left:4px solid var(--orange); padding:3px 8px; margin:5px 0; background:rgba(0,0,0,.25); word-break:break-word; }
+    #log code { color:var(--orange); }
+    #tree { margin:0; font-family:Consolas, monospace; font-size:.8rem; color:var(--cream);
+            white-space:pre; overflow-x:auto; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Document Object Model (DOM)</h1>
+    <p>Unit 3 | Access and manipulation methods</p>
+  </header>
+
+  <main>
+    <!-- Panel 1: the stage (the elements JavaScript will work on) -->
+    <section class="panel">
+      <h2>1. Stage (the web page part)</h2>
+      <div id="stage">
+        <h2 id="mainHeading">Original Heading Text</h2>
+        <p class="note">This is the <span id="targetSpan">first description</span> paragraph.</p>
+        <p class="note">This is the second description paragraph.</p>
+        <ul id="itemList">
+          <li>Existing Item 1</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Panel 2: buttons (created by JavaScript) and the explanation log -->
+    <section class="panel">
+      <h2>2. Controls and log</h2>
+      <div id="buttons"></div>
+      <div id="log"></div>
+    </section>
+
+    <!-- Panel 3: live DOM tree, redrawn after every action -->
+    <section class="panel">
+      <h2>3. Live DOM tree</h2>
+      <pre id="tree"></pre>
+    </section>
+  </main>
+
+  <script>
+    const stage = document.getElementById("stage");
+    const logBox = document.getElementById("log");
+    const treeBox = document.getElementById("tree");
+    const originalStage = stage.innerHTML;   // saved copy, used by Reset
+    let itemCount = 1;
+
+    // ---------- helpers ----------
+    // Adds one explanation line to the log (createElement + appendChild)
+    function log(method, text) {
+      const d = document.createElement("div");
+      d.innerHTML = "<code>" + method + "</code> &rarr; " + text;
+      logBox.appendChild(d);
+    }
+
+    // Draws the element tree of 'el' as text, one line per element
+    function treeText(el, depth) {
+      let s = "  ".repeat(depth) + "<" + el.tagName.toLowerCase() +
+              (el.id ? "#" + el.id : "") +
+              (el.classList.length ? "." + Array.from(el.classList).join(".") : "") + ">";
+      if (el.children.length === 0) {
+        s += ' "' + el.textContent.slice(0, 22) + '"';
+      }
+      s += "\n";
+      for (const child of el.children) { s += treeText(child, depth + 1); }
+      return s;
+    }
+
+    // Clears the log, runs one action, then redraws the tree
+    function run(action) {
+      logBox.textContent = "";
+      action();
+      treeBox.textContent = treeText(stage, 0);   // textContent shows tags as plain text
+    }
+
+    // ---------- ACTIONS (each one demonstrates DOM methods) ----------
+
+    // A. DOM ACCESS: finding elements
+    function accessDemo() {
+      const h = document.getElementById("mainHeading");              // one element by id
+      const ps = document.getElementsByTagName("p");                 // live HTMLCollection
+      const notes = document.getElementsByClassName("note");         // HTMLCollection
+      const first = document.querySelector(".note");                 // first CSS match only
+      const items = document.querySelectorAll("#itemList li");       // NodeList of all matches
+
+      h.classList.add("hit");
+      notes[1].classList.add("hit");   // a collection must be used with an index
+      first.classList.add("hit");
+
+      log('getElementById("mainHeading")', "found <b>" + h.tagName + "</b>, one element");
+      log('getElementsByTagName("p")', "found <b>" + ps.length + "</b> paragraphs (HTMLCollection)");
+      log('getElementsByClassName("note")', "found <b>" + notes.length + "</b>; notes[1] is the second one");
+      log('querySelector(".note")', "returns only the FIRST match");
+      log('querySelectorAll("#itemList li")', "found <b>" + items.length + "</b> item(s) (NodeList)");
+    }
+
+    // B. DOM TREE NAVIGATION: moving between related nodes
+    function navigateDemo() {
+      const ul = document.getElementById("itemList");
+      log("ul.parentNode", "<b>" + ul.parentNode.id + "</b> (the parent)");
+      log("ul.previousElementSibling", "<b>" + ul.previousElementSibling.tagName + "</b> (element before it)");
+      log("ul.nextElementSibling", ul.nextElementSibling ? ul.nextElementSibling.tagName : "<b>null</b> (nothing after it)");
+      log("ul.children.length", "<b>" + ul.children.length + "</b> element child(ren)");
+      log("ul.childNodes.length", "<b>" + ul.childNodes.length + "</b> nodes (includes text nodes of spaces)");
+      if (ul.firstElementChild) {
+        log("ul.firstElementChild", '"' + ul.firstElementChild.textContent + '"');
+        log("ul.lastElementChild", '"' + ul.lastElementChild.textContent + '"');
+      }
+    }
+
+    // C. CONTENT: innerHTML vs textContent
+    function contentDemo() {
+      const span = document.getElementById("targetSpan");
+      const h = document.getElementById("mainHeading");
+
+      log("span.innerHTML (read)", "<b>" + span.innerHTML + "</b>");
+      span.innerHTML = "<b><i>bold italic</i> via innerHTML</b>";     // HTML tags are interpreted
+      h.textContent = "<u>tags</u> shown as text";                     // tags are NOT interpreted
+      log("span.innerHTML = '<b>...</b>'", "HTML tags are <b>rendered</b> as formatting");
+      log("h.textContent = '<u>tags</u>'", "tags appear as <b>plain text</b> (safer for user input)");
+    }
+
+    // D. STYLE, CLASS AND ATTRIBUTES
+    function styleDemo() {
+      const h = document.getElementById("mainHeading");
+      const ul = document.getElementById("itemList");
+
+      h.style.color = "#2e7d32";                      // inline CSS property
+      h.style.backgroundColor = "#dcedc8";
+      h.style.borderBottom = "3px solid #ff9800";
+      h.classList.toggle("big");                      // add/remove a CSS class
+      log("h.style.color / backgroundColor / borderBottom", "inline CSS changed from JavaScript");
+      log('h.classList.toggle("big")', "class on heading now: <b>" + (h.className || "(none)") + "</b>");
+
+      ul.setAttribute("title", "My list");            // create/change an attribute
+      ul.setAttribute("data-x", "42");
+      log('ul.setAttribute("title", "My list")', 'getAttribute gives <b>"' + ul.getAttribute("title") + '"</b>');
+      log('ul.hasAttribute("data-x")', "<b>" + ul.hasAttribute("data-x") + "</b>");
+      ul.removeAttribute("data-x");
+      log('ul.removeAttribute("data-x")', "hasAttribute now <b>" + ul.hasAttribute("data-x") + "</b>");
+    }
+
+    // E. CREATE AND APPEND
+    function createDemo() {
+      const ul = document.getElementById("itemList");
+      itemCount++;
+      const li = document.createElement("li");                    // 1. create element in memory
+      li.textContent = "Dynamic Item " + itemCount;               // 2. add text
+      li.setAttribute("data-id", itemCount);                      // 3. add attribute
+      li.appendChild(document.createTextNode(" (new)"));          // 4. create and add a text node
+      ul.appendChild(li);                                         // 5. attach as LAST child
+      log('document.createElement("li")', "new element created in memory only");
+      log("ul.appendChild(li)", "now part of the page as the last child");
+      log("document.createTextNode()", "creates a text node, added inside the li");
+    }
+
+    // F. INSERT BEFORE and REPLACE
+    function insertDemo() {
+      const ul = document.getElementById("itemList");
+      itemCount++;
+      const li = document.createElement("li");
+      li.textContent = "Inserted at top " + itemCount;
+      ul.insertBefore(li, ul.firstElementChild);                  // add before the first child
+      log("ul.insertBefore(li, ul.firstElementChild)", "new item placed at the <b>top</b>");
+
+      if (ul.children.length > 1) {
+        const rep = document.createElement("li");
+        rep.textContent = "Replaced last item";
+        ul.replaceChild(rep, ul.lastElementChild);                // new node replaces old node
+        log("ul.replaceChild(new, old)", "last item swapped for a new one");
+      }
+    }
+
+    // G. REMOVE
+    function removeDemo() {
+      const ul = document.getElementById("itemList");
+      if (ul.lastElementChild) {
+        const text = ul.lastElementChild.textContent;
+        ul.lastElementChild.remove();                             // element removes itself
+        log("element.remove()", 'removed <b>"' + text + '"</b>');
+      } else {
+        log("element.remove()", "nothing left to remove");
+      }
+    }
+
+    function removeChildDemo() {
+      const ul = document.getElementById("itemList");
+      if (ul.firstElementChild) {
+        const text = ul.firstElementChild.textContent;
+        ul.removeChild(ul.firstElementChild);                     // parent removes the child
+        log("parent.removeChild(child)", 'removed <b>"' + text + '"</b>');
+      } else {
+        log("parent.removeChild(child)", "nothing left to remove");
+      }
+    }
+
+    // H. RESET: put the stage back to its first state
+    function resetDemo() {
+      stage.innerHTML = originalStage;
+      itemCount = 1;
+      log("stage.innerHTML = saved copy", "stage restored to the original state");
+    }
+
+    // ---------- BUILD THE BUTTONS WITH JAVASCRIPT ----------
+    const actions = [
+      ["1. Access elements", accessDemo],
+      ["2. Navigate tree", navigateDemo],
+      ["3. innerHTML / textContent", contentDemo],
+      ["4. Style, class, attributes", styleDemo],
+      ["5. Create + append", createDemo],
+      ["6. insertBefore + replaceChild", insertDemo],
+      ["7. remove()", removeDemo],
+      ["8. removeChild()", removeChildDemo],
+      ["Reset", resetDemo]
+    ];
+    const buttons = document.getElementById("buttons");
+    actions.forEach(function (a) {
+      const b = document.createElement("button");
+      b.textContent = a[0];
+      if (a[0] === "Reset") b.className = "reset";
+      b.addEventListener("click", function () { run(a[1]); });    // event handling
+      buttons.appendChild(b);
+    });
+
+    // Show the starting tree when the page loads
+    treeBox.textContent = treeText(stage, 0);
+    log("Ready", "click the buttons in order and watch the tree on the right change");
+  </script>
+</body>
+</html>
+```
+
+---
+
+### **3. Key Implementation Highlights**
+
+1. **DOM Selection Methods Demonstrated:**
+   * `document.getElementById("mainHeading")`: Fetches the heading by unique ID.
+   * `document.getElementsByClassName("description")`: Returns an array-like list of elements matching the class name.
+   * `document.querySelector("#targetSpan")`: Selects elements using standard CSS syntax (`#id`, `.class`).
+
+2. **DOM Content & Style Manipulation:**
+   * Uses `heading.innerHTML` to inject HTML markup dynamically.
+   * Uses `span.textContent` to safely assign plain text without HTML evaluation.
+   * Modifies inline CSS properties dynamically using `heading.style.color` and `paragraphs.style.backgroundColor`.
+
+3. **Node Creation & Tree Modification:**
+   * `document.createElement("li")`: Constructs a new element node in browser memory.
+   * `list.appendChild(newItem)`: Injects the newly created element at the end of the `<ul>` container node.
+   * `list.lastElementChild.remove()`: Safely detaches and deletes the targeted node from the DOM tree.
+
+---
+
+Whenever you are ready, please share **Question 2** of Assignment 2!
+
+=================================================================================================================================================================================================================== 
+
+### **Assignment 2 – DOM, jQuery, and JSON**
+
+#### **Q1. Document Object Model (DOM) (10 Marks)**
+#### **Question 2: Implement event listeners and demonstrate event flow.** *(2 Marks)*
+
+---
+
+### **1. Concept Explanation**
+
+* **Event Listeners (`addEventListener`):**
+  * An event listener is a mechanism attached to DOM nodes that executes a handler function when a specified event (such as `click`, `mouseover`, or `submit`) occurs.
+  * `element.addEventListener(event, function, useCapture)` is the preferred W3C standard method. Unlike inline HTML handlers or DOM properties (e.g., `onclick`), `addEventListener()` allows multiple event handlers on a single element without overwriting existing ones and can be removed using `removeEventListener()`.
+
+* **Event Propagation & Event Flow:**
+  When an event occurs on an element nested inside other elements, the event travels through the DOM tree hierarchy in three distinct phases:
+  1. **Capturing Phase (Trickling):** The event travels downward from the outermost ancestor (`window` / `document`) down through intermediate parents to the target element. This phase is activated by setting the third parameter of `addEventListener` to `true`.
+  2. **Target Phase:** The event reaches the actual target element where the user interaction originated.
+  3. **Bubbling Phase:** The event travels upward from the target element back through its parent elements to the root. This is the default behavior when `useCapture` is set to `false` or omitted.
+
+* **Controlling Propagation:**
+  * **`event.stopPropagation()`:** Halts the journey of the event through the DOM tree, preventing parent elements from receiving the event during bubbling or capturing.
+  * **`event.preventDefault()`:** Prevents the browser's default action associated with the event (such as preventing a form from submitting or a link from navigating).
+
+---
+
+### **2. Complete Webpage Code**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Listeners and Event Flow | Arcade Theme</title>
+  <style>
+    /* Theme: arcade cabinet - black screen, gold, red and cyan, thick pixel-style borders (plain CSS, no Bootstrap) */
+    :root { --black:#0b0b12; --gold:#ffd400; --red:#ff3b3b; --cyan:#27e1ff; --grey:#2a2a3c; --white:#f4f4f4; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--black); color:var(--white); font-family:"Courier New", monospace; }
+    header { text-align:center; padding:18px 10px; border-bottom:4px solid var(--gold); background:var(--grey); }
+    header h1 { margin:0; font-size:1.5rem; color:var(--gold); letter-spacing:3px; text-transform:uppercase; }
+    header p { margin:6px 0 0; color:var(--cyan); font-size:.85rem; }
+    /* Responsive: panels wrap into columns by available width */
+    main { display:grid; grid-template-columns:repeat(auto-fit, minmax(310px, 1fr)); gap:16px;
+           max-width:1250px; margin:auto; padding:16px; }
+    .panel { border:4px solid var(--gold); background:#14141f; padding:12px; box-shadow:6px 6px 0 var(--red); }
+    .panel h2 { margin:0 0 10px; font-size:1rem; color:var(--gold); text-transform:uppercase; }
+    .opt { display:block; margin:6px 0; font-size:.85rem; cursor:pointer; }
+    button { background:var(--gold); color:var(--black); border:3px solid var(--white); padding:7px 10px;
+             margin:4px 4px 4px 0; font-family:inherit; font-weight:bold; cursor:pointer; }
+    button:hover { background:var(--cyan); }
+    /* Three nested boxes for the event-flow arena */
+    .arena { margin:10px 0; }
+    #outer  { background:#3b2a8f; border:3px solid var(--cyan); padding:14px; }
+    #middle { background:#8f2a3b; border:3px solid var(--gold); padding:14px; margin-top:8px; }
+    #inner  { background:var(--gold); color:var(--black); display:block; width:100%; margin:8px 0 0; padding:10px; }
+    .tag { font-size:.8rem; font-weight:bold; }
+    #log { background:var(--black); border:2px dashed var(--cyan); height:300px; overflow-y:auto; padding:8px; font-size:.78rem; }
+    #log div { padding:2px 0; word-break:break-word; }
+    .cap { color:var(--cyan); } .tgt { color:var(--gold); } .bub { color:var(--red); } .inf { color:var(--white); }
+    ul { padding-left:18px; margin:6px 0; }
+    li { cursor:pointer; margin:3px 0; }
+    li.done { text-decoration:line-through; color:#888; }
+    input[type=text] { width:100%; padding:7px; background:var(--black); color:var(--gold);
+                       border:2px solid var(--cyan); font-family:inherit; }
+    .small { font-size:.78rem; color:#bbb; margin:4px 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Event Listener Arcade</h1>
+    <p>Unit 3 | DOM | addEventListener and event flow</p>
+  </header>
+
+  <!-- Only an empty <main>; JavaScript builds every panel -->
+  <main id="app"></main>
+
+  <script>
+    const app = document.getElementById("app");
+
+    // ---------- small helpers (createElement + appendChild) ----------
+    // el("div", "panel", "text") creates one element
+    function el(tag, cls, text) {
+      const e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (text) e.textContent = text;
+      return e;
+    }
+    // Makes a panel with a heading and adds it to the page
+    function makePanel(title) {
+      const p = el("section", "panel");
+      p.appendChild(el("h2", "", title));
+      app.appendChild(p);
+      return p;
+    }
+    // Makes a checkbox with a label
+    function makeCheck(parent, text) {
+      const lab = el("label", "opt");
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      lab.appendChild(cb);
+      lab.appendChild(document.createTextNode(" " + text));
+      parent.appendChild(lab);
+      return cb;
+    }
+    // Makes a button and attaches a click listener
+    function makeButton(parent, text, handler) {
+      const b = el("button", "", text);
+      b.addEventListener("click", handler);
+      parent.appendChild(b);
+      return b;
+    }
+
+    // ================= PANEL 4 FIRST (the log, used by every demo) =================
+    let step = 0;
+    let logBox;
+    function log(msg, cls) {
+      step++;
+      const d = el("div", cls || "inf");
+      d.innerHTML = step + ". " + msg;
+      logBox.appendChild(d);
+      logBox.scrollTop = logBox.scrollHeight;    // keep newest line visible
+    }
+
+    // ================= PANEL 1: EVENT FLOW (capturing, target, bubbling) =================
+    const p1 = makePanel("1. Event flow: capture, target, bubble");
+    const stopTarget = makeCheck(p1, "stopPropagation() in the button (target)");
+    const stopCapture = makeCheck(p1, "stopPropagation() in MIDDLE capture listener");
+
+    const outer = el("div"); outer.id = "outer";
+    outer.appendChild(el("span", "tag", "OUTER"));
+    const middle = el("div"); middle.id = "middle";
+    middle.appendChild(el("span", "tag", "MIDDLE"));
+    const inner = el("button", "", "INNER BUTTON (click me)"); inner.id = "inner";
+    middle.appendChild(inner);
+    outer.appendChild(middle);
+    const arena = el("div", "arena");
+    arena.appendChild(outer);
+    p1.appendChild(arena);
+    p1.appendChild(el("p", "small", "Click INNER, then MIDDLE, then OUTER and compare the log."));
+
+    // e.eventPhase: 1 = capturing, 2 = target, 3 = bubbling
+    const phaseName = { 1: "CAPTURE", 2: "TARGET", 3: "BUBBLE" };
+    const phaseClass = { 1: "cap", 2: "tgt", 3: "bub" };
+
+    // One reusable handler. e.target = where the click started,
+    // e.currentTarget (same as 'this') = element whose listener is running now.
+    function flowHandler(e) {
+      log("[" + phaseName[e.eventPhase] + "] listener on <b>" + e.currentTarget.id +
+          "</b> | target: " + e.target.id, phaseClass[e.eventPhase]);
+    }
+
+    // Third argument true = capturing listener, false (default) = bubbling listener
+    outer.addEventListener("click", flowHandler, true);     // capture on OUTER
+    middle.addEventListener("click", function (e) {         // capture on MIDDLE
+      flowHandler(e);
+      if (stopCapture.checked) {
+        e.stopPropagation();                                // event never reaches the button
+        log("stopPropagation() in MIDDLE capture: event stops here", "inf");
+      }
+    }, true);
+    inner.addEventListener("click", function (e) {          // target listener
+      flowHandler(e);
+      if (stopTarget.checked) {
+        e.stopPropagation();                                // stops the bubbling phase
+        log("stopPropagation() at target: no bubbling to parents", "inf");
+      }
+    });
+    middle.addEventListener("click", flowHandler);          // bubble on MIDDLE
+    outer.addEventListener("click", flowHandler);           // bubble on OUTER
+
+    // ================= PANEL 2: LISTENER TYPES AND REMOVAL =================
+    const p2 = makePanel("2. addEventListener vs onclick");
+    p2.appendChild(el("p", "small", "Same button: 2 listeners added, and onclick assigned twice."));
+
+    const multi = el("button", "", "Click: multiple handlers");
+    p2.appendChild(multi);
+
+    function listenerA() { log("addEventListener A ran", "inf"); }
+    function listenerB() { log("addEventListener B ran", "inf"); }
+    multi.addEventListener("click", listenerA);             // both listeners are kept
+    multi.addEventListener("click", listenerB);
+    multi.onclick = function () { log("onclick FIRST (will be overwritten)", "inf"); };
+    multi.onclick = function () { log("onclick SECOND (only this one runs)", "inf"); };
+
+    makeButton(p2, "removeEventListener(B)", function () {
+      multi.removeEventListener("click", listenerB);        // needs the SAME named function
+      log("listener B removed. Click the first button again.", "tgt");
+    });
+
+    const onceBtn = el("button", "", "Click: runs only once");
+    p2.appendChild(onceBtn);
+    onceBtn.addEventListener("click", function () {
+      log("{ once: true } listener ran, now it is removed automatically", "inf");
+    }, { once: true });
+
+    // ================= PANEL 3: EVENT OBJECT, preventDefault, KEY EVENTS =================
+    const p3 = makePanel("3. Event object and default actions");
+
+    const blockCb = makeCheck(p3, "Block the box below with preventDefault()");
+    const tick = makeCheck(p3, "Try to tick me");
+    tick.addEventListener("click", function (e) {
+      if (blockCb.checked) {
+        e.preventDefault();                                 // cancels the default action (the tick)
+        log("preventDefault(): default tick action cancelled", "tgt");
+      } else {
+        log("default action allowed, box is now " + (tick.checked ? "ticked" : "unticked"), "inf");
+      }
+    });
+
+    p3.appendChild(el("p", "small", "Keyboard event: type below."));
+    const typeBox = document.createElement("input");
+    typeBox.type = "text";
+    typeBox.placeholder = "type here";
+    p3.appendChild(typeBox);
+    typeBox.addEventListener("keyup", function (e) {
+      log("keyup | e.key = <b>" + e.key + "</b> | value = \"" + typeBox.value + "\"", "inf");
+    });
+
+    const hover = el("button", "", "Hover and leave me");
+    p3.appendChild(hover);
+    hover.addEventListener("mouseover", function () { log("mouseover on the hover button", "inf"); });
+    hover.addEventListener("mouseout", function () { log("mouseout on the hover button", "inf"); });
+
+    // ================= PANEL 4: LOG + EVENT DELEGATION =================
+    const p4 = makePanel("4. Event log and delegation");
+    logBox = el("div"); logBox.id = "log";
+    p4.appendChild(logBox);
+    makeButton(p4, "Clear log", function () { logBox.textContent = ""; step = 0; });
+
+    p4.appendChild(el("p", "small", "Delegation: ONE listener on the list handles every item, even new ones."));
+    const list = document.createElement("ul");
+    ["Learn capturing", "Learn bubbling"].forEach(function (t) { list.appendChild(el("li", "", t)); });
+    p4.appendChild(list);
+    let n = 2;
+    makeButton(p4, "Add item", function () {
+      n++;
+      list.appendChild(el("li", "", "New task " + n));      // no new listener needed
+    });
+    list.addEventListener("click", function (e) {
+      if (e.target.tagName === "LI") {                      // e.target is the clicked <li>
+        e.target.classList.toggle("done");
+        log("delegation: <b>" + e.target.textContent + "</b> toggled by the single UL listener", "tgt");
+      }
+    });
+
+    log("Ready. Click the INNER button to see the complete event flow.", "inf");
+  </script>
+</body>
+</html>
+```
+
+---
+
+### **3. Key Implementation Highlights**
+
+1. **`addEventListener` Parameter Configuration:**
+   * **Capturing Listeners:** Configured with `true` as the third argument (`addEventListener("click", fn, true)`), instructing the browser to execute handlers during the downward capturing phase.
+   * **Bubbling Listeners:** Configured with `false` or default (`addEventListener("click", fn, false)`), executing handlers as the event bubbles up the DOM tree.
+
+2. **Execution Sequence Demonstrated:**
+   * When the **Target Button** is clicked without `stopPropagation()`, the log shows the complete flow:
+     1. `CAPTURING` on Grandparent \\(\rightarrow\\) `CAPTURING` on Parent.
+     2. `TARGET` on Button.
+     3. `BUBBLING` on Parent \\(\rightarrow\\) `BUBBLING` on Grandparent.
+
+3. **Propagation Control (`stopPropagation`):**
+   * Toggling the checkbox calls `e.stopPropagation()` inside the button's event handler. This halts the event from traveling further, preventing the parent and grandparent bubbling listeners from executing.
+
+---
+
+💡 *Whenever you are ready, please share **Question 3 of Section Q1**!*
+
+=================================================================================================================================================================================================================== 
+
+### **Assignment 2 – DOM, jQuery, and JSON**
+
+#### **Q1. Document Object Model (DOM) (10 Marks)**
+#### **Question 3: Demonstrate event bubbling and capturing.** *(2 Marks)*
+
+---
+
+### **1. Concept Explanation**
+
+* **Event Propagation:** When an event occurs on a DOM element nested inside other parent elements, the event does not exist in isolation. It travels through the DOM hierarchy in two distinct phases:
+  1. **Event Capturing (Trickling Phase):** 
+     * The event originates at the outermost ancestor (`window` \\(\rightarrow\\) `document` \\(\rightarrow\\) `<html>` \\(\rightarrow\\) `<body>`) and travels **downwards** through intermediate parent elements until it reaches the target element.
+     * To capture events during this downward phase, set the third parameter (`useCapture`) of `addEventListener()` to **`true`** (e.g., `element.addEventListener('click', handler, true)`).
+  2. **Event Bubbling (Bubbling Phase):** 
+     * Starts at the target element where the user interaction took place and travels **upwards** through parent elements back to the root of the DOM tree.
+     * This is the default behavior in JavaScript when the `useCapture` argument is set to **`false`** or omitted (e.g., `element.addEventListener('click', handler, false)`).
+
+* **Controlling Propagation (`event.stopPropagation()`):**
+  * The `event.stopPropagation()` method can be called inside any event handler to halt the further flow of the event during either the capturing or bubbling phase.
+
+---
+
+### **2. Complete HTML5 Code**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Bubbling and Capturing | Metro Line Theme</title>
+  <style>
+    /* Theme: metro transit map - light grey board, bold line colours red/blue/green/amber (plain CSS, no Bootstrap) */
+    :root { --board:#eceff1; --ink:#263238; --red:#e53935; --blue:#1e88e5; --green:#43a047; --amber:#fdb813; --purple:#8e24aa; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--board); color:var(--ink); font-family:Verdana, Geneva, sans-serif; }
+    header { background:#fff; text-align:center; padding:18px 10px 14px; border-bottom:4px solid var(--ink); position:relative; }
+    header::after { content:""; position:absolute; left:0; right:0; bottom:-12px; height:8px;
+      background:linear-gradient(90deg,var(--red) 25%,var(--blue) 25% 50%,var(--green) 50% 75%,var(--amber) 75%); }
+    header h1 { margin:0; font-size:1.45rem; }
+    header p { margin:6px 0 0; font-size:.85rem; color:#607d8b; }
+    /* Responsive: panels wrap by available width */
+    main { display:grid; grid-template-columns:repeat(auto-fit, minmax(310px, 1fr)); gap:18px;
+           max-width:1200px; margin:26px auto 20px; padding:0 14px; }
+    .panel { background:#fff; border-radius:12px; padding:14px; border-top:8px solid var(--purple);
+             box-shadow:0 2px 6px rgba(0,0,0,.15); }
+    .panel:nth-child(2) { border-top-color:var(--blue); }
+    .panel:nth-child(3) { border-top-color:var(--green); }
+    .panel h2 { margin:0 0 10px; font-size:1.05rem; }
+    .opt { display:block; margin:5px 0; font-size:.85rem; cursor:pointer; }
+    select { width:100%; padding:6px; margin:4px 0 8px; font-size:.85rem; }
+    button { background:var(--ink); color:#fff; border:none; border-radius:6px; padding:8px 12px;
+             margin:4px 4px 4px 0; cursor:pointer; font-size:.85rem; }
+    /* Nested stations */
+    #docbar { background:var(--ink); color:#fff; border-radius:10px; padding:8px; margin:8px 0; }
+    .lbl { display:block; font-weight:bold; font-size:.8rem; pointer-events:none; margin-bottom:6px; }
+    .stn { border-radius:8px; padding:10px; margin-top:6px; color:#fff; transition:all .2s; }
+    #grand  { background:var(--red); }
+    #parent { background:var(--blue); }
+    #child  { background:var(--green); }
+    #btn    { display:block; width:100%; background:var(--amber); color:var(--ink); border:none; border-radius:6px;
+              padding:10px; font-weight:bold; margin:6px 0 0; cursor:pointer; }
+    .lit { outline:5px solid #fff; box-shadow:0 0 0 8px #000; transform:scale(1.03); filter:brightness(1.25); position:relative; z-index:2; }
+    #summary { font-size:.82rem; background:var(--board); border-radius:8px; padding:8px; margin-bottom:8px; min-height:70px; }
+    #log { background:var(--ink); border-radius:8px; height:250px; overflow-y:auto; padding:8px; font-family:Consolas, monospace; font-size:.78rem; }
+    #log div { padding:2px 0; word-break:break-word; }
+    .cap { color:#90caf9; } .tgt { color:var(--amber); } .bub { color:#ef9a9a; } .inf { color:#fff; } .sep { color:#a5d6a7; border-top:1px dashed #78909c; margin-top:6px; padding-top:4px; }
+    #fbox { border:3px dashed var(--green); border-radius:8px; padding:10px; margin:8px 0; }
+    #fbox input { width:100%; padding:8px; }
+    .small { font-size:.78rem; color:#607d8b; margin:4px 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Event Capturing &amp; Bubbling</h1>
+    <p>Unit 3 | DOM | Event propagation</p>
+  </header>
+
+  <!-- Only an empty <main>; JavaScript builds everything -->
+  <main id="app"></main>
+
+  <script>
+    const app = document.getElementById("app");
+
+    // ---------- helpers (createElement + appendChild) ----------
+    function el(tag, cls, text) {
+      const e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (text) e.textContent = text;
+      return e;
+    }
+    function makePanel(title) {
+      const p = el("section", "panel");
+      p.appendChild(el("h2", "", title));
+      app.appendChild(p);
+      return p;
+    }
+    function makeRadio(parent, value, text, checked) {
+      const lab = el("label", "opt");
+      const r = document.createElement("input");
+      r.type = "radio"; r.name = "mode"; r.value = value; r.checked = checked;
+      lab.appendChild(r);
+      lab.appendChild(document.createTextNode(" " + text));
+      parent.appendChild(lab);
+      return r;
+    }
+
+    // ================= PANEL 1: CONTROLS + NESTED ELEMENTS =================
+    const p1 = makePanel("1. Click inside the stations");
+
+    const radios = [
+      makeRadio(p1, "both", "Capturing + bubbling listeners", true),
+      makeRadio(p1, "capture", "Capturing only (useCapture = true)", false),
+      makeRadio(p1, "bubble", "Bubbling only (useCapture = false)", false)
+    ];
+
+    // Where should stopPropagation() be called? (value = elementName-phase)
+    const stopSel = document.createElement("select");
+    [["none", "No stopPropagation()"],
+     ["grand-capture", "Stop in OUTER capture listener"],
+     ["btn-target", "Stop at the BUTTON (target)"],
+     ["parent-bubble", "Stop in MIDDLE bubble listener"]].forEach(function (o) {
+      const op = document.createElement("option");
+      op.value = o[0]; op.textContent = o[1];
+      stopSel.appendChild(op);
+    });
+    p1.appendChild(stopSel);
+
+    const animCb = document.createElement("input");
+    animCb.type = "checkbox"; animCb.checked = true;
+    const animLab = el("label", "opt");
+    animLab.appendChild(animCb);
+    animLab.appendChild(document.createTextNode(" Animate the path (stations light up in order)"));
+    p1.appendChild(animLab);
+
+    // Nested structure: document bar > outer > middle > inner > button
+    const docbar = el("div"); docbar.id = "docbar";
+    docbar.appendChild(el("span", "lbl", "DOCUMENT"));
+    const grand = el("div", "stn"); grand.id = "grand";
+    grand.appendChild(el("span", "lbl", "OUTER"));
+    const parent = el("div", "stn"); parent.id = "parent";
+    parent.appendChild(el("span", "lbl", "MIDDLE"));
+    const child = el("div", "stn"); child.id = "child";
+    child.appendChild(el("span", "lbl", "INNER"));
+    const btn = el("button", "", "BUTTON (target)"); btn.id = "btn";
+    child.appendChild(btn);
+    parent.appendChild(child);
+    grand.appendChild(parent);
+    docbar.appendChild(grand);
+    p1.appendChild(docbar);
+    p1.appendChild(el("p", "small", "Click the button, then click only the INNER, MIDDLE or OUTER area. The target changes, so the path changes."));
+
+    // ================= PANEL 2: SUMMARY + LOG =================
+    const p2 = makePanel("2. Order of execution");
+    const summary = el("div"); summary.id = "summary";
+    summary.textContent = "Click a station to see the order here.";
+    p2.appendChild(summary);
+    const logBox = el("div"); logBox.id = "log";
+    p2.appendChild(logBox);
+    const clearBtn = el("button", "", "Clear log");
+    p2.appendChild(clearBtn);
+
+    let step = 0;
+    function log(msg, cls) {
+      step++;
+      const d = el("div", cls || "inf");
+      d.innerHTML = step + ". " + msg;
+      logBox.appendChild(d);
+      logBox.scrollTop = logBox.scrollHeight;
+    }
+    clearBtn.addEventListener("click", function () {
+      logBox.textContent = ""; step = 0;
+      summary.textContent = "Click a station to see the order here.";
+    });
+
+    // ================= LISTENERS: capture, target, bubble =================
+    const nodes  = { document: document, grand: grand, parent: parent, child: child, btn: btn };
+    const labels = { document: "DOCUMENT", grand: "OUTER", parent: "MIDDLE", child: "INNER", btn: "BUTTON" };
+    const visual = { document: docbar, grand: grand, parent: parent, child: child, btn: btn };
+    const phaseName  = { 1: "capture", 2: "target", 3: "bubble" };
+    const phaseClass = { capture: "cap", target: "tgt", bubble: "bub" };
+
+    let registered = [];   // remembers listeners so they can be removed when the mode changes
+    let current = [];      // listeners that ran for the latest click
+
+    // Builds one handler for the element called 'name'
+    function makeHandler(name) {
+      return function (e) {
+        const ph = phaseName[e.eventPhase];                       // 1, 2 or 3 -> capture, target, bubble
+        current.push({ name: name, ph: ph });
+        log("[" + ph.toUpperCase() + "] listener on <b>" + labels[name] + "</b>", phaseClass[ph]);
+        if (stopSel.value === name + "-" + ph) {
+          e.stopPropagation();                                    // event goes no further
+          log("stopPropagation() called here, the event STOPS", "inf");
+        }
+      };
+    }
+
+    function add(name, useCapture) {
+      const f = makeHandler(name);
+      nodes[name].addEventListener("click", f, useCapture);       // third argument: true = capturing
+      registered.push({ n: nodes[name], f: f, c: useCapture });
+    }
+
+    // (Re)attach listeners according to the selected mode
+    function attach() {
+      registered.forEach(function (r) { r.n.removeEventListener("click", r.f, r.c); });
+      registered = [];
+      const mode = radios.filter(function (r) { return r.checked; })[0].value;
+      Object.keys(nodes).forEach(function (name) {
+        if (name === "btn") {
+          add("btn", mode === "capture");                         // target: one listener only
+        } else {
+          if (mode === "both" || mode === "capture") add(name, true);
+          if (mode === "both" || mode === "bubble") add(name, false);
+        }
+      });
+      log("Mode changed to <b>" + mode + "</b>. Listeners re-attached.", "inf");
+    }
+    radios.forEach(function (r) { r.addEventListener("change", attach); });
+
+    // Bookkeeping listener on window (capture): runs FIRST for every click inside the demo
+    window.addEventListener("click", function (e) {
+      if (!docbar.contains(e.target)) return;
+      current = [];
+      log("--- click started on <b>" + (e.target.id || e.target.tagName) + "</b> (event.target) ---", "sep");
+      setTimeout(finish, 0);                                      // runs after all listeners are done
+    }, true);
+
+    // Shows the summary and plays the light-up animation
+    function finish() {
+      const part = function (ph) {
+        return current.filter(function (x) { return x.ph === ph; })
+                      .map(function (x) { return labels[x.name]; }).join(" &rarr; ") || "none";
+      };
+      summary.innerHTML = "<b>Capturing (down):</b> " + part("capture") +
+        "<br><b>Target:</b> " + part("target") +
+        "<br><b>Bubbling (up):</b> " + part("bubble");
+      if (!animCb.checked) return;
+      current.forEach(function (x, i) {
+        setTimeout(function () {
+          visual[x.name].classList.add("lit");
+          setTimeout(function () { visual[x.name].classList.remove("lit"); }, 420);
+        }, i * 500);
+      });
+    }
+
+    // ================= PANEL 3: EVENTS THAT DO NOT BUBBLE =================
+    const p3 = makePanel("3. Not every event bubbles");
+    p3.appendChild(el("p", "small", "Click inside the input. Parent DIV has 3 listeners."));
+    const fbox = el("div"); fbox.id = "fbox";
+    fbox.appendChild(el("span", "small", "Parent DIV"));
+    const inp = document.createElement("input");
+    inp.type = "text"; inp.placeholder = "focus me";
+    fbox.appendChild(inp);
+    p3.appendChild(fbox);
+    p3.appendChild(el("p", "small", "Compare with a click, which always has e.bubbles = true."));
+
+    fbox.addEventListener("focus", function (e) {
+      log("focus, BUBBLE listener ran (e.bubbles = " + e.bubbles + ")", "bub");   // never runs
+    }, false);
+    fbox.addEventListener("focus", function (e) {
+      log("focus, CAPTURE listener ran (capturing still works)", "cap");
+    }, true);
+    fbox.addEventListener("focusin", function (e) {
+      log("focusin ran (e.bubbles = " + e.bubbles + "), the bubbling version of focus", "tgt");
+    });
+    window.addEventListener("click", function (e) {
+      if (e.target === inp) { /* only to show that click does bubble */ log("click on input: e.bubbles = " + e.bubbles, "inf"); }
+    });
+
+    attach();   // start with both capturing and bubbling listeners
+  </script>
+</body>
+</html>
+```
+
+---
+
+### **3. Key Implementation Highlights**
+
+1. **Capturing Phase Registration (`useCapture = true`):**
+   * Configured via `outerDiv.addEventListener("click", fn, true)` and `innerDiv.addEventListener("click", fn, true)`.
+   * These execute first in top-down order during the downward trickling journey.
+
+2. **Target Phase:**
+   * Executed directly on `#targetBtn` when the click interaction occurs.
+
+3. **Bubbling Phase Registration (`useCapture = false`):**
+   * Configured via `innerDiv.addEventListener("click", fn, false)` and `outerDiv.addEventListener("click", fn, false)`.
+   * These execute after the target phase, bubbling upward from the inner container to the outer container.
+
+4. **Logged Sequence when clicking "Target Button":**
+   1. `[CAPTURING Phase] Outer Div listener executed.`
+   2. `[CAPTURING Phase] Inner Div listener executed.`
+   3. `[TARGET Phase] Target Button clicked!`
+   4. `[BUBBLING Phase] Inner Div listener executed.`
+   5. `[BUBBLING Phase] Outer Div listener executed.`
+
+---
+
+Whenever you are ready, please share **Question 4 of Section Q1**!
+
+=================================================================================================================================================================================================================== 
+
+### **Assignment 2 – DOM, jQuery, and JSON**
+
+#### **Q1. Document Object Model (DOM) (10 Marks)**
+#### **Question 4: Implement any four DOM events from the syllabus: `onclick`, `onload`, `onmouseover`, `onmouseout`, `onmouseup`, and `onmousedown`.** *(2 Marks)*
+
+---
+
+### **1. Concept Explanation**
+
+* **DOM Events:** Mouse and page load events are triggered by user actions or browser state changes, allowing scripts to execute interactive responses dynamically.
+* **Events Selected for Implementation:**
+  1. **`onload`:** Triggers automatically once the document, markup, images, and dependent scripts have finished loading completely.
+  2. **`onclick`:** Triggers when a user clicks (presses and releases) a primary mouse button over an element.
+  3. **`onmouseover` / `onmouseout`:** 
+     * `onmouseover`: Triggers when the mouse pointer moves onto an element.
+     * `onmouseout`: Triggers when the mouse pointer leaves/exits an element.
+  4. **`onmousedown` / `onmouseup`:**
+     * `onmousedown`: Triggers the exact moment a mouse button is pressed down over an element.
+     * `onmouseup`: Triggers when the pressed mouse button is released over an element.
+
+---
+
+### **2. Complete Webpage Code**
+
+```html
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DOM Events | Terracotta Pottery Theme</title>
+  <style>
+    /* Theme: terracotta clay + sage green on warm sand, rounded "pottery" look (plain CSS, no Bootstrap) */
+    :root { --clay:#c8553d; --sage:#8fa98b; --deep:#3d5a45; --sand:#f3e5d0; --brown:#4a2f27; --cream:#fffaf1; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--sand); color:var(--brown); font-family:"Palatino Linotype", Palatino, serif; }
+    header { background:var(--clay); color:var(--cream); text-align:center; padding:20px 12px;
+             border-bottom:8px double var(--sage); }
+    header h1 { margin:0; font-size:1.5rem; letter-spacing:1px; }
+    header p { margin:6px 0 0; font-size:.9rem; color:var(--sand); }
+    /* Responsive: panels wrap by available width */
+    main { display:grid; grid-template-columns:repeat(auto-fit, minmax(310px, 1fr)); gap:18px;
+           max-width:1200px; margin:20px auto; padding:0 14px; }
+    .panel { background:var(--cream); border:3px solid var(--brown); border-radius:18px; padding:14px;
+             box-shadow:6px 6px 0 var(--sage); }
+    .panel h2 { margin:0 0 10px; font-size:1.05rem; color:var(--clay); }
+    .small { font-size:.8rem; margin:6px 0; color:#7a5c52; }
+
+    /* The event zone */
+    #zone { background:var(--sage); border:4px dashed var(--deep); border-radius:16px; padding:34px 12px;
+            text-align:center; cursor:pointer; user-select:none; transition:all .15s; }
+    #zone * { pointer-events:none; }               /* children never become the event target */
+    #zone h3 { margin:0 0 6px; color:var(--brown); }
+    #zone.over { background:#b7cdb3; border-color:var(--clay); }
+    #zone.down { background:var(--clay); color:var(--cream); transform:scale(.97); }
+    #zone.down h3 { color:var(--cream); }
+    button { background:var(--deep); color:var(--cream); border:none; border-radius:20px; padding:8px 14px;
+             margin:8px 6px 0 0; cursor:pointer; font-family:inherit; }
+    button:hover { background:var(--clay); }
+    #imgBox { display:flex; align-items:center; gap:10px; margin-top:10px; font-size:.85rem; }
+
+    /* Event monitor cards */
+    #cards { display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; }
+    .card { border:2px solid var(--brown); border-radius:12px; padding:8px; background:#fff; transition:background .3s; }
+    .card b { color:var(--clay); font-size:.95rem; }
+    .card .n { font-size:1.6rem; font-weight:bold; color:var(--deep); }
+    .card .t { font-size:.7rem; color:#7a5c52; }
+    .card.flash { background:#ffd9a8; }
+
+    /* Log */
+    #log { background:var(--brown); color:var(--sand); border-radius:12px; height:290px; overflow-y:auto;
+           padding:8px; font-family:Consolas, monospace; font-size:.76rem; }
+    #log div { padding:2px 0; border-bottom:1px dotted #7a5c52; word-break:break-word; }
+    #log b { color:#ffb199; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>DOM Events Workshop</h1>
+    <p>Unit 3 | onload, onclick, onmouseover, onmouseout, onmousedown, onmouseup</p>
+  </header>
+
+  <!-- Only an empty <main>; JavaScript builds every panel -->
+  <main id="app"></main>
+
+  <script>
+    const app = document.getElementById("app");
+
+    // ---------- helper: creates one element (createElement) ----------
+    function el(tag, cls, text) {
+      const e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (text) e.textContent = text;
+      return e;
+    }
+    function makePanel(title) {
+      const p = el("section", "panel");
+      p.appendChild(el("h2", "", title));
+      app.appendChild(p);
+      return p;
+    }
+
+    // ================= PANEL 1: THE EVENT ZONE =================
+    const p1 = makePanel("1. Event zone (try every action)");
+    const zone = el("div"); zone.id = "zone";
+    zone.appendChild(el("h3", "", "Hover, press, release, click"));
+    const state = el("p", "", "Waiting for an event...");
+    zone.appendChild(state);
+    p1.appendChild(zone);
+    p1.appendChild(el("p", "small", "Press inside the box but release OUTSIDE it: mouseup will not fire on the box."));
+
+    const colours = ["#8fa98b", "#e9b872", "#a7c4d9", "#d9a7b8"];
+    let colourIndex = 0;
+    const colourBtn = el("button", "", "Change zone colour (onclick)");
+    p1.appendChild(colourBtn);
+
+    const imgBox = el("div"); imgBox.id = "imgBox";
+    imgBox.appendChild(el("span", "", "Image onload:"));
+    p1.appendChild(imgBox);
+
+    // ================= PANEL 2: EVENT MONITOR =================
+    const p2 = makePanel("2. Event monitor (count of each event)");
+    const cardsBox = el("div"); cardsBox.id = "cards";
+    p2.appendChild(cardsBox);
+    p2.appendChild(el("p", "small", "A card flashes every time its event fires."));
+
+    const names = ["onload", "onclick", "onmouseover", "onmouseout", "onmousedown", "onmouseup"];
+    const counts = {};
+    const cards = {};
+    names.forEach(function (n) {
+      counts[n] = 0;
+      const c = el("div", "card");
+      const title = el("b", "", n);
+      const num = el("div", "n", "0");
+      const time = el("div", "t", "not fired yet");
+      c.appendChild(title); c.appendChild(num); c.appendChild(time);
+      cardsBox.appendChild(c);
+      cards[n] = { box: c, num: num, time: time };
+    });
+
+    // ================= PANEL 3: LOG =================
+    const p3 = makePanel("3. Event log (order of events)");
+    const logBox = el("div"); logBox.id = "log";
+    p3.appendChild(logBox);
+    const clearBtn = el("button", "", "Clear log");
+    p3.appendChild(clearBtn);
+    let step = 0;
+    clearBtn.onclick = function () { logBox.textContent = ""; step = 0; };
+
+    // ---------- fire(): updates the card and the log for any event ----------
+    // e = the event object, extra = optional note
+    function fire(name, e, extra) {
+      counts[name]++;
+      cards[name].num.textContent = counts[name];
+      cards[name].time.textContent = new Date().toLocaleTimeString();
+      cards[name].box.classList.add("flash");
+      setTimeout(function () { cards[name].box.classList.remove("flash"); }, 300);
+
+      step++;
+      let info = "";
+      if (e && e.clientX !== undefined) {            // mouse events carry pointer details
+        info = " | x:" + e.clientX + " y:" + e.clientY + " | button:" + e.button;
+      }
+      const d = document.createElement("div");
+      d.innerHTML = step + ". <b>" + name + "</b> (e.type = " + e.type + ")" + info + (extra ? " | " + extra : "");
+      logBox.appendChild(d);
+      logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    // ================= THE SIX EVENTS (DOM level 0 properties) =================
+
+    // 1. onmouseover: pointer moves ONTO the element
+    zone.onmouseover = function (e) {
+      zone.classList.add("over");
+      state.textContent = "onmouseover: pointer entered the box";
+      fire("onmouseover", e);
+    };
+
+    // 2. onmouseout: pointer moves OFF the element
+    zone.onmouseout = function (e) {
+      zone.classList.remove("over");
+      zone.classList.remove("down");                  // reset the pressed look too
+      state.textContent = "onmouseout: pointer left the box";
+      fire("onmouseout", e);
+    };
+
+    // 3. onmousedown: mouse button PRESSED (not yet released)
+    zone.onmousedown = function (e) {
+      zone.classList.add("down");
+      state.textContent = "onmousedown: button pressed (button " + e.button + ")";
+      fire("onmousedown", e);
+    };
+
+    // 4. onmouseup: mouse button RELEASED over the element
+    zone.onmouseup = function (e) {
+      zone.classList.remove("down");
+      state.textContent = "onmouseup: button released";
+      fire("onmouseup", e);
+    };
+
+    // 5. onclick: a full press + release on the same element
+    zone.onclick = function (e) {
+      state.textContent = "onclick: click completed (" + counts.onclick + " so far)";
+      fire("onclick", e, "fires AFTER mousedown and mouseup");
+    };
+
+    // onclick on a button: changes the zone colour using the style property
+    colourBtn.onclick = function (e) {
+      colourIndex = (colourIndex + 1) % colours.length;
+      zone.style.backgroundColor = colours[colourIndex];
+      fire("onclick", e, "button changed colour to " + colours[colourIndex]);
+    };
+
+    // 6. onload (element): an image fires onload when it has finished loading
+    const img = new Image();
+    img.onload = function (e) {                       // handler is set BEFORE src
+      imgBox.appendChild(img);
+      imgBox.appendChild(el("span", "", img.width + " x " + img.height + " px loaded"));
+      fire("onload", e, "image element loaded");
+    };
+    img.alt = "sample clay circle";
+    img.src = "data:image/svg+xml," + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">' +
+      '<circle cx="24" cy="24" r="20" fill="#c8553d"/></svg>');
+
+    // 6. onload (window): fires when the WHOLE page and its resources are loaded
+    window.onload = function (e) {
+      state.textContent = "window.onload: page loaded, now interact with this box";
+      fire("onload", e, "window loaded after " + Math.round(performance.now()) + " ms");
+    };
+  </script>
+</body>
+</html>
+```
+
+---
+
+### **3. Key Implementation Highlights**
+
+1. **`onload` Event:**
+   * Embedded directly on `<body onload="handleOnLoad()">` to execute automatically once the window and DOM finish rendering.
+2. **`onclick` Event:**
+   * Attached to the action button via `onclick="handleClick()"`, triggering an alert and appending a log entry upon user click.
+3. **`onmouseover` & `onmouseout` Events:**
+   * Bound to the interactive `<div>` card. Modifies background color, border styling, and heading text when the cursor enters or exits the boundary.
+4. **`onmousedown` & `onmouseup` Events:**
+   * Captures real-time mouse button clicks (down-press and up-release), altering background color and visual CSS scale transforms dynamically.
+
+---
+
+Whenever you are ready, please share **Question 5 of Section Q1**!
+
+=================================================================================================================================================================================================================== 
+
+### **Assignment 2 – DOM, jQuery, and JSON**
+
+#### **Q1. Document Object Model (DOM) (10 Marks)**
+#### **Question 5: Implement form processing, accessing form data, and form validation.** *(1 Mark)*
+
+---
+
+### **1. Concept Explanation**
+
+* **Form Processing:** Intercepting the standard HTML form submission using JavaScript to inspect, manipulate, or send user inputs without triggering a full webpage reload.
+* **Accessing Form Data via DOM:**
+  * Form elements can be accessed through direct DOM selectors (`document.getElementById()`, `document.querySelector()`) or via the `document.forms` collection (e.g., `document.forms["formName"]["elementName"]`).
+  * Input values, checked states, and selected options are retrieved using properties like `.value`, `.checked`, and `.selectedIndex`.
+* **Preventing Default Submission (`event.preventDefault()`):** Calling `e.preventDefault()` inside the form's `submit` event handler cancels the browser's default submission behavior, allowing client-side validation and local data processing to take place first.
+* **Client-Side Form Validation:** Validating input values (e.g., checking for empty strings, minimum lengths, or format correctness via regex) before processing. If validation fails, error messages are displayed dynamically to guide the user.
+
+---
+
+### **2. Complete Webpage Code**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form Processing and Validation | Ruled Notebook Theme</title>
+  <style>
+    /* Theme: ruled school notebook - cream lined paper, red margin line, blue ink, mint sticky note (plain CSS, no Bootstrap) */
+    :root { --paper:#fdf8e8; --line:#c5d9ea; --margin:#e57373; --ink:#1a3a8a; --pen:#c62828; --ok:#2e7d32; --sticky:#c8e6c9; }
+    * { box-sizing: border-box; }
+    body { margin:0; color:var(--ink); font-family:"Segoe UI", Tahoma, sans-serif;
+           background-color:var(--paper);
+           background-image:repeating-linear-gradient(transparent 0, transparent 27px, var(--line) 28px); }
+    header { text-align:center; padding:18px 10px 12px; border-bottom:3px solid var(--margin); background:rgba(253,248,232,.95); }
+    header h1 { margin:0; font-family:"Segoe Print","Bradley Hand","Chalkboard SE",cursive; font-size:1.6rem; }
+    header p { margin:6px 0 0; font-size:.85rem; color:var(--margin); }
+    /* Responsive: form and result sit side by side, stack on phones */
+    main { display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:20px;
+           max-width:1150px; margin:20px auto; padding:0 14px; align-items:start; }
+    .page { background:var(--paper); border:2px solid var(--ink); border-left:10px double var(--margin);
+            border-radius:6px; padding:14px 16px; box-shadow:5px 5px 0 rgba(26,58,138,.25); }
+    .page h2 { margin:0 0 10px; font-family:"Segoe Print","Bradley Hand",cursive; font-size:1.1rem; border-bottom:2px dashed var(--margin); padding-bottom:4px; }
+    .field { margin-bottom:10px; }
+    label.main, .grouptitle { display:block; font-weight:bold; font-size:.88rem; margin-bottom:3px; }
+    input[type=text], input[type=password], input[type=number], select {
+      width:100%; padding:8px; font-size:.95rem; color:var(--ink); background:#fff;
+      border:none; border-bottom:2px solid var(--ink); outline:none; }
+    input.ok, select.ok { border-bottom-color:var(--ok); background:#f1f8e9; }
+    input.bad, select.bad { border-bottom-color:var(--pen); background:#ffebee; }
+    .choice { display:inline-block; margin:2px 12px 2px 0; font-size:.9rem; }
+    .err { color:var(--pen); font-size:.78rem; min-height:1em; margin-top:2px; font-style:italic; }
+    button { background:var(--ink); color:#fff; border:none; border-radius:4px; padding:9px 16px;
+             margin:6px 8px 0 0; font-size:.95rem; cursor:pointer; }
+    button.alt { background:#fff; color:var(--ink); border:2px solid var(--ink); }
+    button:hover { background:var(--margin); color:#fff; border-color:var(--margin); }
+    /* Result sticky note */
+    .sticky { background:var(--sticky); border:2px solid var(--ok); border-radius:4px; padding:12px; transform:rotate(-.6deg);
+              box-shadow:4px 4px 0 rgba(0,0,0,.15); }
+    .sticky h3 { margin:0 0 8px; color:var(--ok); font-family:"Segoe Print","Bradley Hand",cursive; font-size:1rem; }
+    .sticky.fail { background:#ffcdd2; border-color:var(--pen); }
+    .sticky.fail h3 { color:var(--pen); }
+    table { width:100%; border-collapse:collapse; font-size:.8rem; }
+    td, th { text-align:left; padding:4px 5px; border-bottom:1px dashed var(--ink); vertical-align:top; word-break:break-word; }
+    th { font-size:.72rem; text-transform:uppercase; }
+    code { font-family:Consolas, monospace; font-size:.74rem; color:#6a1b9a; }
+    .small { font-size:.8rem; margin:8px 0 0; }
+    #records li { font-size:.82rem; margin:3px 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Student Registration Notebook</h1>
+    <p>Unit 3 | DOM | Form processing, accessing form data and validation</p>
+  </header>
+
+  <!-- Only an empty <main>; JavaScript builds the form and the result page -->
+  <main id="app"></main>
+
+  <script>
+    const app = document.getElementById("app");
+
+    // ---------- helper: create one element ----------
+    function el(tag, cls, text) {
+      const e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (text) e.textContent = text;
+      return e;
+    }
+
+    // ================= 1. BUILD THE FORM WITH THE DOM =================
+    const formPage = el("section", "page");
+    formPage.appendChild(el("h2", "", "1. Fill the form"));
+
+    const form = document.createElement("form");
+    form.name = "studentForm";          // lets us use document.forms["studentForm"]
+    form.noValidate = true;             // we do the validation ourselves in JavaScript
+
+    const rules = [];                   // every validation rule is stored here
+
+    // Adds one field row. fn() returns "" when valid or an error message
+    function addRule(key, wrapper, fn, inputs) {
+      const err = el("div", "err");
+      wrapper.appendChild(err);
+      rules.push({ key: key, fn: fn, err: err, inputs: inputs, touched: false });
+    }
+
+    // Text-like input (text, password, number)
+    function addInput(id, label, type, placeholder, fn) {
+      const w = el("div", "field");
+      const lab = el("label", "main", label);
+      lab.htmlFor = id;
+      const inp = document.createElement("input");
+      inp.type = type; inp.id = id; inp.name = id; inp.placeholder = placeholder;
+      w.appendChild(lab); w.appendChild(inp);
+      form.appendChild(w);
+      addRule(id, w, function () { return fn(inp.value.trim()); }, [inp]);
+    }
+
+    // ---- text fields (regular expressions from Unit 2) ----
+    addInput("fullName", "Full name", "text", "Rahul Sharma",
+      v => /^[A-Za-z ]{3,30}$/.test(v) ? "" : "Use 3 to 30 letters and spaces only");
+    addInput("email", "Email address", "text", "user@example.com",
+      v => /^[\w.-]+@[\w-]+\.[a-zA-Z]{2,}$/.test(v) ? "" : "Enter a valid email, e.g. user@example.com");
+    addInput("phone", "Mobile number", "text", "9876543210",
+      v => /^\d{10}$/.test(v) ? "" : "Mobile number must be exactly 10 digits");
+    addInput("age", "Age", "number", "18 to 60",
+      v => (v !== "" && Number(v) >= 18 && Number(v) <= 60) ? "" : "Age must be between 18 and 60");
+    addInput("password", "Password", "password", "min 6 characters",
+      v => (v.length >= 6 && /\d/.test(v) && /[a-zA-Z]/.test(v)) ? "" : "At least 6 characters with a letter and a digit");
+    addInput("confirm", "Confirm password", "password", "type it again",
+      v => (v !== "" && v === form.elements["password"].value) ? "" : "Passwords do not match");
+
+    // ---- drop-down (select) ----
+    const selWrap = el("div", "field");
+    const selLab = el("label", "main", "Course");
+    selLab.htmlFor = "course";
+    const sel = document.createElement("select");
+    sel.id = "course"; sel.name = "course";
+    ["-- Choose a course --", "M.Sc. Information Technology", "M.Sc. Computer Science", "MCA"].forEach(function (t, i) {
+      const o = document.createElement("option");
+      o.value = i === 0 ? "" : t;
+      o.textContent = t;
+      sel.appendChild(o);
+    });
+    selWrap.appendChild(selLab); selWrap.appendChild(sel);
+    form.appendChild(selWrap);
+    addRule("course", selWrap, function () {
+      return sel.selectedIndex > 0 ? "" : "Please select a course";      // index 0 is the placeholder
+    }, [sel]);
+
+    // ---- radio buttons ----
+    const gWrap = el("div", "field");
+    gWrap.appendChild(el("span", "grouptitle", "Gender"));
+    ["Male", "Female", "Other"].forEach(function (g) {
+      const lab = el("label", "choice");
+      const r = document.createElement("input");
+      r.type = "radio"; r.name = "gender"; r.value = g;
+      lab.appendChild(r); lab.appendChild(document.createTextNode(" " + g));
+      gWrap.appendChild(lab);
+    });
+    form.appendChild(gWrap);
+    addRule("gender", gWrap, function () {
+      return form.elements["gender"].value !== "" ? "" : "Select one option";   // RadioNodeList.value
+    }, []);
+
+    // ---- checkboxes (zero or more) ----
+    const iWrap = el("div", "field");
+    iWrap.appendChild(el("span", "grouptitle", "Interests (choose at least one)"));
+    ["HTML5", "JavaScript", "DOM", "jQuery", "JSON"].forEach(function (t) {
+      const lab = el("label", "choice");
+      const c = document.createElement("input");
+      c.type = "checkbox"; c.name = "interest"; c.value = t;
+      lab.appendChild(c); lab.appendChild(document.createTextNode(" " + t));
+      iWrap.appendChild(lab);
+    });
+    form.appendChild(iWrap);
+    addRule("interest", iWrap, function () {
+      return form.querySelectorAll('input[name="interest"]:checked').length > 0 ? "" : "Tick at least one interest";
+    }, []);
+
+    // ---- terms checkbox ----
+    const tWrap = el("div", "field");
+    const tLab = el("label", "choice");
+    const terms = document.createElement("input");
+    terms.type = "checkbox"; terms.name = "terms";
+    tLab.appendChild(terms); tLab.appendChild(document.createTextNode(" I agree to the terms"));
+    tWrap.appendChild(tLab);
+    form.appendChild(tWrap);
+    addRule("terms", tWrap, function () { return terms.checked ? "" : "You must accept the terms"; }, []);
+
+    // ---- buttons ----
+    const submitBtn = el("button", "", "Submit form");
+    submitBtn.type = "submit";
+    const resetBtn = el("button", "alt", "Reset");
+    resetBtn.type = "reset";
+    form.appendChild(submitBtn); form.appendChild(resetBtn);
+
+    formPage.appendChild(form);
+    app.appendChild(formPage);
+
+    // ================= 2. VALIDATION =================
+    // Runs one rule, shows or clears the message, returns true if valid
+    function runRule(r) {
+      const msg = r.fn();
+      r.err.textContent = msg;                                  // textContent, never innerHTML
+      r.inputs.forEach(function (i) {
+        i.classList.toggle("bad", msg !== "");
+        i.classList.toggle("ok", msg === "");
+      });
+      return msg === "";
+    }
+
+    // Live validation using event delegation: ONE listener on the form
+    function liveCheck(e) {
+      const name = e.target.name;
+      if (!name) return;
+      rules.forEach(function (r) {
+        if (r.key === name) {
+          // validate while typing only after the user has left the field once
+          if (e.type !== "input" || r.touched) runRule(r);
+          if (e.type !== "input") r.touched = true;
+        }
+      });
+      // confirm password depends on password, so re-check it too
+      if (name === "password") {
+        const c = rules.filter(function (r) { return r.key === "confirm"; })[0];
+        if (c.touched) runRule(c);
+      }
+    }
+    form.addEventListener("input", liveCheck);
+    form.addEventListener("change", liveCheck);
+    form.addEventListener("focusout", liveCheck);               // focusout bubbles, blur does not
+
+    // ================= 3. RESULT PAGE =================
+    const resultPage = el("section", "page");
+    resultPage.appendChild(el("h2", "", "2. Form processing result"));
+    const sticky = el("div", "sticky");
+    sticky.appendChild(el("h3", "", "Nothing submitted yet"));
+    sticky.appendChild(el("p", "small", "Fill the form and press Submit. Each value is read from the DOM using a different method."));
+    resultPage.appendChild(sticky);
+    resultPage.appendChild(el("p", "small", "Saved records:"));
+    const records = document.createElement("ul");
+    records.id = "records";
+    resultPage.appendChild(records);
+    app.appendChild(resultPage);
+
+    // ================= 4. SUBMIT: preventDefault, ACCESS DATA, PROCESS =================
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();                                       // stop the page from reloading
+
+      let firstBad = null;
+      rules.forEach(function (r) {
+        r.touched = true;
+        if (!runRule(r) && !firstBad) firstBad = r;
+      });
+
+      sticky.textContent = "";
+      if (firstBad) {
+        sticky.className = "sticky fail";
+        sticky.appendChild(el("h3", "", "Form NOT processed"));
+        const bad = rules.filter(function (r) { return r.err.textContent !== ""; });
+        sticky.appendChild(el("p", "small", bad.length + " field(s) need correction. Errors are shown in red under each field."));
+        const target = form.elements[firstBad.key];
+        if (target && target.focus) target.focus();             // move the cursor to the first error
+        return;
+      }
+
+      // ----- ACCESSING FORM DATA (a different DOM method for each value) -----
+      const data = [
+        ["Full name", document.forms["studentForm"]["fullName"].value.trim(), 'document.forms["studentForm"]["fullName"].value'],
+        ["Email", document.getElementById("email").value.trim(), 'document.getElementById("email").value'],
+        ["Mobile", form.elements["phone"].value.trim(), 'form.elements["phone"].value'],
+        ["Age", Number(form.querySelector("#age").value), 'Number(form.querySelector("#age").value)'],
+        ["Gender", form.elements["gender"].value, 'form.elements["gender"].value (radio group)'],
+        ["Course", sel.options[sel.selectedIndex].text, "select.options[select.selectedIndex].text"],
+        ["Interests", Array.from(form.querySelectorAll('input[name="interest"]:checked'))
+                           .map(function (c) { return c.value; }).join(", "),
+                      'querySelectorAll(\'input[name="interest"]:checked\')'],
+        ["Terms", form.elements["terms"].checked, 'form.elements["terms"].checked'],
+        ["Password", "(hidden, " + form.elements["password"].value.length + " characters)", "never display a password"]
+      ];
+
+      // ----- PROCESSING: show the data in a table -----
+      sticky.className = "sticky";
+      sticky.appendChild(el("h3", "", "Form processed successfully"));
+      const table = document.createElement("table");
+      const head = document.createElement("tr");
+      ["Field", "Value", "How it was accessed"].forEach(function (t) { head.appendChild(el("th", "", t)); });
+      table.appendChild(head);
+      data.forEach(function (row) {
+        const tr = document.createElement("tr");
+        tr.appendChild(el("td", "", row[0]));
+        tr.appendChild(el("td", "", String(row[1])));            // textContent, so tags typed by a user stay harmless
+        const td = document.createElement("td");
+        td.appendChild(el("code", "", row[2]));
+        tr.appendChild(td);
+        table.appendChild(tr);
+      });
+      sticky.appendChild(table);
+
+      // save a short record in the list below
+      const li = el("li", "", data[0][1] + " | " + data[1][1] + " | " + data[5][1] + " | " + new Date().toLocaleTimeString());
+      records.appendChild(li);
+
+      form.reset();                                             // clear the inputs (fires the reset event)
+    });
+
+    // Reset button: also clear the red/green marks and the messages
+    form.addEventListener("reset", function () {
+      rules.forEach(function (r) {
+        r.touched = false;
+        r.err.textContent = "";
+        r.inputs.forEach(function (i) { i.classList.remove("ok", "bad"); });
+      });
+    });
+  </script>
+</body>
+</html>
+```
+
+---
+
+### **3. Key Implementation Highlights**
+
+1. **`event.preventDefault()`:** Prevents the browser from navigating away or reloading the page upon clicking the submit button, keeping execution strictly on the client side.
+2. **Accessing Form Data:**
+   * Demonstrates accessing data via `document.forms["studentForm"]["fullName"].value` as well as direct DOM selectors (`document.getElementById("email").value`).
+3. **Form Validation Checks:**
+   * **Presence & Length Check:** Ensures the full name is present and contains at least 3 characters.
+   * **Regex Validation:** Tests email structure against `/^[\w.-]+@[\w-]+\.[a-zA-Z]{2,}$/`.
+   * **Dropdown Selection Check:** Ensures a non-empty option value is selected.
+4. **Form Processing:**
+   * Displays formatted submission summary metrics in `#summaryCard` dynamically once all inputs clear validation constraints.
+
+---
+
+Whenever you are ready, please share **Question 1 of Q2 (jQuery)**!
+
+=================================================================================================================================================================================================================== 
+
+### **Unit 3 – Document Object Model (DOM)**
+
+#### **Q1. Document Object Model (DOM) (10 Marks)**
+#### **Question 6: Demonstrate `alert()`, `confirm()`, and `prompt()` popup boxes.** *(1 Mark)*
+
+---
+
+### **1. Concept Explanation**
+
+JavaScript provides three built-in modal dialog boxes through the browser's `window` object. These dialog boxes are **synchronous/modal**, meaning they pause script execution and freeze interaction with the web page until the user dismisses the dialog box.
+
+1. **`alert(message)`:**
+   * **Purpose:** Displays an informational pop-up dialog box containing a message and a single **"OK"** button.
+   * **Return Value:** Returns `undefined`. It is strictly used to notify or warn the user.
+2. **`confirm(message)`:**
+   * **Purpose:** Displays a decision dialog box with a message and two action buttons: **"OK"** and **"Cancel"**.
+   * **Return Value:** Returns a boolean value—`true` if the user clicks **"OK"**, or `false` if the user clicks **"Cancel"** or closes the window.
+3. **`prompt(message, defaultValue)`:**
+   * **Purpose:** Displays an input dialog box prompting the user to enter text, along with an optional default input value, **"OK"**, and **"Cancel"** buttons.
+   * **Return Value:** Returns the string entered by the user if **"OK"** is clicked, or `null` if the user clicks **"Cancel"** or closes the box.
+
+---
+
+### **2. Complete Webpage Code**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Popup Boxes | Retro Desktop Theme</title>
+  <style>
+    /* Theme: retro 90s desktop - teal desktop, grey windows, navy title bars, beveled buttons (plain CSS, no Bootstrap) */
+    :root { --desk:#008080; --grey:#c0c0c0; --navy:#000080; --light:#ffffff; --dark:#808080; --black:#000; --yellow:#ffff66; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--desk); font-family:Tahoma, "MS Sans Serif", Arial, sans-serif; font-size:14px; color:var(--black); }
+    header { background:var(--grey); border-bottom:3px solid var(--dark); padding:8px 12px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:6px; }
+    header h1 { margin:0; font-size:1.1rem; }
+    header span { font-size:.8rem; }
+    /* Responsive: windows wrap by available width */
+    main { display:grid; grid-template-columns:repeat(auto-fit, minmax(310px, 1fr)); gap:18px; max-width:1200px; margin:18px auto; padding:0 12px; align-items:start; }
+    .win { background:var(--grey); border:2px solid; border-color:var(--light) var(--black) var(--black) var(--light); box-shadow:inset -1px -1px var(--dark), 4px 4px 0 rgba(0,0,0,.35); padding:3px; }
+    .title { background:linear-gradient(90deg, var(--navy), #1084d0); color:#fff; font-weight:bold; padding:3px 6px; display:flex; justify-content:space-between; }
+    .body { padding:10px; }
+    button { background:var(--grey); border:2px solid; border-color:var(--light) var(--black) var(--black) var(--light);
+             padding:6px 12px; margin:3px 4px 3px 0; font-family:inherit; font-size:.9rem; cursor:pointer; }
+    button:active { border-color:var(--black) var(--light) var(--light) var(--black); }
+    .sunken { background:#fff; border:2px solid; border-color:var(--dark) var(--light) var(--light) var(--dark); padding:6px; }
+    table { width:100%; border-collapse:collapse; font-size:.8rem; }
+    th, td { border:1px solid var(--dark); padding:3px 5px; text-align:left; word-break:break-word; }
+    th { background:var(--navy); color:#fff; }
+    td.hit { background:var(--yellow); }
+    code { font-family:Consolas, monospace; font-size:.8rem; color:#800000; }
+    .small { font-size:.78rem; margin:6px 0; }
+    #msg { min-height:70px; }
+    ul#tasks { list-style:none; margin:6px 0; padding:0; }
+    ul#tasks li { display:flex; justify-content:space-between; align-items:center; gap:6px; border-bottom:1px dotted var(--dark); padding:3px 0; word-break:break-word; }
+    #log { height:200px; overflow-y:auto; font-family:Consolas, monospace; font-size:.76rem; background:#000; color:#33ff33; padding:6px; }
+    #log div { padding:1px 0; word-break:break-word; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Popup Boxes Desktop</h1>
+    <span>Unit 3 | DOM | alert(), confirm(), prompt()</span>
+  </header>
+
+  <!-- Only an empty <main>; JavaScript builds every window -->
+  <main id="app"></main>
+
+  <script>
+    const app = document.getElementById("app");
+
+    // ---------- helpers (createElement + appendChild) ----------
+    function el(tag, cls, text) {
+      const e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (text) e.textContent = text;
+      return e;
+    }
+    // Builds one "window" and returns its body
+    function makeWindow(title) {
+      const w = el("section", "win");
+      const t = el("div", "title");
+      t.appendChild(el("span", "", title));
+      t.appendChild(el("span", "", "[_][X]"));
+      const b = el("div", "body");
+      w.appendChild(t); w.appendChild(b);
+      app.appendChild(w);
+      return b;
+    }
+    function makeButton(parent, text, handler) {
+      const b = el("button", "", text);
+      b.addEventListener("click", handler);
+      parent.appendChild(b);
+      return b;
+    }
+
+    // ================= WINDOW 4 FIRST: LOG (used by all demos) =================
+    const w1 = makeWindow("1. Launcher");
+    const w2 = makeWindow("2. Return values");
+    const w3 = makeWindow("3. Practical use: task list");
+    const w4 = makeWindow("4. Event log");
+
+    const logBox = el("div"); logBox.id = "log";
+    w4.appendChild(logBox);
+    function log(msg) {
+      const d = el("div", "", new Date().toLocaleTimeString() + "  " + msg);
+      logBox.appendChild(d);
+      logBox.scrollTop = logBox.scrollHeight;
+    }
+    makeButton(w4, "Clear log", function () { logBox.textContent = ""; });
+
+    // ================= WINDOW 2: RETURN VALUE TABLE =================
+    const table = document.createElement("table");
+    const head = document.createElement("tr");
+    ["Method", "Returned value", "typeof"].forEach(function (t) { head.appendChild(el("th", "", t)); });
+    table.appendChild(head);
+    const rows = {};
+    ["alert()", "confirm()", "prompt()"].forEach(function (m) {
+      const tr = document.createElement("tr");
+      const c1 = el("td", "", m), c2 = el("td", "", "-"), c3 = el("td", "", "-");
+      tr.appendChild(c1); tr.appendChild(c2); tr.appendChild(c3);
+      table.appendChild(tr);
+      rows[m] = { value: c2, type: c3 };
+    });
+    w2.appendChild(table);
+    w2.appendChild(el("p", "small", "The table updates with the real value each popup returns. Closing a box with X or Esc works like Cancel."));
+
+    // Shows what a popup returned (String() so null and undefined are visible)
+    function showReturn(method, value) {
+      rows[method].value.textContent = typeof value === "string" ? '"' + value + '"' : String(value);
+      rows[method].type.textContent = value === null ? "object (null)" : typeof value;
+      rows[method].value.className = "hit";
+      setTimeout(function () { rows[method].value.className = ""; }, 600);
+    }
+
+    // ================= WINDOW 1: THE THREE POPUPS =================
+    const msg = el("div", "sunken"); msg.id = "msg";
+    msg.textContent = "Click a button. The script PAUSES until you close the popup.";
+
+    // 1. alert(): message + OK button, returns undefined
+    makeButton(w1, "alert()", function () {
+      const before = Date.now();
+      log("before alert(): script is running");
+      const result = alert("Welcome! This is an alert box. It only has an OK button.");
+      const waited = Date.now() - before;                  // time spent waiting = script was blocked
+      log("after alert(): resumed, waited " + waited + " ms");
+      showReturn("alert()", result);
+      msg.textContent = "alert() returned undefined. The code after it waited " + waited + " ms for OK.";
+    });
+
+    // 2. confirm(): OK = true, Cancel = false
+    makeButton(w1, "confirm()", function () {
+      const choice = confirm("Do you want to continue?");
+      showReturn("confirm()", choice);
+      log("confirm() returned " + choice);
+      msg.textContent = choice ? "You pressed OK, so confirm() returned true."
+                               : "You pressed Cancel (or closed it), so confirm() returned false.";
+    });
+
+    // 3. prompt(): text = string, Cancel = null, OK with empty box = ""
+    makeButton(w1, "prompt()", function () {
+      const name = prompt("Please enter your name:", "Guest");   // 2nd argument = default text
+      showReturn("prompt()", name);
+      log("prompt() returned " + (name === null ? "null" : '"' + name + '"'));
+      if (name === null) {
+        msg.textContent = "Cancel pressed, so prompt() returned null.";
+      } else if (name.trim() === "") {
+        msg.textContent = "OK pressed with an empty box, so prompt() returned an empty string.";
+      } else {
+        msg.textContent = "Hello, " + name.trim() + "! (text taken from prompt)";   // textContent keeps user text safe
+      }
+    });
+
+    // Combined flow: prompt -> convert to number -> confirm -> alert
+    makeButton(w1, "All three together", function () {
+      const input = prompt("Enter your age (number):");
+      if (input === null) { log("age prompt cancelled"); return; }
+      const age = Number(input);                           // prompt always returns a STRING
+      if (input.trim() === "" || isNaN(age) || age < 1 || age > 120) {
+        alert("Invalid age: please enter a number from 1 to 120.");
+        log("invalid age entered: " + input);
+        return;
+      }
+      if (confirm("You entered " + age + ". Is this correct?")) {
+        alert(age >= 18 ? "You are an adult." : "You are a minor.");
+        msg.textContent = "Age " + age + " accepted: " + (age >= 18 ? "adult" : "minor");
+        log("age " + age + " accepted");
+      } else {
+        msg.textContent = "Age was not confirmed.";
+        log("age not confirmed");
+      }
+    });
+
+    w1.appendChild(msg);
+    w1.appendChild(el("p", "small", "Dialogs are modal: the page cannot be used until the box is closed."));
+
+    // ================= WINDOW 3: TASK LIST USING ALL THREE =================
+    const list = document.createElement("ul"); list.id = "tasks";
+    w3.appendChild(list);
+
+    function addTask(text) {
+      const li = el("li");
+      const span = el("span", "", text);
+      const box = el("span");
+      const edit = el("button", "", "Edit");
+      const del = el("button", "", "Delete");
+      edit.dataset.act = "edit"; del.dataset.act = "delete";
+      box.appendChild(edit); box.appendChild(del);
+      li.appendChild(span); li.appendChild(box);
+      list.appendChild(li);
+    }
+    ["Revise DOM methods", "Practise events"].forEach(addTask);
+
+    // Checks the text typed in a prompt: returns "" if OK, else an error message
+    function checkTask(t) {
+      if (t.length < 3) return "Task must have at least 3 characters.";
+      if (t.length > 30) return "Task must have at most 30 characters.";
+      return "";
+    }
+
+    makeButton(w3, "Add task (prompt)", function () {
+      const t = prompt("Enter a new task (3 to 30 characters):");
+      if (t === null) { log("add cancelled"); return; }          // Cancel
+      const clean = t.trim();
+      const error = checkTask(clean);
+      if (error) { alert(error); log("add rejected: " + error); return; }   // alert used for errors
+      addTask(clean);
+      log('task added: "' + clean + '"');
+    });
+    w3.appendChild(el("p", "small", "Delete asks confirm(). Edit shows prompt() with the old text as default."));
+
+    // Event delegation: ONE listener on the list handles every Edit/Delete button
+    list.addEventListener("click", function (e) {
+      const act = e.target.dataset.act;
+      if (!act) return;
+      const li = e.target.closest("li");
+      const span = li.firstElementChild;
+      if (act === "delete") {
+        if (confirm('Delete "' + span.textContent + '"?')) {
+          li.remove();                                           // DOM removal
+          log("task deleted");
+        } else {
+          log("delete cancelled");
+        }
+      } else {
+        const t = prompt("Edit the task:", span.textContent);    // default value = current text
+        if (t === null) { log("edit cancelled"); return; }
+        const error = checkTask(t.trim());
+        if (error) { alert(error); return; }
+        span.textContent = t.trim();
+        log('task changed to "' + t.trim() + '"');
+      }
+    });
+
+    log("Ready. Try each popup and watch the return values table.");
+  </script>
+</body>
+</html>
+```
+
+---
+
+### **3. Key Implementation Highlights**
+
+1. **`alert(message)`:** Pauses browser thread execution and displays an informational notification modal.
+2. **`confirm(message)`:** Evaluates user consent by returning a boolean (`true` for **OK**, `false` for **Cancel**).
+3. **`prompt(message, default)`:** Captures user text input dynamically; handles both string input and `null` cancellation safely.
+
+---
+
+🎉 **Unit 3 (Document Object Model & Events) is now officially complete!**
+
+Whenever you are ready, please share **Question 1 of Unit 4 (jQuery)**!
+
+=================================================================================================================================================================================================================== 
+
+Q2. jQuery (8 Marks)
+
+### **Unit 4 – jQuery**
+
+#### **Q2. jQuery (8 Marks)**
+#### **Question 1: Explain jQuery and demonstrate its installation and syntax.** *(1 Mark)*
+
+---
+
+### **1. Concept Explanation**
+
+* **What is jQuery?**
+  * **jQuery** is a fast, lightweight, and free open-source JavaScript library created by **John Resig in 2006**.
+  * Its core motto is **"Write less, do more"**.
+  * It simplifies HTML DOM document traversal and manipulation, event handling, CSS animations, and AJAX requests while resolving cross-browser inconsistencies so your code executes identically across all browsers.
+
+* **Installation Methods:**
+  1. **Option 1: Content Delivery Network (CDN) (Recommended / Easiest):**
+     Includes jQuery directly from a remote Content Delivery Network (e.g., `code.jquery.com`) using a `<script>` link. No local file download is required.
+     ```html
+     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+     ```
+  2. **Option 2: Local File Download:**
+     Download `jquery-3.7.1.min.js` from `jquery.com`, save it inside your local project folder (e.g., `js/`), and reference it with a local script tag.
+     ```html
+     <script src="js/jquery-3.7.1.min.js"></script>
+     ```
+
+* **Basic jQuery Syntax:**
+  * The fundamental jQuery formula is:
+    ```javascript
+    $(selector).action();
+    ```
+    * **`$`**: Defines or accesses jQuery.
+    * **`(selector)`**: Finds or queries HTML element(s) using standard CSS selector syntax (e.g., `"p"`, `"#id"`, `".class"`, `"*"`).
+    * **`.action()`**: The jQuery method to be performed on the selected element(s) (e.g., `.hide()`, `.show()`, `.css()`, `.text()`, `.fadeIn()`).
+
+* **The Document Ready Event (`$(document).ready()`):**
+  * Prevents jQuery code from executing before the browser finishes parsing the document object model (DOM).
+  * **Full Form:**
+    ```javascript
+    $(document).ready(function(){
+      // jQuery code goes here
+    });
+    ```
+  * **Shorthand Form:**
+    ```javascript
+    $(function(){
+      // jQuery code goes here
+    });
+    ```
+
+---
+
+### **2. Complete Webpage Code**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>jQuery Installation and Syntax | Swiss Poster Theme</title>
+  <style>
+    /* Theme: Swiss poster - off-white paper, black rules, signal red, bold sans-serif type (plain CSS, no Bootstrap) */
+    :root { --paper:#f4f1ea; --ink:#111; --red:#d9261c; --yellow:#ffe14d; --grey:#8c8c84; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--paper); color:var(--ink); font-family:"Helvetica Neue", Helvetica, Arial, sans-serif; }
+    header { border-bottom:8px solid var(--ink); padding:18px 16px 10px; max-width:1200px; margin:0 auto; }
+    header h1 { margin:0; font-size:2.2rem; font-weight:900; letter-spacing:-1px; line-height:1; }
+    header h1 span { color:var(--red); }
+    header p { margin:8px 0 0; font-size:.85rem; text-transform:uppercase; letter-spacing:2px; color:var(--grey); }
+    /* Responsive: panels wrap by available width */
+    main { display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:0 22px;
+           max-width:1200px; margin:0 auto; padding:14px 16px 30px; align-items:start; }
+    .panel { border-top:4px solid var(--ink); padding:10px 0 18px; }
+    .panel h2 { margin:0 0 10px; font-size:1rem; text-transform:uppercase; letter-spacing:1px; }
+    .panel h2 b { color:var(--red); margin-right:6px; }
+    table { width:100%; border-collapse:collapse; font-size:.82rem; }
+    td, th { border-bottom:1px solid var(--ink); padding:5px 4px; text-align:left; word-break:break-word; }
+    th { font-size:.7rem; text-transform:uppercase; color:var(--grey); }
+    code { font-family:Consolas, "Courier New", monospace; font-size:.8rem; background:#fff; border:1px solid var(--ink); padding:0 4px; }
+    .formula { font-family:Consolas, monospace; font-size:1.5rem; font-weight:bold; margin:6px 0; word-break:break-all; }
+    .formula .d { color:var(--red); } .formula .s { background:var(--yellow); } .formula .a { text-decoration:underline; }
+    .small { font-size:.78rem; color:#444; margin:5px 0; }
+    /* The stage: elements that jQuery will select and change */
+    #stage { border:3px solid var(--ink); background:#fff; padding:12px; }
+    #stage h2 { text-transform:none; letter-spacing:0; font-size:1.4rem; margin:0 0 6px; }
+    #stage p { margin:6px 0; }
+    #stage ul { margin:6px 0; padding-left:22px; }
+    #stage input[type=text] { padding:5px; border:2px solid var(--ink); width:60%; }
+    #box { width:40px; height:20px; background:var(--red); margin-top:10px; }
+    .hit { background:var(--yellow); outline:3px solid var(--ink); }
+    .added { color:var(--red); font-weight:bold; }
+    button { background:var(--ink); color:#fff; border:none; padding:7px 10px; margin:3px 4px 3px 0; font-weight:bold;
+             font-size:.8rem; cursor:pointer; font-family:inherit; }
+    button:hover { background:var(--red); }
+    button.reset { background:#fff; color:var(--ink); border:2px solid var(--ink); }
+    #log { border:3px solid var(--ink); background:#fff; height:300px; overflow-y:auto; padding:6px; font-size:.8rem; }
+    #log div { border-bottom:1px dotted var(--grey); padding:4px 0; word-break:break-word; }
+    #log .n { color:var(--red); font-weight:bold; margin-right:4px; }
+  </style>
+
+  <!-- INSTALLATION: load the downloaded file from the local js folder (relative path) -->
+  <script src="js/jquery-4.0.0.min.js"></script>
+  <script>
+    // Remember where jQuery came from. If the local file is missing,
+    // window.jQuery is undefined, so load the official CDN copy instead (fallback).
+    var loadedFrom = window.jQuery ? "Local file: js/jquery-4.0.0.min.js" : "CDN: code.jquery.com (fallback)";
+    if (!window.jQuery) {
+      document.write('<script src="https://code.jquery.com/jquery-4.0.0.min.js"><\/script>');
+    }
+  </script>
+</head>
+<body>
+  <header>
+    <h1>jQuery<span>.</span> Write less, do more</h1>
+    <p>Unit 4 | jQuery | Installation, syntax and core methods</p>
+  </header>
+
+  <main>
+    <!-- Panel 1: installation check (rows added by jQuery) -->
+    <section class="panel">
+      <h2><b>1</b>Installation check</h2>
+      <table id="install"><tr><th>Item</th><th>Value</th></tr></table>
+      <p class="small">Local file path: <code>js/jquery-4.0.0.min.js</code></p>
+      <p class="small">Official link: <code>https://code.jquery.com/jquery-4.0.0.min.js</code></p>
+    </section>
+
+    <!-- Panel 2: the syntax formula -->
+    <section class="panel">
+      <h2><b>2</b>Basic syntax</h2>
+      <div class="formula"><span class="d">$</span>(<span class="s">selector</span>).<span class="a">action</span>()</div>
+      <table>
+        <tr><td><code>$</code></td><td>the jQuery function (same as <code>jQuery</code>)</td></tr>
+        <tr><td><code>(selector)</code></td><td>CSS-style query that finds the elements</td></tr>
+        <tr><td><code>.action()</code></td><td>what to do with them: hide, text, css, fadeIn ...</td></tr>
+      </table>
+      <p class="small">Example used in this page: <code>$(".intro").hide(400)</code></p>
+    </section>
+
+    <!-- Panel 3: the stage -->
+    <section class="panel">
+      <h2><b>3</b>Stage (elements to select)</h2>
+      <div id="stage">
+        <h2 id="title">Original Heading</h2>
+        <p class="intro">Paragraph one, class intro.</p>
+        <p class="intro">Paragraph two, class intro.</p>
+        <p id="unique">Unique paragraph, id unique.</p>
+        <ul id="list">
+          <li>Item 1</li>
+          <li class="special">Item 2 (special)</li>
+          <li>Item 3</li>
+        </ul>
+        <input type="text" id="name" value="Rahul">
+        <a id="link" href="https://jquery.com">jQuery website</a>
+        <div id="box" data-level="1"></div>
+      </div>
+    </section>
+
+    <!-- Panel 4: buttons (built by jQuery) -->
+    <section class="panel">
+      <h2><b>4</b>Controls</h2>
+      <div id="buttons"></div>
+    </section>
+
+    <!-- Panel 5: log -->
+    <section class="panel">
+      <h2><b>5</b>Code executed</h2>
+      <div id="log"></div>
+    </section>
+  </main>
+
+  <script>
+    // ===== READY EVENT, FULL FORM: runs when the DOM is ready =====
+    $(document).ready(function () {
+      // Fill the installation table using jQuery
+      var info = [
+        ["Loaded from", loadedFrom],
+        ["jQuery version ($.fn.jquery)", $.fn.jquery],
+        ["typeof $", typeof $],
+        ["$ === jQuery", $ === jQuery],
+        ["Paragraphs on page ($('p').length)", $("p").length]
+      ];
+      $.each(info, function (i, row) {                         // $.each loops over an array
+        $("<tr>")
+          .append($("<td>").text(row[0]))
+          .append($("<td>").text(String(row[1])).css("font-weight", "bold"))
+          .appendTo("#install");
+      });
+    });
+
+    // ===== READY EVENT, SHORT FORM: $(function(){ ... }) =====
+    $(function () {
+      var original = $("#stage").html();                       // saved copy for Reset
+      var step = 0, count = 3;
+
+      // ---------- helpers ----------
+      // log(code, note): adds one numbered line to the log
+      function log(code, note) {
+        step++;
+        $("<div>")
+          .append($("<span>").addClass("n").text(step + "."))
+          .append($("<code>").text(code))
+          .append($("<span>").text("  " + note))
+          .appendTo("#log");
+        $("#log").scrollTop($("#log")[0].scrollHeight);
+      }
+      // flash($els): highlights elements, then removes the highlight (delay + queue)
+      function flash($els) {
+        $els.addClass("hit").delay(1500).queue(function (next) {
+          $(this).removeClass("hit");
+          next();
+        });
+      }
+
+      // ---------- the demonstrations (each is mostly jQuery methods) ----------
+      var actions = [
+
+        ["1. Selectors", function () {
+          flash($("p"));
+          log('$("p").length', $("p").length + " paragraphs (element selector)");
+          log('$(".intro").length', $(".intro").length + " elements (class selector)");
+          log('$("#unique").text()', '"' + $("#unique").text() + '" (id selector)');
+          log('$("ul li.special").text()', '"' + $("ul li.special").text() + '" (descendant + class)');
+          log('$("li:first").text()', '"' + $("li:first").text() + '" (:first filter)');
+          log("$(\"input[type='text']\").val()", '"' + $("input[type='text']").val() + '" (attribute selector)');
+          log('$("h2, ul").length', $("#stage").find("h2, ul").length + " (multiple selectors)");
+        }],
+
+        ["2. Get content", function () {
+          log('$("#title").text()', '"' + $("#title").text() + '"');
+          log('$("#unique").html()', '"' + $("#unique").html() + '"');
+          log('$("#name").val()', '"' + $("#name").val() + '"');
+          log('$("#link").attr("href")', '"' + $("#link").attr("href") + '"');
+          log('$("#box").data("level")', String($("#box").data("level")) + " (reads data-level)");
+        }],
+
+        ["3. Set content", function () {
+          $("#title").text("Heading changed");
+          $("#unique").html("<b>Bold</b> text set with html()");
+          $("#name").val("Priya");
+          $("#link").attr({ href: "https://example.com", title: "Changed link" });
+          $("#box").data("level", 5);
+          log('$("#title").text("Heading changed")', "text() sets plain text");
+          log('$("#unique").html("<b>Bold</b> ...")', "html() sets HTML markup");
+          log('$("#name").val("Priya")', "val() sets the input value");
+          log('$("#link").attr({href:..., title:...})', "attr() with an object sets many attributes");
+          log('$("#box").data("level", 5)', "data() now returns " + $("#box").data("level"));
+        }],
+
+        ["4. CSS and classes", function () {
+          $("#title").css("color", "#d9261c");
+          $("#unique").css({ "background-color": "#ffe14d", "font-weight": "bold", padding: "4px" });
+          $(".intro").addClass("added");
+          log('$("#title").css("color", "#d9261c")', 'css() read back: "' + $("#title").css("color") + '"');
+          log('$("#unique").css({...})', "css() with an object sets many properties");
+          log('$(".intro").addClass("added")', "hasClass: " + $(".intro").first().hasClass("added"));
+          log('$(".intro").toggleClass("added")', "toggles on every click of this button");
+          $(".intro").toggleClass("added");                    // second call toggles it back off: shows toggle
+          $(".intro").toggleClass("added");
+        }],
+
+        ["5. hide / show / toggle", function () {
+          $(".intro").toggle(500);
+          log('$(".intro").toggle(500)', "hides if visible, shows if hidden. Click again.");
+        }],
+
+        ["6. fade effects", function () {
+          $("#unique").fadeToggle(600);
+          $("#title").fadeTo(500, 0.4).fadeTo(500, 1);
+          log('$("#unique").fadeToggle(600)', "fades out or in");
+          log('$("#title").fadeTo(500, 0.4)', "fades to opacity 0.4, then back with fadeTo(500, 1)");
+        }],
+
+        ["7. slide effects", function () {
+          $("#list").slideToggle(500);
+          log('$("#list").slideToggle(500)', "slides the list up or down. Click again.");
+        }],
+
+        ["8. animate()", function () {
+          $("#box")
+            .animate({ width: "85%", height: "50px", opacity: 0.6 }, 800)
+            .animate({ width: "40px", height: "20px", opacity: 1 }, 800);
+          log('$("#box").animate({width:"85%", ...}, 800)', "custom animation of CSS properties");
+          log(".animate({width:'40px'...}, 800)", "second animate() is queued and runs after the first");
+          log('$("#box").is(":animated")', String($("#box").is(":animated")) + " right now");
+        }],
+
+        ["9. Method chaining", function () {
+          $("#title")
+            .text("Chained!")
+            .css("color", "#d9261c")
+            .slideUp(300)
+            .slideDown(300)
+            .fadeOut(200)
+            .fadeIn(200);
+          log('$("#title").text().css().slideUp().slideDown().fadeOut().fadeIn()', "many actions on one selection in one statement");
+        }],
+
+        ["10. append / prepend", function () {
+          count++;
+          $("#list").append("<li class='added'>Appended " + count + "</li>");
+          $("#list").prepend("<li class='added'>Prepended " + count + "</li>");
+          log('$("#list").append("<li>...</li>")', "adds INSIDE, at the end");
+          log('$("#list").prepend("<li>...</li>")', "adds INSIDE, at the start");
+          log('$("#list li").length', $("#list li").length + " items now");
+        }],
+
+        ["11. before / after", function () {
+          $("#unique").before("<p class='added'>Inserted BEFORE</p>");
+          $("#unique").after("<p class='added'>Inserted AFTER</p>");
+          log('$("#unique").before("<p>...</p>")', "adds OUTSIDE, before the element");
+          log('$("#unique").after("<p>...</p>")', "adds OUTSIDE, after the element");
+          $("<li>").text("Made with $('<li>')").appendTo("#list");
+          log("$('<li>').text(...).appendTo('#list')", "creates a new element and appends it");
+        }],
+
+        ["12. remove / empty", function () {
+          log('$("#list li:last").remove()', "removes the last item: " + $("#list li:last").text());
+          $("#list li:last").remove();
+          $(".added").remove();
+          log('$(".added").remove()', "removes every element with class added");
+          $("#list").empty();
+          log('$("#list").empty()', "removes only the children, the ul stays");
+        }],
+
+        ["13. Traversal", function () {
+          var $s = $("li.special");
+          flash($s);
+          log('$("li.special").parent()', "tag: " + $s.parent().prop("tagName"));
+          log('$("li.special").siblings().length', String($s.siblings().length));
+          log('$("li.special").next().text()', '"' + $s.next().text() + '"');
+          log('$("li.special").prev().text()', '"' + $s.prev().text() + '"');
+          log('$("#list").children().length', String($("#list").children().length));
+          log('$("#stage").find(".special").length', String($("#stage").find(".special").length));
+          log('$("#list li").eq(2).text()', '"' + $("#list li").eq(2).text() + '" (zero-based index)');
+          log('$("#list li").first() / .last()', '"' + $("#list li").first().text() + '" and "' + $("#list li").last().text() + '"');
+          log('$("li.special").closest("div").attr("id")', $s.closest("div").attr("id"));
+        }],
+
+        ["14. each() loop", function () {
+          $("#list li").each(function (index) {                // 'this' is the current element
+            $(this).css("color", index % 2 ? "#d9261c" : "#111");
+            log("each: index " + index, '"' + $(this).text() + '"');
+          });
+          log('$("#list li").filter(":even").length', String($("#list li").filter(":even").length) + " even-position items");
+          flash($("#list li").filter(":odd"));
+        }],
+
+        ["15. Events: on() + trigger()", function () {
+          $("#title").off(".demo");                            // avoid binding twice
+          $("#title").on("click.demo", function () {
+            $(this).toggleClass("hit");
+            log("click handler ran", "toggled class hit on the heading");
+          });
+          $("#unique").on("mouseenter.demo mouseleave.demo", function (e) {
+            $(this).css("background-color", e.type === "mouseenter" ? "#ffe14d" : "");
+            log("event: " + e.type, "on() handles two events in one call");
+          });
+          log('$("#title").on("click.demo", fn)', "handler attached. Click the heading, or hover the unique paragraph.");
+          $("#title").trigger("click");                        // fire the event from code
+          log('$("#title").trigger("click")', "fires the click from code");
+        }],
+
+        ["16. Events: off()", function () {
+          $("#title, #unique").off(".demo");
+          log('$("#title, #unique").off(".demo")', "removes all handlers added with the .demo namespace");
+        }],
+
+        ["Reset", function () {
+          $("#stage").find("*").off().stop(true);              // remove events, stop animations
+          $("#stage").html(original);
+          count = 3;
+          log('$("#stage").html(original)', "stage restored to the original state");
+        }]
+      ];
+
+      // ---------- build the buttons with jQuery ----------
+      $.each(actions, function (i, a) {
+        $("<button>")
+          .text(a[0])
+          .toggleClass("reset", a[0] === "Reset")
+          .on("click", function () {
+            if (a[0] === "Reset") { $("#log").empty(); step = 0; }
+            a[1]();
+          })
+          .appendTo("#buttons");
+      });
+
+      log("Ready", "jQuery " + $.fn.jquery + " loaded from: " + loadedFrom);
+    });
+  </script>
+</body>
+</html>
+```
+
+---
+
+### **3. Key Implementation Highlights**
+
+1. **CDN Script Link:** Loads the jQuery library in the `<head>` using `<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>`.
+2. **Document Ready Handler (`$(document).ready(function(){...})`):** Ensures all DOM element nodes are loaded before jQuery binds event handlers.
+3. **Core Syntax (`$(selector).action()`):**
+   * **Class Selector (`$(".intro")`)**: Targets all elements matching the class name and hides/fades them.
+   * **ID Selector (`$("#mainTitle")`)**: Targets a single element by its ID.
+   * **Method Chaining**: Chains `.text()`, `.css()`, `.slideUp()`, and `.slideDown()` together in one fluid statement.
+
+---
+
+💡 *Whenever you are ready, please share **Question 2 of Q2 (jQuery)**!*
+
+=================================================================================================================================================================================================================== 
+
+### **Unit 4 – jQuery**
+
+#### **Q2. jQuery (8 Marks)**
+#### **Question 2: Implement `*`, element, `#id`, and `.class` selectors.** *(2 Marks)*
+
+---
+
+### **1. Concept Explanation**
+
+jQuery selectors allow developers to find and manipulate HTML elements in the DOM using standard CSS selector syntax. The basic syntax is **`$(selector).action()`**.
+
+* **Universal Selector (`$("*")`):** 
+  * Selects **every single element** on the HTML page (e.g., `<html>`, `<head>`, `<body>`, `<div>`, `<p>`, buttons, etc.).
+  * Used when applying global styling or clearing attributes across all elements.
+* **Element / Tag Selector (`$("tag")`):** 
+  * Selects **all elements** sharing the specified HTML tag name (e.g., `$("p")` selects all `<p>` elements, `$("h3")` selects all `<h3>` elements).
+* **ID Selector (`$("#id")`):** 
+  * Selects a **single unique element** that possesses the matching `id` attribute (prefixed with `#`). In standard HTML, an `id` must be unique per document.
+* **Class Selector (`$(".class")`):** 
+  * Selects **all elements** that share the matching CSS class name (prefixed with `.`). A class can be reused across multiple elements of different tag types.
+
+---
+
+### **2. Complete Webpage Code**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>jQuery Basic Selectors | Cork Board Theme</title>
+  <style>
+    /* Theme: cork notice board - brown cork, coloured sticky notes, pins, handwritten-style headings (plain CSS, no Bootstrap) */
+    :root { --cork:#c19a6b; --cork2:#b08655; --brown:#4e342e; --yellow:#fff176; --pink:#f48fb1; --blue:#81d4fa; --green:#a5d6a7; --paper:#fffdf5; }
+    * { box-sizing: border-box; }
+    body { margin:0; color:var(--brown); font-family:"Segoe UI", Tahoma, sans-serif;
+           background-color:var(--cork);
+           background-image:radial-gradient(var(--cork2) 2px, transparent 2px); background-size:18px 18px; }
+    header { text-align:center; padding:18px 10px; background:var(--brown); color:var(--yellow); border-bottom:6px solid #3e2723; }
+    header h1 { margin:0; font-family:"Segoe Print","Bradley Hand","Comic Sans MS",cursive; font-size:1.6rem; }
+    header p { margin:6px 0 0; font-size:.85rem; color:#ffe0b2; }
+    /* Responsive: notes wrap by available width */
+    main { display:grid; grid-template-columns:repeat(auto-fit, minmax(310px, 1fr)); gap:22px; max-width:1200px; margin:22px auto; padding:0 16px; align-items:start; }
+    .note-card { background:var(--paper); padding:22px 14px 14px; box-shadow:4px 5px 8px rgba(0,0,0,.35); position:relative; }
+    .note-card::before { content:""; position:absolute; top:6px; left:50%; width:14px; height:14px; margin-left:-7px; border-radius:50%; background:#d32f2f; box-shadow:1px 2px 2px rgba(0,0,0,.5); }
+    .c1 { background:var(--yellow); transform:rotate(-.7deg); } .c2 { background:var(--blue); transform:rotate(.6deg); }
+    .c3 { background:var(--paper); } .c4 { background:var(--pink); transform:rotate(-.5deg); } .c5 { background:var(--green); transform:rotate(.5deg); }
+    .note-card h2 { margin:0 0 10px; font-family:"Segoe Print","Bradley Hand",cursive; font-size:1.05rem; }
+    .small { font-size:.78rem; margin:6px 0; }
+    code { font-family:Consolas, monospace; font-size:.8rem; background:rgba(255,255,255,.7); padding:0 4px; border-radius:3px; }
+    button { background:var(--brown); color:#fff; border:none; border-radius:4px; padding:7px 10px; margin:3px 4px 3px 0; font-size:.82rem; cursor:pointer; font-family:inherit; }
+    button:hover { background:#d32f2f; }
+    button.reset { background:#fff; color:var(--brown); border:2px solid var(--brown); }
+    /* The specimen stage that selectors will target */
+    #stage { background:#fff; border:2px dashed var(--brown); padding:10px; }
+    #stage h3, #stage p, #stage div, #stage ul, #stage li, #stage span { margin:5px 0; padding:3px 5px; border:1px solid transparent; }
+    #stage ul { padding-left:24px; }
+    #banner { background:#e1f5fe; font-weight:bold; }
+    .note { font-style:italic; }
+    .hit-all { outline:2px dashed #7b1fa2; background:#f3e5f5; }
+    .hit-el  { outline:3px solid #1565c0; background:#bbdefb; }
+    .hit-id  { outline:3px solid #2e7d32; background:#c8e6c9; }
+    .hit-cls { outline:3px solid #e65100; background:#ffe0b2; }
+    .hit-try { outline:3px solid #c2185b; background:#f8bbd0; }
+    /* counters */
+    #counters { display:grid; grid-template-columns:repeat(2, 1fr); gap:8px; }
+    .count { background:#fff; border:2px solid var(--brown); border-radius:6px; text-align:center; padding:6px; }
+    .count b { display:block; font-size:1.7rem; }
+    .count span { font-size:.72rem; font-family:Consolas, monospace; }
+    table { width:100%; border-collapse:collapse; font-size:.78rem; background:#fff; }
+    th, td { border:1px solid var(--brown); padding:3px 5px; text-align:left; word-break:break-word; }
+    th { background:var(--brown); color:#fff; }
+    #log { background:#fff; border:2px solid var(--brown); height:170px; overflow-y:auto; padding:6px; font-size:.78rem; }
+    #log div { border-bottom:1px dotted #999; padding:3px 0; word-break:break-word; }
+    #tryInput { width:100%; padding:7px; border:2px solid var(--brown); font-family:Consolas, monospace; }
+    #tryMsg { font-weight:bold; min-height:1.2em; }
+  </style>
+
+  <!-- INSTALLATION: local file from the js folder (relative path) -->
+  <script src="js/jquery-4.0.0.min.js"></script>
+  <script>
+    // If the local file is missing, window.jQuery is undefined, so load the official CDN copy
+    var source = window.jQuery ? "local file js/jquery-4.0.0.min.js" : "CDN code.jquery.com (fallback)";
+    if (!window.jQuery) { document.write('<script src="https://code.jquery.com/jquery-4.0.0.min.js"><\/script>'); }
+  </script>
+</head>
+<body>
+  <header>
+    <h1>jQuery Selectors Notice Board</h1>
+    <p>Unit 4 | jQuery | * (universal), element, #id and .class selectors</p>
+  </header>
+
+  <main>
+    <!-- Every panel's inside parts are filled by jQuery -->
+    <section class="note-card c1">
+      <h2>1. Specimen (elements to select)</h2>
+      <div id="stage">
+        <h3 id="title">Class Notice Board</h3>
+        <p>Plain paragraph one.</p>
+        <p class="note">Paragraph with class note.</p>
+        <div id="banner">Banner with id banner</div>
+        <div class="note">Div with class note.</div>
+        <ul>
+          <li>List item one</li>
+          <li class="note">List item with class note</li>
+        </ul>
+        <span class="note">Span with class note</span>
+      </div>
+    </section>
+
+    <section class="note-card c2">
+      <h2>2. Selector buttons</h2>
+      <div id="buttons"></div>
+      <p class="small">Run a button, then look at the colours in the specimen, the counters and the table.</p>
+      <div id="counters"></div>
+    </section>
+
+    <section class="note-card c3">
+      <h2>3. Matched elements</h2>
+      <p class="small" id="current">No selector run yet.</p>
+      <table id="matches"></table>
+    </section>
+
+    <section class="note-card c4">
+      <h2>4. Try your own selector</h2>
+      <input type="text" id="tryInput" value="p.note" aria-label="selector">
+      <div id="chips"></div>
+      <button id="tryBtn">Run $(selector)</button>
+      <div id="tryMsg"></div>
+    </section>
+
+    <section class="note-card c5">
+      <h2>5. Code executed</h2>
+      <div id="log"></div>
+    </section>
+  </main>
+
+  <script>
+    // READY EVENT: code runs after the DOM is loaded
+    $(function () {
+      var step = 0;
+      var $stage = $("#stage");
+
+      // ---------- helpers (all jQuery) ----------
+      function log(code, note) {
+        step++;
+        $("<div>").append($("<b>").text(step + ". "))
+                  .append($("<code>").text(code))
+                  .append($("<span>").text("  " + note))
+                  .appendTo("#log");
+        $("#log").scrollTop($("#log").prop("scrollHeight"));
+      }
+
+      // Removes every highlight class from the stage
+      function clearMarks() {
+        $("#stage, #stage *").removeClass("hit-all hit-el hit-id hit-cls hit-try");
+      }
+
+      // Fills the table with every element in the jQuery object (uses .each)
+      function showMatches($set, text) {
+        $("#current").text(text + " - " + $set.length + " element(s) matched");
+        $("#matches").empty().append("<tr><th>#</th><th>Tag</th><th>id</th><th>class</th></tr>");
+        $set.each(function (i) {                         // 'this' = current DOM element
+          $("<tr>")
+            .append($("<td>").text(i))
+            .append($("<td>").text(this.tagName.toLowerCase()))
+            .append($("<td>").text($(this).attr("id") || "-"))
+            .append($("<td>").text($(this).attr("class") ? $(this).attr("class").replace(/hit-\w+/g, "").trim() || "-" : "-"))
+            .appendTo("#matches");
+        });
+      }
+
+      // ---------- counters ----------
+      var counters = [["all", "$(\"*\")"], ["el", "$(\"p\")"], ["id", "$(\"#banner\")"], ["cls", "$(\".note\")"]];
+      $.each(counters, function (i, c) {
+        $("<div>").addClass("count").attr("id", "cnt-" + c[0])
+          .append($("<b>").text("0")).append($("<span>").text(c[1]))
+          .appendTo("#counters");
+      });
+      function setCount(key, n) {
+        $("#cnt-" + key).find("b").text(n).end().fadeTo(150, .3).fadeTo(150, 1);   // find, end, fadeTo
+      }
+
+      // ---------- the four selector demonstrations ----------
+      var actions = [
+
+        ["1. * universal", function () {
+          clearMarks();
+          var $all = $("#stage *");                      // every element INSIDE the stage
+          $all.addClass("hit-all");
+          showMatches($all, '$("#stage *")');
+          setCount("all", $("*").length);
+          log('$("*").length', $("*").length + " = EVERY element on the whole page (html, head, script, body ...)");
+          log('$("#stage *").length', $all.length + " = every element inside the specimen only");
+          log('$("*").first().prop("tagName")', $("*").first().prop("tagName") + " (the first element in the page)");
+          log('$("body *").length', $("body *").length + " (all elements inside body)");
+        }],
+
+        ["2. element: p", function () {
+          clearMarks();
+          var $p = $("#stage p");
+          $p.addClass("hit-el");
+          showMatches($p, '$("p")');
+          setCount("el", $("p").length);
+          log('$("p")', $("p").length + " paragraph(s) on the page: selects every <p> tag");
+          log('$("li").length', $("li").length + " list items (same idea with the li tag)");
+          log('$("h3").text()', '"' + $("h3").text() + '" (read from the h3 element)');
+          $("#stage li").addClass("hit-el");
+        }],
+
+        ["3. #id: #banner", function () {
+          clearMarks();
+          var $b = $("#banner");
+          $b.addClass("hit-id");
+          showMatches($b, '$("#banner")');
+          setCount("id", $b.length);
+          log('$("#banner")', $b.length + " element: an id is unique, so at most one match");
+          log('$("#banner").text()', '"' + $b.text() + '"');
+          log('$("#nothing").length', $("#nothing").length + " (no such id gives an empty set, not an error)");
+          log('$("#title").attr("id")', $("#title").attr("id"));
+        }],
+
+        ["4. .class: .note", function () {
+          clearMarks();
+          var $n = $("#stage .note");
+          $n.addClass("hit-cls");
+          showMatches($n, '$(".note")');
+          setCount("cls", $(".note").length);
+          log('$(".note")', $(".note").length + " elements: div, p, li and span all share the class");
+          log('$("p.note").length', $("p.note").length + " (tag + class: only <p> with class note)");
+          log('$("div.note").length', $("div.note").length + " (only <div> with class note)");
+        }],
+
+        ["5. Combined: , ", function () {
+          clearMarks();
+          var $m = $("#stage").find("h3, #banner, li.note");
+          $m.addClass("hit-try");
+          showMatches($m, '$("h3, #banner, li.note")');
+          log('$("h3, #banner, li.note")', "comma joins selectors: " + $m.length + " elements, one jQuery object");
+        }],
+
+        ["Reset", function () {
+          clearMarks();
+          $("#matches").empty();
+          $("#current").text("No selector run yet.");
+          $(".count b").text("0");
+          $("#log").empty(); step = 0;
+          log("reset", "highlights, counters and table cleared");
+        }]
+      ];
+
+      // build buttons with jQuery
+      $.each(actions, function (i, a) {
+        $("<button>").text(a[0]).toggleClass("reset", a[0] === "Reset")
+          .on("click", a[1]).appendTo("#buttons");
+      });
+
+      // ---------- try your own selector ----------
+      $.each(["*", "p", "#banner", ".note", "li", "p.note", "div, span"], function (i, s) {
+        $("<button>").addClass("reset").text(s)
+          .on("click", function () { $("#tryInput").val(s); $("#tryBtn").trigger("click"); })   // trigger() fires the click from code
+          .appendTo("#chips");
+      });
+
+      $("#tryBtn").on("click", function () {
+        var sel = $.trim ? $("#tryInput").val().trim() : $("#tryInput").val();   // trim the typed text
+        clearMarks();
+        try {
+          var $r = $("#stage").find(sel);                // find() searches inside the stage only
+          $r.addClass("hit-try");
+          showMatches($r, '$("' + sel + '")');
+          $("#tryMsg").css("color", "#1b5e20").text($r.length + " match(es) inside the specimen");
+          log('$("#stage").find("' + sel + '")', $r.length + " match(es)");
+        } catch (err) {
+          $("#tryMsg").css("color", "#b71c1c").text("Invalid selector");       // bad syntax throws an error
+          log("invalid selector", sel);
+        }
+      });
+      $("#tryInput").on("keyup", function (e) { if (e.key === "Enter") $("#tryBtn").trigger("click"); });
+
+      log("Ready", "jQuery " + $.fn.jquery + " loaded from " + source);
+    });
+  </script>
+</body>
+</html>
+```
+
+---
+
+### **3. Key Implementation Highlights**
+
+1. **Universal Selector (`$("*")`):** Applied via `$("*").css("outline", "1px dashed red")`, selecting every element in the entire DOM hierarchy.
+2. **Element Selector (`$("p")`):** Targets all `<p>` tags on the page simultaneously to modify text styles.
+3. **ID Selector (`$("#uniqueBanner")`):** Uses `#` prefix to select and update the single element with `id="uniqueBanner"`.
+4. **Class Selector (`$(".note")`):** Uses `.` prefix to select all elements with `class="note"`, regardless of whether they are `<div>` or `<p>` tags.
+
+---
+
+Whenever you are ready, please share **Question 3 of Q2 (jQuery)**!
+
+=================================================================================================================================================================================================================== 
+
+### **Unit 4 – jQuery**
+
+#### **Q2. jQuery (8 Marks)**
+#### **Question 3: Demonstrate any four jQuery event methods from the syllabus, including `blur()`, `change()`, `click()`, `dblclick()`, `die()` and `error()`.** *(2 Marks)*
+
+---
+
+### **1. Concept Explanation**
+
+In jQuery, **event methods** attach handler functions to HTML elements to respond dynamically when browser events or user actions occur.
+
+* **Syllabus Event Methods Overview:**
+  1. **`click()`:** Triggers when an HTML element is clicked once.
+  2. **`dblclick()`:** Triggers when an element is double-clicked (two rapid clicks).
+  3. **`blur()`:** Fires when a form control loses focus (e.g., when the user clicks or tabs away from an input box).
+  4. **`change()`:** Fires when the value of a form element (`<input>`, `<select>`, or `<textarea>`) is changed.
+  5. **`bind()` (Legacy):** Attaches event handlers to selected elements (modern projects use `.on()`).
+  6. **`die()` (Removed in jQuery 1.9):** Used to remove event handlers attached via `.live()` (replaced by `.off()` in modern jQuery).
+  7. **`error()` (Removed in jQuery 3.0):** Triggered when an element (such as an `<img>`) failed to load (replaced by `.on("error", fn)`).
+
+*(The program below demonstrates four active event methods: **`click()`, `dblclick()`, `blur()`, and `change()`**).*
+
+---
+
+### **2. Complete Webpage Code**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>jQuery Event Methods | Galaxy Theme</title>
+  <style>
+    /* Theme: galaxy - deep indigo space, violet panels, lime and star-white accents (plain CSS, no Bootstrap) */
+    :root { --space:#0e0a24; --violet:#2b1d5c; --purple:#7c4dff; --lime:#b2ff59; --star:#f3f0ff; --pink:#ff6ec7; --warn:#ffb74d; }
+    * { box-sizing: border-box; }
+    body { margin:0; color:var(--star); font-family:"Segoe UI", Tahoma, sans-serif;
+           background-color:var(--space);
+           background-image:radial-gradient(1.5px 1.5px at 20px 30px,#fff,transparent),
+                            radial-gradient(1px 1px at 90px 70px,#cfc4ff,transparent),
+                            radial-gradient(1.5px 1.5px at 150px 20px,#fff,transparent);
+           background-size:180px 120px; }
+    header { text-align:center; padding:20px 10px; background:linear-gradient(135deg,#1a1245,#4a2a9c); border-bottom:3px solid var(--lime); }
+    header h1 { margin:0; font-size:1.6rem; letter-spacing:2px; }
+    header p { margin:6px 0 0; color:var(--lime); font-size:.85rem; }
+    /* Responsive: panels wrap by available width */
+    main { display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:18px; max-width:1250px; margin:20px auto; padding:0 14px; align-items:start; }
+    .panel { background:rgba(43,29,92,.88); border:2px solid var(--purple); border-radius:14px; padding:14px; box-shadow:0 0 14px rgba(124,77,255,.4); }
+    .panel h2 { margin:0 0 10px; font-size:1.02rem; color:var(--lime); }
+    .small { font-size:.78rem; color:#cfc4ff; margin:6px 0; }
+    code { font-family:Consolas, monospace; font-size:.78rem; color:var(--pink); }
+    button { background:var(--purple); color:#fff; border:none; border-radius:20px; padding:7px 13px; margin:3px 4px 3px 0; font-size:.82rem; cursor:pointer; }
+    button:hover { background:var(--lime); color:#12082e; }
+    label { display:block; font-weight:bold; font-size:.85rem; margin:8px 0 3px; }
+    input[type=text], select { width:100%; padding:8px; border-radius:8px; border:2px solid var(--purple); background:#150f3a; color:var(--star); font-size:.95rem; }
+    input.ok { border-color:var(--lime); } input.bad { border-color:var(--pink); }
+    #clickBox { border:3px dashed var(--lime); border-radius:14px; padding:26px 10px; text-align:center; cursor:pointer; user-select:none; transition:background .2s; }
+    #clickBox.single { background:#3b7d2c; } #clickBox.double { background:#a8325e; }
+    .stats { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-top:8px; }
+    .stat { background:#150f3a; border-radius:10px; text-align:center; padding:6px; }
+    .stat b { display:block; font-size:1.6rem; color:var(--lime); }
+    .stat span { font-size:.72rem; font-family:Consolas, monospace; }
+    #dyn { min-height:44px; border:2px dashed var(--purple); border-radius:10px; padding:6px; margin:8px 0; }
+    #dyn button { background:var(--pink); }
+    #imgBox { min-height:70px; border:2px dashed var(--purple); border-radius:10px; padding:8px; margin:8px 0; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    #imgBox img { max-height:54px; }
+    table { width:100%; border-collapse:collapse; font-size:.76rem; }
+    th, td { border:1px solid var(--purple); padding:3px 5px; text-align:left; word-break:break-word; }
+    th { background:#150f3a; color:var(--lime); }
+    td.yes { color:var(--lime); font-weight:bold; } td.no { color:var(--warn); font-weight:bold; }
+    #log { background:#08051a; border:2px solid var(--purple); border-radius:10px; height:300px; overflow-y:auto; padding:6px; font-size:.78rem; }
+    #log div { border-bottom:1px dotted #4a3a8c; padding:3px 0; word-break:break-word; }
+    #log .n { color:var(--lime); font-weight:bold; margin-right:4px; }
+  </style>
+
+  <!-- INSTALLATION: local file from the js folder (relative path) -->
+  <script src="js/jquery-4.0.0.min.js"></script>
+  <script>
+    // If the local file is missing, window.jQuery is undefined, so load the official CDN copy
+    var source = window.jQuery ? "local file js/jquery-4.0.0.min.js" : "CDN code.jquery.com (fallback)";
+    if (!window.jQuery) { document.write('<script src="https://code.jquery.com/jquery-4.0.0.min.js"><\/script>'); }
+  </script>
+</head>
+<body>
+  <header>
+    <h1>jQuery Event Methods Galaxy</h1>
+    <p>Unit 4 | jQuery | click(), dblclick(), blur(), change(), die() and error()</p>
+  </header>
+
+  <!-- Only the panel frames are written here; jQuery fills them -->
+  <main>
+    <section class="panel"><h2>1. click() and dblclick()</h2><div id="p1"></div></section>
+    <section class="panel"><h2>2. blur() and change()</h2><div id="p2"></div></section>
+    <section class="panel"><h2>3. die() (removed) and its replacement</h2><div id="p3"></div></section>
+    <section class="panel"><h2>4. error() (removed) and its replacement</h2><div id="p4"></div></section>
+    <section class="panel"><h2>5. Method availability in this jQuery</h2><div id="p5"></div></section>
+    <section class="panel"><h2>6. Event log</h2><div id="log"></div><button id="clearLog">Clear log</button></section>
+  </main>
+
+  <script>
+    // READY EVENT: runs after the DOM is loaded
+    $(function () {
+      var step = 0;
+
+      // log(): adds one numbered line to the log
+      function log(method, note) {
+        step++;
+        $("<div>").append($("<span>").addClass("n").text(step + "."))
+                  .append($("<code>").text(method))
+                  .append($("<span>").text("  " + note))
+                  .appendTo("#log");
+        $("#log").scrollTop($("#log").prop("scrollHeight"));
+      }
+      $("#clearLog").on("click", function () { $("#log").empty(); step = 0; });
+
+      // ================= PANEL 1: click() and dblclick() =================
+      var clicks = 0, dbls = 0;
+      $("#p1").append(
+        $("<div>").attr("id", "clickBox").html("<b>Click me once, then double-click me</b>"),
+        $("<div>").addClass("stats").append(
+          $("<div>").addClass("stat").append($("<b>").attr("id", "cClick").text(0), $("<span>").text("click()")),
+          $("<div>").addClass("stat").append($("<b>").attr("id", "cDbl").text(0), $("<span>").text("dblclick()"))
+        ),
+        $("<p>").addClass("small").text("A double-click fires click() twice and then dblclick(). Watch the log.")
+      );
+
+      // click(handler): shorthand for .on("click", handler)
+      $("#clickBox").click(function (e) {
+        clicks++;
+        $("#cClick").text(clicks);
+        $(this).removeClass("double").addClass("single");
+        log("click()", "fired, e.detail = " + e.detail + " (1st or 2nd press of a double-click)");
+      });
+
+      // dblclick(handler): shorthand for .on("dblclick", handler)
+      $("#clickBox").dblclick(function () {
+        dbls++;
+        $("#cDbl").text(dbls);
+        $(this).removeClass("single").addClass("double").text("Double-clicked!");
+        log("dblclick()", "fired after two clicks");
+      });
+
+      // ================= PANEL 2: blur() and change() =================
+      $("#p2").append(
+        $("<label>").attr("for", "user").text("Username (letters only, 3 to 12). Click away to fire blur()."),
+        $("<input>").attr({ type: "text", id: "user", placeholder: "type, then click outside" }),
+        $("<div>").addClass("small").attr("id", "userMsg"),
+        $("<label>").attr("for", "course").text("Course. Pick another option to fire change()."),
+        $("<select>").attr("id", "course").append(
+          $.map(["-- choose --", "M.Sc. IT", "M.Sc. CS", "MCA"], function (t, i) {
+            return $("<option>").val(i ? t : "").text(t)[0];      // $.map builds the list of options
+          })
+        ),
+        $("<div>").addClass("small").attr("id", "courseMsg")
+      );
+
+      // blur(handler): the field LOST focus
+      $("#user").blur(function () {
+        var v = $(this).val().replace(/^\s+|\s+$/g, "");           // trim spaces
+        var ok = /^[A-Za-z]{3,12}$/.test(v);
+        $(this).toggleClass("ok", ok).toggleClass("bad", !ok);
+        $("#userMsg").text(ok ? "Valid username" : "Invalid: use 3 to 12 letters");
+        log("blur()", 'input lost focus, value "' + v + '" is ' + (ok ? "valid" : "invalid"));
+      });
+      // focus() is the opposite of blur(): used here to show the pair
+      $("#user").focus(function () { log("focus()", "input gained focus (opposite of blur)"); });
+
+      // change(handler): the value was changed and committed
+      $("#course").change(function () {
+        var v = $(this).val();
+        $("#courseMsg").text(v ? "Selected: " + v : "Nothing selected");
+        log("change()", 'select value changed to "' + v + '", selectedIndex ' + this.selectedIndex);
+      });
+      // change() also works on a text box, but fires only when it loses focus after editing
+      $("#user").change(function () { log("change()", "text input changed (fires when it loses focus)"); });
+
+      // ================= PANEL 3: die() replacement =================
+      // live() and die() were removed in jQuery 1.9. A delegated on() / off() replaces them.
+      var made = 0;
+      $("#p3").append(
+        $("<p>").addClass("small").html("<code>live()</code> attached a handler to present AND future elements. <code>die()</code> removed it. Now: <code>on(event, selector, fn)</code> and <code>off()</code>."),
+        $("<button>").attr("id", "add").text("Add dynamic button"),
+        $("<button>").attr("id", "die").text("die() equivalent: off()"),
+        $("<button>").attr("id", "live").text("live() equivalent: on()"),
+        $("<div>").attr("id", "dyn"),
+        $("<div>").addClass("small").attr("id", "dynState")
+      );
+
+      function attachLive() {
+        $("#dyn").off("click.live")                                  // never attach twice
+                 .on("click.live", ".dyn", function () {             // delegated handler on the parent
+                   log('on("click", ".dyn", fn)', 'handled by parent for "' + $(this).text() + '"');
+                   $(this).fadeOut(250, function () { $(this).remove(); });
+                 });
+        $("#dynState").text("Delegated handler is ON: dynamic buttons respond.");
+      }
+      $("#add").on("click", function () {
+        made++;
+        $("<button>").addClass("dyn").text("Dynamic " + made).appendTo("#dyn");
+        log('$("<button>").appendTo("#dyn")', "new element added after the handler was attached");
+      });
+      $("#die").on("click", function () {
+        $("#dyn").off("click.live");                                 // this is what die() did
+        $("#dynState").text("Handler removed with off(): dynamic buttons do nothing.");
+        log('$("#dyn").off("click.live")', "replacement for die(): handler removed");
+      });
+      $("#live").on("click", function () {
+        attachLive();
+        log('$("#dyn").on("click.live", ".dyn", fn)', "replacement for live(): handler attached again");
+      });
+      attachLive();
+
+      // ================= PANEL 4: error() replacement =================
+      // error() was removed in jQuery 3.0. Use .on("error", fn). Attach the handlers BEFORE setting src.
+      $("#p4").append(
+        $("<p>").addClass("small").html("The <code>error</code> event fires when an image cannot load."),
+        $("<button>").attr("id", "badImg").text("Load a missing image"),
+        $("<button>").attr("id", "goodImg").text("Load a valid image"),
+        $("<div>").attr("id", "imgBox").text("Image area"),
+        $("<div>").addClass("small").attr("id", "imgMsg")
+      );
+
+      function loadImage(src, label) {
+        var $img = $("<img>").attr("alt", label)
+          .on("error", function () {                                 // fires on a broken link
+            $("#imgMsg").css("color", "#ffb74d").text("error event: " + label + " could not be loaded");
+            $(this).replaceWith($("<b>").text("[image failed]"));    // show a fallback instead
+            log('.on("error", fn)', label + " failed to load");
+          })
+          .on("load", function () {                                  // fires when loading works
+            $("#imgMsg").css("color", "#b2ff59").text("load event: " + label + " loaded (" + this.width + " x " + this.height + ")");
+            log('.on("load", fn)', label + " loaded successfully");
+          })
+          .attr("src", src);                                         // src is set LAST
+        $("#imgBox").empty().append($img);
+      }
+      $("#badImg").on("click", function () { loadImage("images/does-not-exist.png", "missing image"); });
+      $("#goodImg").on("click", function () {
+        loadImage("data:image/svg+xml," + encodeURIComponent(
+          '<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60"><circle cx="30" cy="30" r="26" fill="#7c4dff"/><circle cx="30" cy="30" r="10" fill="#b2ff59"/></svg>'), "valid image");
+      });
+
+      // ================= PANEL 5: which methods exist in this jQuery? =================
+      var methods = [
+        ["click", "current (shortcut)"], ["dblclick", "current (shortcut)"], ["blur", "current (shortcut)"],
+        ["change", "current (shortcut)"], ["on", "current, preferred"], ["off", "current, preferred"],
+        ["bind", "deprecated 3.0, use on()"], ["live", "removed 1.9, use on()"],
+        ["die", "removed 1.9, use off()"], ["error", "removed 3.0, use on('error')"]
+      ];
+      var $t = $("<table>").append("<tr><th>Method</th><th>typeof $.fn.x</th><th>Status</th></tr>");
+      $.each(methods, function (i, m) {
+        var t = typeof $.fn[m[0]];                                   // checks the real library
+        $("<tr>").append($("<td>").text("." + m[0] + "()"))
+                 .append($("<td>").addClass(t === "function" ? "yes" : "no").text(t))
+                 .append($("<td>").text(m[1])).appendTo($t);
+      });
+      $("#p5").append($t, $("<p>").addClass("small").text("jQuery " + $.fn.jquery + " from " + source));
+
+      log("Ready", "jQuery " + $.fn.jquery + " loaded from " + source);
+    });
+  </script>
+</body>
+</html>
+```
+
+---
+
+### **3. Key Implementation Highlights**
+
+1. **`click()` Method:** Attaches a single-click handler to `#targetBox` to update CSS styling dynamically.
+2. **`dblclick()` Method:** Attaches a double-click handler to `#targetBox` to apply a distinct background color.
+3. **`blur()` Method:** Listens for when focus leaves `#usernameInput`, checks `.val()`, and highlights the border red or green accordingly.
+4. **`change()` Method:** Monitors `#courseSelect` for option selection changes.
+5. **Legacy Method Note:** In modern jQuery (3.0+), deprecated methods like `.die()` and `.error()` have been removed and replaced by `.off()` and `.on("error", fn)`.
+
+---
+
+💡 Whenever you are ready, please share **Question 4 of Q2 (jQuery)**!
+
+=================================================================================================================================================================================================================== 
+
+### **Unit 4 – jQuery**
+
+#### **Q2. jQuery (8 Marks)**
+#### **Question 4: Demonstrate DOM manipulation using jQuery methods.** *(2 Marks)*
+
+---
+
+### **1. Concept Explanation**
+
+jQuery simplifies Document Object Model (DOM) manipulation by providing intuitive methods to retrieve and modify HTML content, attributes, element nodes, and CSS styles without writing verbose vanilla JavaScript.
+
+#### **Core Categories of jQuery DOM Manipulation Methods:**
+
+1. **Content & Value Methods (`text()`, `html()`, `val()`):**
+   * **`text()`**: Gets or sets the combined plain text content of selected elements (strips HTML tags).
+   * **`html()`**: Gets or sets the inner content of selected elements, including HTML markup.
+   * **`val()`**: Gets or sets the input value of form controls (e.g., `<input>`, `<select>`, `<textarea>`).
+   * *Rule:* Passing no argument retrieves (gets) the value; passing an argument updates (sets) it.
+
+2. **Element Insertion & Deletion Methods (`append()`, `prepend()`, `after()`, `before()`, `remove()`, `empty()`):**
+   * **`append()`**: Inserts content **inside** the selected element at the end.
+   * **`prepend()`**: Inserts content **inside** the selected element at the beginning.
+   * **`after()`**: Inserts content **outside** and after the selected element.
+   * **`before()`**: Inserts content **outside** and before the selected element.
+   * **`remove()`**: Deletes the selected element along with all its child nodes.
+   * **`empty()`**: Clears all child nodes and text content from inside the selected element while keeping the element itself.
+
+3. **Attribute & CSS Methods (`attr()`, `addClass()`, `removeClass()`, `css()`):**
+   * **`attr("name", "value")`**: Reads or modifies element attribute values (e.g., `src`, `href`, `title`).
+   * **`addClass("class")` / `removeClass("class")` / `toggleClass("class")`**: Dynamically adds, removes, or toggles CSS classes.
+   * **`css("property", "value")`**: Directly gets or sets inline CSS style properties.
+
+---
+
+### **2. Complete Webpage Code**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>jQuery DOM Manipulation | Chalkboard Theme</title>
+  <style>
+    /* Theme: classroom chalkboard - green board, wooden frame, coloured chalk (plain CSS, no Bootstrap) */
+    :root { --board:#24382f; --board2:#2d463a; --wood:#8d6e4a; --chalk:#f5f5ef; --yellow:#ffe98a; --pink:#ff9eb5; --blue:#8fd3ff; --green:#9be59b; --paper:#fffdf4; --ink:#2b2b2b; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:#5d4630; color:var(--chalk); font-family:"Segoe UI", Tahoma, sans-serif; }
+    header { background:var(--wood); text-align:center; padding:16px 10px; border-bottom:6px solid #5d4630; }
+    header h1 { margin:0; font-family:"Segoe Print","Bradley Hand","Chalkboard SE",cursive; font-size:1.6rem; color:var(--yellow); }
+    header p { margin:6px 0 0; font-size:.85rem; color:#f1e3c8; }
+    /* Responsive: panels wrap by available width */
+    main { display:grid; grid-template-columns:repeat(auto-fit, minmax(330px, 1fr)); gap:16px; max-width:1300px; margin:16px auto; padding:0 12px; align-items:start; }
+    .board { background:var(--board); border:8px solid var(--wood); border-radius:6px; padding:12px; box-shadow:inset 0 0 25px rgba(0,0,0,.5); }
+    .board h2 { margin:0 0 10px; font-family:"Segoe Print","Bradley Hand",cursive; font-size:1.05rem; color:var(--yellow); border-bottom:2px dashed var(--chalk); padding-bottom:4px; }
+    .board h4 { margin:10px 0 4px; font-family:"Segoe Print","Bradley Hand",cursive; font-size:.88rem; color:var(--blue); }
+    .small { font-size:.78rem; color:#cfe3d5; margin:6px 0; }
+    code { font-family:Consolas, monospace; font-size:.78rem; color:var(--pink); }
+    button { background:transparent; color:var(--chalk); border:2px solid var(--chalk); border-radius:8px; padding:5px 9px; margin:3px 3px 3px 0;
+             font-size:.78rem; cursor:pointer; font-family:inherit; }
+    button:hover { background:var(--yellow); color:var(--ink); border-color:var(--yellow); }
+    button.reset { border-color:var(--pink); color:var(--pink); }
+    button.reset:hover { background:var(--pink); color:var(--ink); }
+
+    /* Specimen: a paper sheet pinned on the board */
+    #stage { background:var(--paper); color:var(--ink); border-radius:4px; padding:12px; }
+    #stage h3 { margin:0 0 6px; color:#1b5e20; }
+    #stage p { margin:6px 0; }
+    #stage input[type=text] { padding:5px; border:2px solid #555; width:55%; }
+    #stage ul { margin:8px 0; padding-left:24px; }
+    #card { background:#e3f2fd; border:2px solid #1565c0; border-radius:6px; padding:8px; margin:8px 0; }
+    #stage .copy { background:#fce4ec; border-color:#c2185b; }
+    .wrapped { border:2px dashed #e65100; padding:4px; }
+    .flash { outline:3px solid #e65100; background:#fff3cd !important; }
+    .hl { background:#ffe98a; font-weight:bold; padding:0 4px; border-radius:3px; }
+    .big { font-size:1.3rem; }
+    .added { color:#c2185b; font-weight:bold; }
+
+    #source { margin:0; background:#16251e; color:var(--green); font-family:Consolas, monospace; font-size:.74rem; padding:8px;
+              height:260px; overflow:auto; white-space:pre-wrap; word-break:break-all; border-radius:4px; }
+    #log { background:#16251e; border-radius:4px; height:260px; overflow-y:auto; padding:6px; font-size:.78rem; }
+    #log div { border-bottom:1px dotted #4d6a5a; padding:3px 0; word-break:break-word; }
+    #log .n { color:var(--yellow); font-weight:bold; margin-right:4px; }
+  </style>
+
+  <!-- INSTALLATION: local file from the js folder (relative path) -->
+  <script src="js/jquery-4.0.0.min.js"></script>
+  <script>
+    // If the local file is missing, window.jQuery is undefined, so load the official CDN copy
+    var source = window.jQuery ? "local file js/jquery-4.0.0.min.js" : "CDN code.jquery.com (fallback)";
+    if (!window.jQuery) { document.write('<script src="https://code.jquery.com/jquery-4.0.0.min.js"><\/script>'); }
+  </script>
+</head>
+<body>
+  <header>
+    <h1>jQuery DOM Manipulation Chalkboard</h1>
+    <p>Unit 4 | jQuery | content, attributes, CSS, insert, wrap, clone, remove, traverse</p>
+  </header>
+
+  <main>
+    <section class="board">
+      <h2>1. Specimen (the page part we change)</h2>
+      <div id="stage">
+        <h3 id="title">Original Heading</h3>
+        <p id="para">A paragraph with <b>bold text</b>.</p>
+        <input type="text" id="field" value="Sample text">
+        <label><input type="checkbox" id="chk"> tick box</label><br>
+        <a id="link" href="https://jquery.com">jQuery website</a>
+        <ul id="list">
+          <li>Item 1</li>
+          <li>Item 2</li>
+        </ul>
+        <div id="card"><span id="inner">Text inside card</span></div>
+      </div>
+    </section>
+
+    <section class="board">
+      <h2>2. Methods (click one)</h2>
+      <div id="buttons"></div>
+    </section>
+
+    <section class="board">
+      <h2>3. Live HTML of the specimen</h2>
+      <pre id="source"></pre>
+      <p class="small">This box is refreshed after every action using <code>$("#stage").html()</code>.</p>
+    </section>
+
+    <section class="board">
+      <h2>4. Code executed</h2>
+      <div id="log"></div>
+    </section>
+  </main>
+
+  <script>
+    // READY EVENT: runs after the DOM is loaded
+    $(function () {
+      var original = $("#stage").html();      // saved copy for Reset
+      var step = 0, n = 2, copies = 0, $detached = null;
+
+      // ---------- helpers ----------
+      // log(code, note): adds one numbered line to the log
+      function log(code, note) {
+        step++;
+        $("<div>")
+          .append($("<span>").addClass("n").text(step + "."))
+          .append($("<code>").text(code))
+          .append($("<span>").text("  " + note))
+          .appendTo("#log");
+        $("#log").scrollTop($("#log").prop("scrollHeight"));
+      }
+      // q(): wraps a value in quotes for the log
+      function q(v) { return '"' + v + '"'; }
+      // refresh(): redraws the live HTML box (text() shows tags as plain text)
+      function refresh() {
+        $("#source").text($("#stage").html().replace(/></g, ">\n<").replace(/\sclass="\s*"/g, ""));
+      }
+      // flash(): highlights elements for a moment, using delay() and queue()
+      function flash($els) {
+        $els.addClass("flash").delay(1200).queue(function (next) {
+          $(this).removeClass("flash");
+          next();
+        });
+      }
+
+      // ---------- the methods, grouped by category ----------
+      var groups = [
+
+        ["A. Get content", [
+          ["text()", function () {
+            log('$("#para").text()', q($("#para").text()) + " (tags are removed)");
+            log('$("#title").text()', q($("#title").text()));
+          }],
+          ["html()", function () {
+            log('$("#para").html()', q($("#para").html()) + " (tags are kept)");
+          }],
+          ["val()", function () {
+            log('$("#field").val()', q($("#field").val()) + " (form value)");
+          }],
+          ["attr() / prop() / data()", function () {
+            log('$("#link").attr("href")', q($("#link").attr("href")));
+            log('$("#link").prop("tagName")', $("#link").prop("tagName"));
+            log('$("#chk").prop("checked")', String($("#chk").prop("checked")) + " (true or false, the CURRENT state)");
+            log('$("#chk").attr("checked")', String($("#chk").attr("checked")) + " (the HTML attribute, not the current state)");
+            $("#card").data("level", 7);
+            log('$("#card").data("level", 7)', "stored in memory, read back: " + $("#card").data("level"));
+          }]
+        ]],
+
+        ["B. Set content", [
+          ["text(new)", function () {
+            $("#para").text("Set with <b>text()</b>: tags show as plain text.");
+            flash($("#para")); log('$("#para").text("<b>..</b>")', "text() escapes HTML, so tags are shown literally");
+          }],
+          ["html(new)", function () {
+            $("#para").html("Set with <b>html()</b>: <i>tags are interpreted</i>.");
+            flash($("#para")); log('$("#para").html("<b>..</b>")', "html() renders the markup");
+          }],
+          ["val(new)", function () {
+            $("#field").val("Value set by jQuery");
+            flash($("#field")); log('$("#field").val("Value set by jQuery")', "val() sets the input value");
+          }],
+          ["val() on a function", function () {
+            $("#field").val(function (i, old) { return old.toUpperCase(); });     // callback receives the old value
+            flash($("#field")); log('$("#field").val(function(i, old){...})', "callback form: value is now " + q($("#field").val()));
+          }]
+        ]],
+
+        ["C. Attributes and properties", [
+          ["attr({...})", function () {
+            $("#link").attr({ href: "https://example.com", title: "Changed by attr()", target: "_blank" });
+            flash($("#link")); log('$("#link").attr({href, title, target})', "an object sets many attributes at once");
+          }],
+          ["removeAttr()", function () {
+            $("#link").removeAttr("title target");
+            flash($("#link")); log('$("#link").removeAttr("title target")', "removes two attributes in one call");
+          }],
+          ["prop(checked)", function () {
+            $("#chk").prop("checked", !$("#chk").prop("checked"));
+            flash($("#chk").parent()); log('$("#chk").prop("checked", !...)', "now " + $("#chk").prop("checked"));
+          }],
+          ["data() attribute", function () {
+            $("#card").attr("data-color", "blue");
+            log('$("#card").attr("data-color", "blue")', 'data("color") reads ' + q($("#card").data("color")));
+          }]
+        ]],
+
+        ["D. CSS and classes", [
+          ["css(name, value)", function () {
+            $("#title").css("color", "#c2185b");
+            log('$("#title").css("color", "#c2185b")', "read back: " + q($("#title").css("color")) + " (computed value)");
+            flash($("#title"));
+          }],
+          ["css({...})", function () {
+            $("#para").css({ "background-color": "#e8f5e9", "font-size": "1.1rem", padding: "6px" });
+            log('$("#para").css({...})', "an object sets many properties");
+          }],
+          ["addClass()", function () {
+            $("#title").addClass("hl big");
+            log('$("#title").addClass("hl big")', "two classes added together");
+          }],
+          ["removeClass()", function () {
+            $("#title").removeClass("hl big");
+            log('$("#title").removeClass("hl big")', "classes removed");
+          }],
+          ["toggleClass()", function () {
+            $("#title").toggleClass("hl");
+            log('$("#title").toggleClass("hl")', "hasClass now: " + $("#title").hasClass("hl"));
+          }],
+          ["width() / height()", function () {
+            var $c = $("#card");
+            log('$("#card").width()', $c.width() + " px (content only)");
+            log('$("#card").innerWidth()', $c.innerWidth() + " px (with padding)");
+            log('$("#card").outerWidth(true)', $c.outerWidth(true) + " px (padding, border, margin)");
+            log('$("#card").height()', $c.height() + " px");
+          }]
+        ]],
+
+        ["E. Insert INSIDE", [
+          ["append()", function () {
+            n++;
+            $("#list").append("<li class='added'>Appended " + n + "</li>");
+            flash($("#list li:last")); log('$("#list").append("<li>..</li>")', "added inside, at the END");
+          }],
+          ["prepend()", function () {
+            n++;
+            $("#list").prepend("<li class='added'>Prepended " + n + "</li>");
+            flash($("#list li:first")); log('$("#list").prepend("<li>..</li>")', "added inside, at the START");
+          }],
+          ["appendTo()", function () {
+            n++;
+            $("<li>").addClass("added").text("appendTo " + n).appendTo("#list");
+            flash($("#list li:last")); log('$("<li>").text(..).appendTo("#list")', "same as append, but the new element comes first");
+          }],
+          ["prependTo()", function () {
+            n++;
+            $("<li>").addClass("added").text("prependTo " + n).prependTo("#list");
+            flash($("#list li:first")); log('$("<li>").text(..).prependTo("#list")', "new element placed at the start");
+          }]
+        ]],
+
+        ["F. Insert OUTSIDE", [
+          ["before()", function () {
+            $("#list").before("<p class='added'>Paragraph inserted BEFORE the list</p>");
+            log('$("#list").before("<p>..</p>")', "added outside, above the element");
+          }],
+          ["after()", function () {
+            $("#list").after("<p class='added'>Paragraph inserted AFTER the list</p>");
+            log('$("#list").after("<p>..</p>")', "added outside, below the element");
+          }],
+          ["insertBefore()", function () {
+            $("<p>").addClass("added").text("insertBefore the card").insertBefore("#card");
+            log('$("<p>").insertBefore("#card")', "reverse syntax of before()");
+          }],
+          ["insertAfter()", function () {
+            $("<p>").addClass("added").text("insertAfter the card").insertAfter("#card");
+            log('$("<p>").insertAfter("#card")', "reverse syntax of after()");
+          }]
+        ]],
+
+        ["G. Wrap, replace, clone", [
+          ["wrap()", function () {
+            $("#para").wrap("<div class='wrapped'></div>");
+            log('$("#para").wrap("<div class=\'wrapped\'>")', "a new parent is put around the element");
+          }],
+          ["unwrap()", function () {
+            if ($("#para").parent().hasClass("wrapped")) {
+              $("#para").unwrap();
+              log('$("#para").unwrap()', "the parent is removed, the element stays");
+            } else {
+              log('$("#para").unwrap()', "skipped: the paragraph is not wrapped, click wrap() first");
+            }
+          }],
+          ["wrapInner()", function () {
+            $("#title").wrapInner("<em></em>");
+            log('$("#title").wrapInner("<em>")', "wraps the CONTENT inside the element");
+          }],
+          ["replaceWith()", function () {
+            $("#title").replaceWith("<h3 id='title'>Replaced heading</h3>");
+            flash($("#title")); log('$("#title").replaceWith("<h3>..</h3>")', "the whole element is swapped");
+          }],
+          ["clone()", function () {
+            copies++;
+            $("#card").clone().find("[id]").removeAttr("id").end()          // ids must stay unique
+              .addClass("copy").append(" (copy " + copies + ")").appendTo("#stage");
+            log('$("#card").clone().appendTo("#stage")', "copy made; find(\"[id]\").removeAttr(\"id\") keeps ids unique");
+          }]
+        ]],
+
+        ["H. Remove", [
+          ["remove() last li", function () {
+            var t = $("#list li:last").text();
+            $("#list li:last").remove();
+            log('$("#list li:last").remove()', "removed " + q(t));
+          }],
+          ["remove(.added)", function () {
+            var c = $(".added").length;
+            $(".added").remove();
+            log('$(".added").remove()', "removed " + c + " element(s) with class added");
+          }],
+          ["empty()", function () {
+            $("#list").empty();
+            log('$("#list").empty()', "children removed, the <ul> itself stays");
+          }],
+          ["detach() / reattach", function () {
+            if ($detached) {
+              $detached.appendTo("#stage");
+              log("$detached.appendTo(\"#stage\")", "the detached list is back (data and events are kept)");
+              $detached = null;
+            } else {
+              $detached = $("#list").detach();
+              log('$("#list").detach()', "removed but kept in memory. Click again to put it back.");
+            }
+          }]
+        ]],
+
+        ["I. Loop and collect", [
+          ["each()", function () {
+            $("#list li").each(function (i) {                              // 'this' = current li
+              $(this).attr("data-n", i + 1).css("color", i % 2 ? "#c2185b" : "#1565c0");
+              log("each: index " + i, q($(this).text()) + ", data-n set to " + (i + 1));
+            });
+          }],
+          ["map() + get()", function () {
+            var texts = $("#list li").map(function () { return $(this).text(); }).get().join(", ");
+            log('$("#list li").map(fn).get().join(", ")', q(texts));
+          }],
+          ["index(), eq(), length", function () {
+            log('$("#list li").length', String($("#list li").length) + " items");
+            log('$("#list li").eq(1).text()', q($("#list li").eq(1).text()) + " (zero-based)");
+            log('$("#list li:last").index()', String($("#list li:last").index()) + " (position among siblings)");
+          }]
+        ]],
+
+        ["", [
+          ["Reset", function () {
+            if ($detached) { $detached = null; }
+            $("#stage").stop(true, true).html(original);
+            n = 2; copies = 0;
+            $("#log").empty(); step = 0;
+            log('$("#stage").html(original)', "specimen restored to the original state");
+          }]
+        ]]
+      ];
+
+      // ---------- build the controls with jQuery ----------
+      $.each(groups, function (i, g) {
+        if (g[0]) { $("<h4>").text(g[0]).appendTo("#buttons"); }
+        $.each(g[1], function (j, a) {
+          $("<button>")
+            .text(a[0])
+            .toggleClass("reset", a[0] === "Reset")
+            .on("click", function () { a[1](); refresh(); })
+            .appendTo("#buttons");
+        });
+      });
+
+      refresh();
+      log("Ready", "jQuery " + $.fn.jquery + " loaded from " + source);
+    });
+  </script>
+</body>
+</html>
+```
+
+---
+
+### **3. Key Implementation Highlights**
+
+1. **Content Transformation (`text()` vs `html()`):**
+   * Demonstrates setting plain text via `$("#demoPara").text(...)` versus injecting HTML tags dynamically with `$("#demoPara").html(...)`.
+2. **Form Control Manipulation (`val()`):**
+   * Uses `$("#userInput").val()` to read text field input and `$("#userInput").val("...")` to update it.
+3. **Node Insertion (`append()` & `prepend()`):**
+   * Demonstrates adding new `<li>` elements at the end (`append()`) or beginning (`prepend()`) of the `<ul>` tree container.
+4. **Node Deletion (`empty()` vs `remove()`):**
+   * Highlights the difference between clearing inner child nodes (`empty()`) and destroying the target container node completely (`remove()`).
+5. **Class & CSS Styling (`toggleClass()` & `css()`):**
+   * Uses `$("#headingText").toggleClass("highlight")` to add/remove classes and applies inline styles using multi-property object syntax in `.css()`.
+
+---
+
+Whenever you are ready, please share **Question 5 of Q2 (jQuery)**!
+
+=================================================================================================================================================================================================================== 
+
+### **Unit 4 – jQuery**
+
+#### **Q2. jQuery (8 Marks)**
+#### **Question 5: Explain advantages and disadvantages of jQuery.** *(1 Mark)*
+
+---
+
+### **1. Advantages of jQuery**
+
+1. **Simplified & Concise Syntax:** Adheres to the motto *"Write less, do more"*, allowing complex DOM operations to be executed in significantly fewer lines of code compared to plain JavaScript.
+2. **Cross-Browser Compatibility:** Handles cross-browser inconsistencies internally, ensuring identical behavior across Chrome, Firefox, Edge, and Safari.
+3. **Built-in Effects & Animation:** Features built-in methods for hiding/showing elements, sliding, fading (`fadeIn()`, `fadeOut()`), and custom animations (`animate()`) without needing complex CSS/JS scripts.
+4. **Simplified AJAX Support:** Offers easy-to-use asynchronous methods (such as `.load()` and `$.get()`) to update portions of a page dynamically without a full page reload.
+5. **Vast Ecosystem & Plugin Support:** Provides access to an extensive ecosystem of community plugins (e.g., jQuery UI widgets like datepickers and tabs).
+6. **Free & Open Source:** Free to use and easily integrated via local files or remote CDNs.
+
+---
+
+### **2. Disadvantages of jQuery**
+
+1. **Extra Overhead & File Size:** Requires downloading an external library file (around 30 KB minified), which adds HTTP request overhead during initial page load.
+2. **Slower Execution than Plain JS:** Abstracting native DOM methods creates performance overhead, making it slower than pure vanilla JavaScript for heavy computations or large DOM trees.
+3. **Redundancy with Modern Web APIs:** Modern JavaScript (ES6+) now includes powerful native capabilities (`querySelectorAll()`, `fetch()`, `classList`) that perform the same tasks without needing an external library.
+4. **Plugin Conflicts & Slowdown:** Including too many third-party jQuery plugins can cause script conflicts and degrade overall website performance.
+5. **Breaking Changes & Deprecations:** Newer versions of jQuery have removed older methods (e.g., `live()`, `die()`, and `error()`), which can break legacy codebases during library updates.
+
+---
+
+💡 *We have completed all 5 questions of **Unit 4 (jQuery)**! Whenever you are ready, please share **Question 1 of Unit 5 (JSON)**.*
+
+=================================================================================================================================================================================================================== 
+
+### **Unit 5 – JavaScript Object Notation (JSON)**
+
+#### **Q3. JSON (7 Marks)**
+#### **Question 1: Explain JSON and its characteristics.** *(1 Mark)*
+
+---
+
+### **1. Concept Explanation**
+
+* **What is JSON?**
+  * **JSON** stands for **JavaScript Object Notation**. It is a lightweight, text-based data-interchange format popularized by **Douglas Crockford** in the early 2000s.
+  * It is designed to be **easy for humans to read and write** and **easy for machines to parse and generate**.
+  * It is the standard data format for modern Web APIs, mobile applications, microservices, and server-client data communication.
+  * **File Extension:** `.json`
+  * **MIME Type:** `application/json`
+
+* **Core Characteristics of JSON (from Unit 5 notes):**
+  1. **Lightweight & Fast:** Uses a simple syntax without heavy markup or redundant end tags (unlike XML), reducing data size and bandwidth usage over network requests.
+  2. **Language-Independent:** Although based on a subset of JavaScript object syntax, JSON is plain text. Virtually all modern programming languages (Python, Java, PHP, C#, C++, etc.) have built-in parsers for JSON.
+  3. **Self-Describing & Readable:** Data is structured as intuitive `name: value` pairs, making the schema easy to understand without external documentation.
+  4. **Hierarchical (Nested):** Supports tree-like data structures where objects can contain nested objects and arrays of items.
+  5. **Text-Based:** Consists entirely of UTF-8 plain text, enabling safe transmission across web servers and firewalls.
+
+---
+
+### **2. JSON Data Example (`student_data.json`)**
+
+```json
+{
+  "college": "MIT ACSC Alandi",
+  "courseCode": "2417MJCT101",
+  "subject": "Web Techniques",
+  "academicYear": 2026,
+  "isSemesterActive": true,
+  "departmentHead": null,
+  "studentDetails": {
+    "rollNo": 101,
+    "name": "Rahul Sharma",
+    "email": "rahul.sharma@example.com"
+  },
+  "enrolledSubjects": [
+    "DOM Manipulation",
+    "jQuery Essentials",
+    "JSON Data Exchange"
+  ],
+  "marksSummary": [
+    { "unit": "Unit 3 - DOM", "maxMarks": 10, "obtained": 9 },
+    { "unit": "Unit 4 - jQuery", "maxMarks": 8, "obtained": 8 },
+    { "unit": "Unit 5 - JSON", "maxMarks": 7, "obtained": 7 }
+  ]
+}
+```
+
+---
+
+### **3. Key Characteristics Summary**
+
+| Characteristic | Description | JSON Implementation Example |
+| :--- | :--- | :--- |
+| **Data Pair Structure** | Data is represented in key/value pairs; keys **must** use double quotes. | `"courseCode": "2417MJCT101"` |
+| **Data Types Supported** | Supports String, Number, Boolean, Null, Object, and Array. | `"academicYear": 2026` *(Number)*, `"isSemesterActive": true` *(Boolean)* |
+| **Hierarchical Nesting** | Objects inside curly braces `{}` holding key-value pairs. | `"studentDetails": { "rollNo": 101 }` |
+| **Array Collections** | Ordered lists enclosed within square brackets `[]`. | `"enrolledSubjects": ["DOM", "jQuery", "JSON"]` |
+
+---
+
+💡 *Whenever you are ready, please share **Question 2 of Q3 (JSON)**!*
+
+=================================================================================================================================================================================================================== 
+
+### **Unit 5 – JavaScript Object Notation (JSON)**
+
+#### **Q3. JSON (7 Marks)**
+#### **Question 2: Create a JSON dataset containing at least 15 records relevant to your application.** *(2 Marks)*
+
+---
+
+### **1. Concept & Dataset Overview**
+
+This JSON dataset represents a **Student Information & Academic Management System** for the *M.Sc. Information Technology* department at *MIT ACSC, Alandi, Pune*. 
+
+#### **JSON Syntax Rules Followed:**
+* All property key names are enclosed in **double quotes** (`"key"`).
+* Strings are strictly enclosed in double quotes (`"string"`).
+* Numbers are written without quotes (`24`, `88.5`).
+* Booleans (`true` / `false`) and `null` values are unquoted.
+* Records are stored in a top-level JSON Object containing an Array of **15 distinct student record objects**.
+* No trailing commas exist after the last property or element.
+
+---
+
+### **2. Complete JSON Dataset (`students_dataset.json`)**
+
+```json
+{
+  "college": "MAEER's MIT Arts, Commerce and Science College, Alandi (D), Pune",
+  "department": "Department of Computer Science & Information Technology",
+  "courseName": "F.Y. M.Sc. Information Technology",
+  "subject": "Web Techniques",
+  "subjectCode": "2417MJCT101",
+  "academicYear": "2025-2026",
+  "totalRecords": 15,
+  "students": [
+    {
+      "rollNo": 101,
+      "prn": "202501001",
+      "fullName": "Rahul Sharma",
+      "gender": "Male",
+      "email": "rahul.sharma@example.com",
+      "attendancePercentage": 92.5,
+      "isFeePaid": true,
+      "labBatch": "Batch A",
+      "assignmentMarks": { "assignment1": 24, "assignment2": 25 },
+      "skills": ["JavaScript", "HTML5", "jQuery", "JSON"]
+    },
+    {
+      "rollNo": 102,
+      "prn": "202501002",
+      "fullName": "Priya Verma",
+      "gender": "Female",
+      "email": "priya.verma@example.com",
+      "attendancePercentage": 88.0,
+      "isFeePaid": true,
+      "labBatch": "Batch A",
+      "assignmentMarks": { "assignment1": 22, "assignment2": 23 },
+      "skills": ["DOM Manipulation", "CSS3", "JSON"]
+    },
+    {
+      "rollNo": 103,
+      "prn": "202501003",
+      "fullName": "Amit Kulkarni",
+      "gender": "Male",
+      "email": "amit.kulkarni@example.com",
+      "attendancePercentage": 76.5,
+      "isFeePaid": false,
+      "labBatch": "Batch A",
+      "assignmentMarks": { "assignment1": 18, "assignment2": 20 },
+      "skills": ["Bootstrap", "JavaScript", "AJAX"]
+    },
+    {
+      "rollNo": 104,
+      "prn": "202501004",
+      "fullName": "Sneha Patil",
+      "gender": "Female",
+      "email": "sneha.patil@example.com",
+      "attendancePercentage": 95.0,
+      "isFeePaid": true,
+      "labBatch": "Batch B",
+      "assignmentMarks": { "assignment1": 25, "assignment2": 25 },
+      "skills": ["HTML5", "jQuery", "JSON", "Python"]
+    },
+    {
+      "rollNo": 105,
+      "prn": "202501005",
+      "fullName": "Rohan Deshmukh",
+      "gender": "Male",
+      "email": "rohan.d@example.com",
+      "attendancePercentage": 64.0,
+      "isFeePaid": true,
+      "labBatch": "Batch B",
+      "assignmentMarks": { "assignment1": 15, "assignment2": 17 },
+      "skills": ["JavaScript", "CSS3"]
+    },
+    {
+      "rollNo": 106,
+      "prn": "202501006",
+      "fullName": "Ananya Joshi",
+      "gender": "Female",
+      "email": "ananya.j@example.com",
+      "attendancePercentage": 91.2,
+      "isFeePaid": true,
+      "labBatch": "Batch B",
+      "assignmentMarks": { "assignment1": 23, "assignment2": 24 },
+      "skills": ["jQuery", "DOM Manipulation", "JSON"]
+    },
+    {
+      "rollNo": 107,
+      "prn": "202501007",
+      "fullName": "Vikas Shinde",
+      "gender": "Male",
+      "email": "vikas.s@example.com",
+      "attendancePercentage": 82.4,
+      "isFeePaid": false,
+      "labBatch": "Batch A",
+      "assignmentMarks": { "assignment1": 20, "assignment2": 21 },
+      "skills": ["HTML5", "Bootstrap", "JavaScript"]
+    },
+    {
+      "rollNo": 108,
+      "prn": "202501008",
+      "fullName": "Pooja Mehta",
+      "gender": "Female",
+      "email": "pooja.m@example.com",
+      "attendancePercentage": 89.0,
+      "isFeePaid": true,
+      "labBatch": "Batch A",
+      "assignmentMarks": { "assignment1": 22, "assignment2": 24 },
+      "skills": ["JSON", "AJAX", "jQuery"]
+    },
+    {
+      "rollNo": 109,
+      "prn": "202501009",
+      "fullName": "Karan Malhotra",
+      "gender": "Male",
+      "email": "karan.m@example.com",
+      "attendancePercentage": 71.0,
+      "isFeePaid": true,
+      "labBatch": "Batch B",
+      "assignmentMarks": { "assignment1": 17, "assignment2": 19 },
+      "skills": ["JavaScript", "CSS3"]
+    },
+    {
+      "rollNo": 110,
+      "prn": "202501010",
+      "fullName": "Neha Gadre",
+      "gender": "Female",
+      "email": "neha.g@example.com",
+      "attendancePercentage": 94.6,
+      "isFeePaid": true,
+      "labBatch": "Batch B",
+      "assignmentMarks": { "assignment1": 24, "assignment2": 25 },
+      "skills": ["HTML5", "DOM Manipulation", "JSON", "Bootstrap"]
+    },
+    {
+      "rollNo": 111,
+      "prn": "202501011",
+      "fullName": "Aditya Pawar",
+      "gender": "Male",
+      "email": "aditya.p@example.com",
+      "attendancePercentage": 79.5,
+      "isFeePaid": true,
+      "labBatch": "Batch A",
+      "assignmentMarks": { "assignment1": 19, "assignment2": 20 },
+      "skills": ["jQuery", "JavaScript"]
+    },
+    {
+      "rollNo": 112,
+      "prn": "202501012",
+      "fullName": "Divya Nambiar",
+      "gender": "Female",
+      "email": "divya.n@example.com",
+      "attendancePercentage": 87.3,
+      "isFeePaid": true,
+      "labBatch": "Batch A",
+      "assignmentMarks": { "assignment1": 21, "assignment2": 22 },
+      "skills": ["JSON", "HTML5", "CSS3"]
+    },
+    {
+      "rollNo": 113,
+      "prn": "202501013",
+      "fullName": "Siddharth Rao",
+      "gender": "Male",
+      "email": "siddharth.r@example.com",
+      "attendancePercentage": 85.0,
+      "isFeePaid": false,
+      "labBatch": "Batch B",
+      "assignmentMarks": { "assignment1": 20, "assignment2": 23 },
+      "skills": ["Bootstrap", "jQuery", "JSON"]
+    },
+    {
+      "rollNo": 114,
+      "prn": "202501014",
+      "fullName": "Tanvi Kulkarni",
+      "gender": "Female",
+      "email": "tanvi.k@example.com",
+      "attendancePercentage": 96.2,
+      "isFeePaid": true,
+      "labBatch": "Batch B",
+      "assignmentMarks": { "assignment1": 25, "assignment2": 24 },
+      "skills": ["JavaScript", "jQuery", "DOM Manipulation", "JSON"]
+    },
+    {
+      "rollNo": 115,
+      "prn": "202501015",
+      "fullName": "Gaurav Thorat",
+      "gender": "Male",
+      "email": "gaurav.t@example.com",
+      "attendancePercentage": 78.0,
+      "isFeePaid": true,
+      "labBatch": "Batch A",
+      "assignmentMarks": { "assignment1": 18, "assignment2": 19 },
+      "skills": ["HTML5", "CSS3", "JavaScript"]
+    }
+  ]
+}
+```
+
+---
+
+### **3. Breakdown of Data Types Used in Dataset**
+
+1. **String:** `"fullName": "Rahul Sharma"`, `"email": "rahul.sharma@example.com"`
+2. **Number (Integer & Decimal):** `"rollNo": 101`, `"attendancePercentage": 92.5`
+3. **Boolean:** `"isFeePaid": true`, `"isFeePaid": false`
+4. **Object (Nested):** `"assignmentMarks": { "assignment1": 24, "assignment2": 25 }`
+5. **Array (Collection of Strings):** `"skills": ["JavaScript", "HTML5", "jQuery", "JSON"]`
+6. **Array of Objects:** `"students": [ { ... }, { ... } ]`
+
+---
+
+💡 *Whenever you are ready, please share **Question 3 of Q3 (JSON)**!*
+
+=================================================================================================================================================================================================================== 
+
+### **Unit 5 – JavaScript Object Notation (JSON)**
+
+#### **Q3. JSON (7 Marks)**
+#### **Question 3: Demonstrate JSON objects, arrays, values and syntax rules.** *(1 Mark)*
+
+---
+
+### **1. Concept Explanation**
+
+* **JSON Data Structures:**
+  1. **JSON Object (`{}`):** An unordered collection of key-value pairs enclosed in curly braces.
+  2. **JSON Array (`[]`):** An ordered list of values enclosed in square brackets. Array elements can be strings, numbers, booleans, objects, or other arrays.
+
+* **Supported JSON Data Types (6 Valid Values):**
+  * **String:** Text enclosed strictly in double quotes (e.g., `"M.Sc. IT"`).
+  * **Number:** Floating-point or integer values written without quotes (e.g., `101`, `92.5`).
+  * **Boolean:** Lowercase `true` or `false` without quotes.
+  * **Null:** Represents an intentional empty value using the lowercase keyword `null`.
+  * **Object:** Nested name/value pairs enclosed in `{}`.
+  * **Array:** Ordered collection of items enclosed in `[]`.
+  * *(Note: Functions, `undefined`, `Date` objects, and `NaN` are **not** permitted in JSON).*
+
+* **Strict JSON Syntax Rules:**
+  1. **Keys in Double Quotes:** Every key/property name **must** be wrapped in double quotes.
+  2. **Double Quotes for Strings:** String values **must** use double quotes (single quotes cause a syntax error).
+  3. **Comma Separators:** Multiple key-value pairs or array elements must be separated by commas.
+  4. **No Trailing Commas:** A comma **cannot** follow the last item or property in an object/array.
+  5. **No Comments Allowed:** JSON does not support `//` or `/* */` comments.
+
+---
+
+### **2. Complete JSON Data Structure Example (`academic_record.json`)**
+
+```json
+{
+  "instituteName": "MIT ACSC Alandi",
+  "academicYear": 2026,
+  "isSemesterActive": true,
+  "accreditationGrade": null,
+  "departmentDetails": {
+    "deptCode": "IT-01",
+    "name": "Information Technology",
+    "totalLabs": 4
+  },
+  "courseModules": [
+    "DOM Manipulation",
+    "jQuery Essentials",
+    "JSON Data Exchange"
+  ],
+  "studentList": [
+    {
+      "rollNo": 101,
+      "name": "Rahul Sharma",
+      "marks":,
+      "isPassed": true
+    },
+    {
+      "rollNo": 102,
+      "name": "Priya Verma",
+      "marks":,
+      "isPassed": true
+    }
+  ]
+}
+```
+
+---
+
+### **3. Key Syntax Breakdown & Valid vs. Invalid Rules**
+
+| Syntax Rule | Invalid / Wrong JSON ❌ | Valid / Correct JSON ✅ |
+| :--- | :--- | :--- |
+| **Quotes on Keys** | `{ rollNo: 101 }` *(Missing quotes)* | `{ "rollNo": 101 }` |
+| **String Quotation** | `{ "name": 'Rahul' }` *(Single quotes)* | `{ "name": "Rahul" }` |
+| **Trailing Commas** | `{ "a": 10, "b": 20, }` *(Comma at end)* | `{ "a": 10, "b": 20 }` |
+| **Comments** | `{ "a": 1 } // Note` *(Comments present)* | `{ "a": 1 }` |
+| **Data Types** | `{ "func": function() {} }` *(Functions)* | `{ "func": null }` |
+
+---
+
+💡 *Whenever you are ready, please share **Question 4 of Q3 (JSON)**!*
+
+=================================================================================================================================================================================================================== 
+
+### **Unit 5 – JavaScript Object Notation (JSON)**
+
+#### **Q3. JSON (7 Marks)**
+#### **Question 4: Implement `JSON.parse()` and `JSON.stringify()`.** *(2 Marks)*
+
+---
+
+### **1. Concept Explanation**
+
+* **`JSON.parse(text)` (Deserialization):**
+  * Converts a valid **JSON-formatted text string** into a native **JavaScript object or array**.
+  * This allows JavaScript to read, access, and modify properties using standard dot or bracket notation (`obj.key`).
+  * *Note:* The JSON text string must conform strictly to JSON syntax rules (e.g., keys in double quotes), otherwise `JSON.parse()` will throw a syntax error.
+
+* **`JSON.stringify(object)` (Serialization):**
+  * Converts a native **JavaScript object or array** into a standardized **JSON plain text string**.
+  * This is required before transmitting JavaScript data structures across network APIs or storing them in text-based storage.
+
+---
+
+### **2. Complete Webpage Code**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON.parse() and JSON.stringify()</title>
+  <style>
+    :root { --olive: #4f5d2f; --terra: #c8553d; --bone: #f6f1e3; --ink: #2d2a22; }
+    body { margin: 0; background: var(--bone); color: var(--ink); font-family: "Gill Sans", Calibri, sans-serif; line-height: 1.5; }
+    header { background: var(--olive); color: var(--bone); text-align: center; padding: 20px 12px; border-bottom: 6px solid var(--terra); }
+    header h1 { margin: 0; font-size: 1.5rem; }
+    header p { margin: 4px 0 0; color: #f0c9b8; }
+    main { max-width: 980px; margin: auto; padding: 14px; }
+    h2 { color: var(--olive); border-bottom: 3px solid var(--terra); padding-bottom: 3px; margin-top: 26px; font-size: 1.1rem; }
+    .flow { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; margin: 10px 0; }
+    .flow span { background: #fff; border: 2px solid var(--olive); padding: 6px 12px; border-radius: 20px; font-weight: bold; }
+    .flow .arrow { background: none; border: 0; color: var(--terra); }
+    textarea { width: 100%; height: 150px; font-family: Consolas, monospace; font-size: 0.85rem; padding: 8px; border: 2px solid var(--olive); border-radius: 8px; box-sizing: border-box; }
+    button { background: var(--terra); color: #fff; border: 0; padding: 9px 18px; border-radius: 6px; font-weight: bold; cursor: pointer; margin: 8px 0; }
+    button:hover { background: #a8402c; }
+    pre { background: #25281c; color: #f2d9a6; padding: 10px; border-radius: 8px; overflow-x: auto; margin: 6px 0; font-size: 0.85rem; white-space: pre-wrap; word-break: break-word; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+    .grid b { color: var(--terra); }
+    .err { color: #ff8a80; }
+    .scroll { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; background: #fff; font-size: 0.85rem; }
+    th, td { border: 1px solid #ddd2b8; padding: 5px 8px; text-align: left; }
+    th { background: var(--olive); color: var(--bone); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>JSON.parse() and JSON.stringify()</h1>
+    <p>Text to object, and object back to text</p>
+  </header>
+
+  <main>
+    <div class="flow">
+      <span>JSON text</span><span class="arrow">&rarr; JSON.parse() &rarr;</span>
+      <span>JavaScript object</span><span class="arrow">&rarr; JSON.stringify() &rarr;</span>
+      <span>JSON text</span>
+    </div>
+
+    <h2>1. Incoming JSON Text (edit it and press Run)</h2>
+    <textarea id="src" spellcheck="false"></textarea>
+    <button id="run">Run parse and stringify</button>
+
+    <h2>2. JSON.parse(text): text becomes an object</h2>
+    <pre id="o1"></pre>
+
+    <h2>3. Modify the Object (add, update, delete)</h2>
+    <pre id="o2"></pre>
+
+    <h2>4. JSON.stringify(object): object becomes text</h2>
+    <div class="grid">
+      <div><b>Compact</b><pre id="o3"></pre></div>
+      <div><b>Pretty (indent 2)</b><pre id="o4"></pre></div>
+      <div><b>Replacer array (only chosen keys)</b><pre id="o5"></pre></div>
+      <div><b>Replacer function (hides "marks")</b><pre id="o6"></pre></div>
+    </div>
+
+    <h2>5. Reviver: fix values while parsing</h2>
+    <pre id="o7"></pre>
+
+    <h2>6. Deep Copy using stringify + parse</h2>
+    <pre id="o8"></pre>
+
+    <h2>7. What stringify() Skips or Changes</h2>
+    <div class="scroll"><table id="quirks"></table></div>
+
+    <h2>8. Invalid JSON gives an Error</h2>
+    <pre id="o9"></pre>
+  </main>
+
+  <!-- ===================== JSON DATA (the incoming text) ===================== -->
+  <script type="application/json" id="data">
+  {
+    "studentId": 101,
+    "name": "Rahul Sharma",
+    "course": "M.Sc. IT",
+    "marks": [88, 92, 75],
+    "isPassed": true,
+    "scholarship": null,
+    "enrolledOn": "2025-07-15",
+    "address": { "city": "Pune", "pin": "411001" }
+  }
+  </script>
+
+  <!-- ===================== SHORT JAVASCRIPT ===================== -->
+  <script>
+    var src = document.getElementById("src");
+    function out(id, text) { document.getElementById(id).textContent = text; }
+
+    // Load the JSON text into the editor
+    src.value = JSON.stringify(JSON.parse(document.getElementById("data").textContent), null, 2);
+
+    function run() {
+      var text = src.value;
+
+      // ---- parse ----
+      var obj;
+      try { obj = JSON.parse(text); }
+      catch (e) {
+        out("o1", "Invalid JSON: " + e.message);
+        ["o2","o3","o4","o5","o6","o7","o8"].forEach(function (id) { out(id, "-"); });
+        return;
+      }
+      out("o1",
+        "typeof text   : " + typeof text + "\n" +
+        "typeof result : " + typeof obj + "\n" +
+        "obj.name      : " + obj.name + "\n" +
+        "obj.marks[1]  : " + (obj.marks ? obj.marks[1] : "n/a") + "\n" +
+        "obj.address.city : " + (obj.address ? obj.address.city : "n/a"));
+
+      // ---- modify ----
+      obj.course = "M.Sc. Information Technology";   // update
+      obj.grade = "A";                                // add
+      delete obj.scholarship;                         // delete
+      out("o2", "course updated, grade added, scholarship deleted\n\nKeys now: " + Object.keys(obj).join(", "));
+
+      // ---- stringify (4 forms) ----
+      out("o3", JSON.stringify(obj));
+      out("o4", JSON.stringify(obj, null, 2));
+      out("o5", JSON.stringify(obj, ["name", "course", "grade"]));
+      out("o6", JSON.stringify(obj, function (key, value) {
+        return key === "marks" ? undefined : value;   // returning undefined removes the key
+      }, 2));
+
+      // ---- reviver ----
+      var withDate = JSON.parse(text, function (key, value) {
+        return key === "enrolledOn" ? new Date(value) : value;   // string -> Date object
+      });
+      out("o7",
+        "Without reviver : typeof enrolledOn = " + typeof obj.enrolledOn + "\n" +
+        "With reviver    : typeof enrolledOn = " + typeof withDate.enrolledOn + "\n" +
+        "Year            : " + (withDate.enrolledOn instanceof Date ? withDate.enrolledOn.getFullYear() : "n/a"));
+
+      // ---- deep copy ----
+      var copy = JSON.parse(JSON.stringify(obj));
+      copy.address.city = "Mumbai";
+      out("o8",
+        "copy.address.city     = " + copy.address.city + "\n" +
+        "original city stays   = " + obj.address.city + "\n" +
+        "copy === original ?   = " + (copy === obj));
+    }
+    document.getElementById("run").addEventListener("click", run);
+    run();
+
+    // ---- what stringify() skips or changes ----
+    var sample = { text: "hi", n: NaN, inf: Infinity, nothing: undefined, fn: function () {}, day: new Date(0), list: [undefined, 5] };
+    var rows = "<tr><th>JavaScript value</th><th>Result in JSON</th></tr>";
+    for (var k in sample) {
+      var single = JSON.stringify({ v: sample[k] });
+      var shown = (typeof sample[k] === "function") ? "function" : String(sample[k]);
+      rows += "<tr><td><code>" + k + " : " + shown + "</code></td><td><code>" + single + "</code></td></tr>";
+    }
+    document.getElementById("quirks").innerHTML = rows;
+
+    // ---- invalid JSON ----
+    var bad = ["{ 'a': 1 }", "{ \"a\": 1, }", "{ a: 1 }", "{\"a\": undefined}"];
+    out("o9", bad.map(function (t) {
+      try { JSON.parse(t); return t + "  ->  valid"; }
+      catch (e) { return t + "  ->  " + e.name + ": " + e.message; }
+    }).join("\n\n"));
+  </script>
+</body>
+</html>
+```
+
+---
+
+### **3. Key Implementation Highlights**
+
+1. **`JSON.parse()` Execution:** Parses the string `'{"studentId":101,...}'` into a live JavaScript object, enabling property access (`parsedObject.name`).
+2. **Object Mutation:** Demonstrates updating existing properties (`parsedObject.marks = 95`) and attaching new properties (`parsedObject.grade = "A+"`).
+3. **`JSON.stringify()` Execution:** Serializes the mutated JavaScript object back into a string (`JSON.stringify(parsedObject, null, 2)`), formatting it into valid JSON text for server transmission.
+
+---
+
+💡 *Whenever you are ready, please share **Question 5 of Q3 (JSON)**!*
+
+=================================================================================================================================================================================================================== 
+
+### **Unit 5 – JavaScript Object Notation (JSON)**
+
+#### **Q3. JSON (7 Marks)**
+#### **Question 5: Explain the advantages and disadvantages of JSON.** *(1 Mark)*
+
+---
+
+### **1. Advantages of JSON**
+
+1. **Lightweight & Fast Transfer:** JSON uses minimal text markup without redundant closing tags (unlike XML), reducing data payload size and speeding up network transmission over APIs.
+2. **Easy to Read & Write:** Features a clean, self-describing key-value structure that makes data simple for developers to inspect and understand.
+3. **Language-Independent:** Although derived from JavaScript object syntax, JSON is plain text supported by virtually all modern programming languages (Python, Java, PHP, C#), making cross-platform data exchange seamless.
+4. **Native JavaScript Integration:** Converts effortlessly between JSON strings and JavaScript objects using built-in methods (`JSON.parse()` and `JSON.stringify()`).
+5. **Fast Parsing & High Performance:** Translates directly into native runtime memory structures far more quickly than complex XML DOM tree parsing.
+6. **Widespread Industry Adoption:** Standard data format across modern RESTful web APIs, mobile applications, microservices, and NoSQL databases like MongoDB.
+
+---
+
+### **2. Disadvantages of JSON**
+
+1. **No Comment Support:** Standard JSON strictly forbids comments (`//` or `/* */`), making it challenging to document configuration files or add notes directly within the dataset.
+2. **Strict & Unforgiving Syntax:** Minor formatting mistakes—such as using single quotes instead of double quotes, missing quotes around keys, or leaving a trailing comma—will cause parsing to fail completely.
+3. **Limited Supported Data Types:** Lacks built-in support for complex data types like `Date` objects, `Function`, `undefined`, or binary data, forcing them to be converted into strings.
+4. **No Built-in Schema or Validation:** Standard JSON does not natively enforce structural data types or schema constraints without using external schema tools.
+5. **Requires Transport Security:** Plain JSON text transmitted over network connections does not provide native encryption, requiring HTTPS and input sanitization to ensure data integrity.
+
+---
+
+### **3. Quick Comparison: JSON vs. XML**
+
+| Feature | JSON | XML |
+| :--- | :--- | :--- |
+| **Data Size** | **Smaller & lightweight** (No closing tags) | **Larger** (Requires opening/closing tags) |
+| **Parsing Speed** | **Fast** (Parses natively into objects) | **Slower** (Requires DOM parser tree) |
+| **Data Types** | Supports String, Number, Boolean, Null, Object, Array | All data is treated strictly as plain text |
+| **Comments** | **Not allowed** | Supported (`<!-- comment -->`) |
+| **Primary Use Case** | **Web APIs, mobile apps, and microservices** | Document markup and legacy enterprise systems |
+
+---
+
+🎉 **Congratulations! We have completed all 16 questions across Unit 3 (DOM), Unit 4 (jQuery), and Unit 5 (JSON) for your Web Techniques Assignment 2!**
+
+Would you like me to compile all 16 answered questions into a single consolidated document, or format a project report outline for your submission?
+
+=================================================================================================================================================================================================================== 

@@ -1,0 +1,2355 @@
+Q1. HTML5 and Bootstrap (12 Marks) 
+
+### **Unit 1 & Unit 2 – Assignment 1**
+
+#### **Question 1: Create a webpage using HTML5 semantic elements and demonstrate grouping using `<div>` and `<span>`.** *(2 Marks)*
+
+---
+
+### **1. Concept Explanation**
+
+* **HTML5 Semantic Elements:** Elements like `<header>`, `<nav>`, `<main>`, `<section>`, `<article>`, and `<footer>` clearly describe their structural purpose to both browsers and assistive tools. They replace generic containers with meaningful tags to improve webpage accessibility, maintainability, and Search Engine Optimization (SEO).
+* **Grouping Elements (`<div>` vs `<span>`):**
+  * **`<div>` (Block-level Grouping):** A generic block container used to group multiple elements together for layout structuring or styling without adding semantic meaning. It starts on a new line and spans the full available width.
+  * **`<span>` (Inline-level Grouping):** A generic inline container used to group small portions of text or inline content within a paragraph or block without starting a new line.
+
+---
+
+### **2. Complete HTML5 Code**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML5 Semantic Webpage Demo</title>
+  <style>
+    /* Simple inline styles to highlight grouping elements */
+    body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+    header, nav, main, section, article, footer { border: 1px solid #ccc; padding: 15px; margin-bottom: 10px; }
+    
+    /* Styling for block-level grouping (div) */
+    .card-group { background-color: #f4f4f4; border-radius: 5px; padding: 10px; margin-top: 10px; }
+    
+    /* Styling for inline-level grouping (span) */
+    .highlight { color: #d9534f; font-weight: bold; }
+    .badge { background-color: #5bc0de; color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+
+  <!-- Semantic Header -->
+  <header>
+    <h1>Web Techniques Department</h1>
+    <p>Welcome to <span class="highlight">MIT ACSC</span> Learning Portal</p>
+  </header>
+
+  <!-- Semantic Navigation -->
+  <nav>
+    <a href="#home">Home</a> | 
+    <a href="#courses">Courses</a> | 
+    <a href="#contact">Contact</a>
+  </nav>
+
+  <!-- Semantic Main Content Area -->
+  <main>
+    
+    <!-- Semantic Section -->
+    <section id="courses">
+      <h2>Featured IT Course</h2>
+
+      <!-- Semantic Article -->
+      <article>
+        <h3>Web Techniques (2417MJCT101)</h3>
+        <p>This course covers <span class="highlight">HTML5</span>, Bootstrap, and JavaScript basics.</p>
+
+        <!-- Block-Level Grouping using <div> -->
+        <div class="card-group">
+          <h4>Course Overview</h4>
+          <p>Status: <span class="badge">Active</span></p>
+          <p>Duration: <span class="badge">15 Weeks</span></p>
+        </div>
+      </article>
+
+    </section>
+
+  </main>
+
+  <!-- Semantic Footer -->
+  <footer>
+    <p>&copy; 2026 MIT Arts, Commerce and Science College, Alandi (D), Pune.</p>
+  </footer>
+
+</body>
+</html>
+```
+
+---
+
+### **3. Key Implementation Highlights**
+
+1. **Semantic Layout Elements Used:**
+   * `<header>`: Contains the page heading banner.
+   * `<nav>`: Contains top navigation links.
+   * `<main>`: Encloses the unique primary content of the webpage.
+   * `<section>`: Divides content into thematic sections.
+   * `<article>`: Wraps a self-contained content block for the course.
+   * `<footer>`: Contains copyright and institutional details.
+
+2. **Grouping Elements Demonstrated:**
+   * **`<div>` (Block Grouping):** Encloses the `.card-group` container holding the course overview heading and paragraph elements together as a single visual card.
+   * **`<span>` (Inline Grouping):** Used inside paragraphs to apply targeted CSS classes (`.highlight` and `.badge`) to specific text phrases without breaking the line flow.
+
+---
+
+
+===================================================================================================================================================================================================================
+
+
+### **Unit 1 & Unit 2 – Assignment 1**
+
+#### **Question 2: Add images with appropriate `alt` text and demonstrate responsive images using `srcset` and `<picture>`.** *(2 Marks)*
+
+---
+
+### **1. Concept Explanation**
+
+* **`alt` Attribute (From Your Sources):** The `alt` (alternate text) attribute describes the content of an image. It is rendered if the image fails to load due to a broken path or slow network connection, and it is read aloud by screen readers for web accessibility.
+* **Responsive Images (`srcset` & `<picture>`) (HTML5 Specification):**
+  * **`srcset` Attribute:** Provides a list of different image sources along with width descriptors (e.g., `400w`, `800w`) or pixel densities, allowing the browser to automatically download the optimal image size based on the user's screen width.
+  * **`<picture>` Element:** A wrapper element containing one or more `<source>` tags with `media` queries and a fallback `<img>` tag. It allows developers to specify completely different image files or formats depending on device screen dimensions (art direction).
+
+---
+
+### **2. Complete HTML5 Code**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive Images Demo</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+    .image-container { margin-bottom: 30px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+    img { max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+
+  <h1>HTML5 Image Demonstration</h1>
+
+  <!-- 1. Standard Image with Alt Text -->
+  <div class="image-container">
+    <h3>1. Standard Image with Descriptive Alt Text</h3>
+    <img src="https://picsum.photos/200" alt="Random placeholder sample image for testing">
+  </div>
+
+  <!-- 2. Responsive Image using srcset & sizes -->
+  <div class="image-container">
+    <h3>2. Responsive Image using 'srcset' (Resolution Switching)</h3>
+    <img 
+      src="[suspicious link removed]" 
+      srcset="https://picsum.photos/200 300w, 
+              [suspicious link removed] 600w, 
+              [suspicious link removed] 1200w"
+      sizes="(max-width: 600px) 200px, (max-width: 1200px) 400px, 800px"
+      alt="Responsive landscape placeholder photo">
+  </div>
+
+  <!-- 3. Responsive Image using the <picture> Element -->
+  <div class="image-container">
+    <h3>3. Art Direction using the &lt;picture&gt; Element</h3>
+    <picture>
+      <!-- Display large 800px image for viewports 800px or wider -->
+      <source media="(min-width: 800px)" srcset="[suspicious link removed]">
+      
+      <!-- Display medium 500px image for viewports 500px or wider -->
+      <source media="(min-width: 500px)" srcset="[suspicious link removed]">
+      
+      <!-- Fallback img element for smaller screens or unsupported browsers -->
+      <img src="https://picsum.photos/200" alt="Fallback testing photo">
+    </picture>
+  </div>
+
+</body>
+</html>
+```
+
+---
+
+### **3. Key Implementation Highlights**
+
+1. **Standard `<img>` with `alt` Text:**
+   * Includes `alt="Random placeholder sample image for testing"` to ensure screen reader accessibility and text fallback if the image fails to load.
+2. **`srcset` and `sizes` (Resolution Switching):**
+   * Supplies three image resolutions (`200px`, `400px`, `800px` from Picsum).
+   * The browser evaluates the viewport width via the `sizes` attribute and automatically selects the smallest suitable image, saving bandwidth on mobile devices.
+3. **`<picture>` Element (Art Direction):**
+   * Uses `<source media="(min-width: 800px)">` to deliver a wide banner image (`800x400`) on desktop viewports.
+   * Uses `<source media="(min-width: 500px)">` to deliver a medium image (`500x300`) on tablet viewports.
+   * Falls back to the default `200px` image for mobile viewports.
+
+---
+
+===================================================================================================================================================================================================================
+
+### **Unit 1 & Unit 2 – Assignment 1**
+
+#### **Question 3: Create a table using `<thead>`, `<tbody>`, `<tfoot>`, `rowspan`, and `colspan`.** *(2 Marks)*
+
+---
+
+### **1. Concept Explanation**
+
+* **Structural Grouping Tags (`<thead>`, `<tbody>`, `<tfoot>`):**
+  * **`<thead>` (Table Header):** Groups the header rows (`<tr>`) and header cells (`<th>`) that define column titles.
+  * **`<tbody>` (Table Body):** Encapsulates the main dataset rows containing standard data cells (`<td>`).
+  * **`<tfoot>` (Table Footer):** Groups summary rows at the bottom of the table, typically used for calculations, totals, or metadata.
+* **Cell Spanning Attributes (`rowspan` & `colspan`):**
+  * **`colspan` (Column Span):** Merges a single cell horizontally across multiple adjacent columns.
+  * **`rowspan` (Row Span):** Merges a single cell vertically across multiple adjacent rows.
+
+---
+
+### **2. Complete HTML5 Code**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML5 Table with Rowspan and Colspan</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { border: 1px solid #333; padding: 10px; text-align: center; }
+    thead { background-color: #337ab7; color: white; }
+    tfoot { background-color: #f5f5f5; font-weight: bold; }
+    tbody tr:nth-child(even) { background-color: #f9f9f9; }
+  </style>
+</head>
+<body>
+
+  <h2>Student Marksheet Summary</h2>
+
+  <table>
+    <!-- Table Header Group -->
+    <thead>
+      <tr>
+        <th rowspan="2">Roll No</th>
+        <th rowspan="2">Student Name</th>
+        <th colspan="2">Marks Obtained</th>
+        <th rowspan="2">Grade</th>
+      </tr>
+      <tr>
+        <th>Web Techniques</th>
+        <th>Database Systems</th>
+      </tr>
+    </thead>
+
+    <!-- Table Body Group -->
+    <tbody>
+      <tr>
+        <td>101</td>
+        <td>Rahul Sharma</td>
+        <td>85</td>
+        <td>90</td>
+        <td rowspan="2">A</td> <!-- Vertical Span across 2 rows -->
+      </tr>
+      <tr>
+        <td>102</td>
+        <td>Priya Verma</td>
+        <td>88</td>
+        <td>92</td>
+      </tr>
+      <tr>
+        <td>103</td>
+        <td>Amit Patel</td>
+        <td>75</td>
+        <td>78</td>
+        <td>B</td>
+      </tr>
+    </tbody>
+
+    <!-- Table Footer Group -->
+    <tfoot>
+      <tr>
+        <td colspan="2">Total Students Passed</td> <!-- Horizontal Span across 2 columns -->
+        <td colspan="3">3 Students</td>             <!-- Horizontal Span across 3 columns -->
+      </tr>
+    </tfoot>
+  </table>
+
+</body>
+</html>
+```
+
+---
+
+### **3. Key Implementation Highlights**
+
+1. **Table Structure:**
+   * **`<thead>`**: Contains two rows defining a multi-level header.
+   * **`<tbody>`**: Contains student performance data rows.
+   * **`<tfoot>`**: Displays a summary row at the bottom of the table.
+
+2. **Spanning Demonstrated:**
+   * **`colspan="2"` (in `<thead>`):** Merges the header cell *"Marks Obtained"* across two sub-columns (*Web Techniques* and *Database Systems*).
+   * **`rowspan="2"` (in `<thead>`):** Extends *"Roll No"*, *"Student Name"*, and *"Grade"* downward across both header rows.
+   * **`rowspan="2"` (in `<tbody>`):** Merges the Grade cell (`"A"`) vertically across Roll No 101 and 102.
+   * **`colspan="2"` & `colspan="3"` (in `<tfoot>`):** Spans footer summary cells horizontally to align totals across the 5 total table columns.
+
+---
+
+Whenever you are ready, please share **Question 4**!
+
+===================================================================================================================================================================================================================
+
+### **Unit 1 & Unit 2 – Assignment 1**
+
+#### **Question 4: Design an HTML form with submission and file upload functionality.** *(2 Marks)*
+
+---
+
+### **1. Concept Explanation**
+
+* **`<form>` Container:** The `<form>` tag is used to collect user input and submit it to a server-side script or process.
+* **Form Submission Attributes:**
+  * **`action`:** Specifies the URL/path where the form data is sent upon submission.
+  * **`method="POST"`:** Sends data inside the HTTP request body without size limitations, making it ideal for submitting form inputs and binary file data securely.
+  * **`enctype="multipart/form-data"`:** Required whenever a form includes a file upload element. It ensures that binary file content is encoded properly when sent to the server.
+* **File Upload Input (`<input type="file">`):** Allows users to select one or more files from their local storage device to upload. Adding the `multiple` attribute enables selecting multiple files simultaneously.
+* **Submit Button (`<input type="submit">`):** Triggers the form submission process.
+
+---
+
+### **2. Complete HTML5 Code**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML5 Form with File Upload</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 30px; line-height: 1.6; }
+    .form-container { max-width: 500px; padding: 20px; border: 1px solid #ccc; border-radius: 8px; background-color: #f9f9f9; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; font-weight: bold; margin-bottom: 5px; }
+    input[type="text"], input[type="email"], input[type="file"] { width: 100%; padding: 8px; box-sizing: border-box; }
+    input[type="submit"] { background-color: #28a745; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
+    input[type="submit"]:hover { background-color: #218838; }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <h2>Student Document Submission Form</h2>
+
+    <!-- Form with POST method and multipart encoding for file upload -->
+    <form action="/upload_page.php" method="POST" enctype="multipart/form-data">
+      
+      <!-- Text Input -->
+      <div class="form-group">
+        <label for="fullName">Full Name:</label>
+        <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" required>
+      </div>
+
+      <!-- Email Input -->
+      <div class="form-group">
+        <label for="userEmail">Email Address:</label>
+        <input type="email" id="userEmail" name="userEmail" placeholder="Enter your email" required>
+      </div>
+
+      <!-- File Upload Input (Single File) -->
+      <div class="form-group">
+        <label for="identityDoc">Upload Identity Proof (PDF/Image):</label>
+        <input type="file" id="identityDoc" name="identityDoc" accept=".pdf, image/*" required>
+      </div>
+
+      <!-- File Upload Input (Multiple Files) -->
+      <div class="form-group">
+        <label for="certificates">Upload Academic Certificates (Multiple):</label>
+        <input type="file" id="certificates" name="certificates" multiple>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="form-group">
+        <input type="submit" value="Submit Application">
+      </div>
+
+    </form>
+  </div>
+
+</body>
+</html>
+```
+
+---
+
+### **3. Key Implementation Highlights**
+
+1. **`enctype="multipart/form-data"`:** Included on the `<form>` element so the browser treats the form data as multi-part binary data, allowing file uploads to reach the server properly.
+2. **`method="POST"`:** Used instead of `GET` because binary files cannot be appended to a URL.
+3. **Single File Upload (`<input type="file">`):** Prompts the user to pick a document from their device storage.
+4. **Multiple File Upload (`multiple` attribute):** Allows users to select more than one file at a time in a single upload field.
+5. **Native Form Submission:** Clicking `<input type="submit">` triggers browser validation for `required` fields before submitting the payload to `/upload_page.php`.
+
+---
+
+Whenever you are ready, please share **Question 5**!
+
+===================================================================================================================================================================================================================
+
+### **Unit 1 & Unit 2 – Assignment 1**
+
+#### **Question 5: Implement Bootstrap grid, themes, and a carousel.** *(2 Marks)*
+
+---
+
+### **1. Concept Explanation**
+
+* **Bootstrap 12-Column Grid System:** Uses containers (`.container`), rows (`.row`), and column classes (`.col-md-4`, `.col-sm-6`, etc.) to create responsive page layouts that automatically adjust across mobile, tablet, and desktop viewports.
+* **Bootstrap Contextual Themes & Colors:** Provides built-in utility classes for backgrounds and text colors (`bg-primary`, `bg-dark`, `bg-light`, `text-primary`, `text-light`, `btn-primary`, `btn-secondary`, etc.) to quickly style components with consistent color themes.
+* **Bootstrap Carousel Plugin:** An interactive slideshow component used to cycle through a series of image slides, text, or custom content, complete with slide indicators, next/previous controls, and auto-play animation.
+
+---
+
+### **2. Complete HTML5 & Bootstrap Code**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bootstrap Grid, Themes, and Carousel Demo</title>
+
+  <!-- User-Specified Bootstrap CSS CDN Link -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
+</head>
+<body>
+
+  <!-- Dark Themed Header Banner -->
+  <header class="bg-dark text-light text-center py-4 mb-4">
+    <div class="container">
+      <h1 class="display-5 fw-bold">Bootstrap Interactive Showcase</h1>
+      <p class="lead text-secondary">Demonstrating Responsive Grid, Contextual Themes, and Image Carousel</p>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Section 1: Bootstrap Carousel Component -->
+    <section class="mb-5">
+      <h3 class="text-primary mb-3">1. Interactive Image Carousel</h3>
+      
+      <div id="demoCarousel" class="carousel slide shadow-sm rounded overflow-hidden" data-bs-ride="carousel">
+        
+        <!-- Slide Indicators -->
+        <div class="carousel-indicators">
+          <button type="button" data-bs-target="#demoCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+          <button type="button" data-bs-target="#demoCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+          <button type="button" data-bs-target="#demoCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+
+        <!-- Carousel Slides (Using Specified Dummy Image URL) -->
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <img src="[suspicious link removed]" class="d-block w-100" alt="First Slide Image">
+            <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
+              <h5>First Featured Slide</h5>
+              <p>Responsive carousel slide powered by Bootstrap Javascript.</p>
+            </div>
+          </div>
+          <div class="carousel-item">
+            <img src="[suspicious link removed]" class="d-block w-100" alt="Second Slide Image">
+            <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
+              <h5>Second Featured Slide</h5>
+              <p>Seamlessly transitions images across devices.</p>
+            </div>
+          </div>
+          <div class="carousel-item">
+            <img src="[suspicious link removed]" class="d-block w-100" alt="Third Slide Image">
+            <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
+              <h5>Third Featured Slide</h5>
+              <p>Integrated with slide indicators and navigation controls.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Next / Previous Controls -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#demoCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#demoCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+
+      </div>
+    </section>
+
+    <!-- Section 2: Bootstrap Grid & Contextual Themes -->
+    <section>
+      <h3 class="text-primary mb-3">2. Responsive 12-Column Grid & Contextual Color Cards</h3>
+      
+      <div class="row g-4">
+        
+        <!-- Grid Column 1: Primary Theme Card -->
+        <div class="col-md-4 col-sm-6">
+          <div class="card bg-primary text-white h-100 shadow-sm">
+            <div class="card-body text-center">
+              <img src="https://picsum.photos/200" alt="Card Thumbnail 1" class="rounded-circle mb-3 border border-3 border-white">
+              <h5 class="card-title">Primary Theme</h5>
+              <p class="card-text">Built using <code>.col-md-4</code> grid layout and <code>.bg-primary</code> contextual styling.</p>
+              <button class="btn btn-light text-primary fw-bold">Explore More</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grid Column 2: Success Theme Card -->
+        <div class="col-md-4 col-sm-6">
+          <div class="card bg-success text-white h-100 shadow-sm">
+            <div class="card-body text-center">
+              <img src="https://picsum.photos/200" alt="Card Thumbnail 2" class="rounded-circle mb-3 border border-3 border-white">
+              <h5 class="card-title">Success Theme</h5>
+              <p class="card-text">Automatically stacks vertically on smaller viewports and aligns 3-across on desktop.</p>
+              <button class="btn btn-dark fw-bold">View Status</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grid Column 3: Warning Theme Card -->
+        <div class="col-md-4 col-sm-12">
+          <div class="card bg-warning text-dark h-100 shadow-sm">
+            <div class="card-body text-center">
+              <img src="https://picsum.photos/200" alt="Card Thumbnail 3" class="rounded-circle mb-3 border border-3 border-dark">
+              <h5 class="card-title">Warning Theme</h5>
+              <p class="card-text">Utilizes Bootstrap contextual utilities <code>.bg-warning</code> and <code>.text-dark</code>.</p>
+              <button class="btn btn-outline-dark fw-bold">Action Info</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-light text-center py-3 mt-5 border-top">
+    <p class="text-muted mb-0">&copy; 2026 MIT ACSC - Web Techniques Bootstrap Demo</p>
+  </footer>
+
+  <!-- User-Specified Bootstrap JS Bundle CDN Link -->
+  <script type="module" src="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-1a/pXj49ZQ1aHEmrJ+gMw1otqoVsYwlEnlD8mIfY2TV03r20Y0CN7uqx1tQogjPL" crossorigin="anonymous"></script>
+</body>
+</html>
+```
+
+---
+
+### **3. Key Implementation Highlights**
+
+1. **Exact CDN Links Included:**
+   * Contains the user-provided Bootstrap CSS `<link>` in the `<head>`.
+   * Contains the user-provided Bootstrap JS bundle `<script type="module">` at the end of the `<body>`.
+2. **Carousel Component (`.carousel`):**
+   * Incorporates `.carousel-indicators`, `.carousel-inner` with `.carousel-item` slides, and navigation arrows (`.carousel-control-prev` / `.carousel-control-next`).
+   * Uses the requested `https://picsum.photos/` image URLs for slide backgrounds.
+3. **12-Column Responsive Grid (`.row`, `.col-md-4`):**
+   * Arranges 3 distinct cards across the screen (`col-md-4` = 4/12 columns each on medium/large screens).
+   * Automatically adapts for mobile screens (`col-sm-6` / `col-sm-12`).
+4. **Contextual Color Themes (`bg-*`, `text-*`):**
+   * Demonstrates Bootstrap background and text color themes across `.bg-dark`, `.bg-primary`, `.bg-success`, `.bg-warning`, `.text-light`, and `.text-dark`.
+
+---
+
+Whenever you are ready, please share **Question 6**!
+
+===================================================================================================================================================================================================================
+
+### **Unit 1 & Unit 2 – Assignment 1**
+
+#### **Question 6: Demonstrate one Bootstrap form layout: vertical, horizontal or inline.** *(1 Mark)*
+
+---
+
+### **1. Concept Explanation**
+
+Bootstrap provides three primary form layout options to organize user inputs:
+* **Vertical Form Layout (Default):** Form labels and input fields stack on top of each other. This is the default form behavior in Bootstrap.
+* **Horizontal Form Layout:** Labels and input fields sit side-by-side using the Bootstrap grid system (`.row` and `.col-*-*` classes).
+* **Inline Form Layout:** Arranges all labels, controls, and buttons on a single horizontal line, which is ideal for compact interfaces like search bars.
+
+*(The code below demonstrates the **Horizontal Form Layout** using grid column classes).*
+
+---
+
+### **2. Complete HTML5 & Bootstrap Code**
+
+---html
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Bootstrap Horizontal Form Layout</title>
+
+        <!-- Bootstrap 5.3 CSS (CDN) -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+        />
+
+        <!-- ===================== CUSTOM CSS ===================== -->
+        <style>
+            /* Teal and sand colour theme (colours kept in variables) */
+            :root {
+                --teal: #0f766e;
+                --teal-dark: #115e59;
+                --sand: #fdf6e9;
+            }
+
+            body {
+                background-color: var(--sand);
+            }
+
+            /* Form card with a teal top border */
+            .form-card {
+                border: 0;
+                border-top: 6px solid var(--teal);
+                border-radius: 1rem;
+                box-shadow: 0 10px 30px rgba(15, 118, 110, 0.15);
+            }
+
+            /* Teal heading area */
+            .form-card .card-header {
+                background-color: var(--teal);
+                color: #fff;
+                border-radius: 0.75rem 0.75rem 0 0;
+            }
+
+            /* Teal button that gets darker on hover */
+            .btn-teal {
+                background-color: var(--teal);
+                border-color: var(--teal);
+                color: #fff;
+            }
+            .btn-teal:hover {
+                background-color: var(--teal-dark);
+                border-color: var(--teal-dark);
+                color: #fff;
+            }
+
+            /* Teal glow when a field is selected */
+            .form-control:focus,
+            .form-select:focus {
+                border-color: var(--teal);
+                box-shadow: 0 0 0 0.25rem rgba(15, 118, 110, 0.25);
+            }
+
+            /* Teal checkbox when ticked */
+            .form-check-input:checked {
+                background-color: var(--teal);
+                border-color: var(--teal);
+            }
+
+            /* Smaller heading text on phones */
+            @media (max-width: 576px) {
+                .form-card .card-header h4 {
+                    font-size: 1.1rem;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <main class="container py-5" style="max-width: 680px">
+            <div class="card form-card">
+                <div class="card-header py-3">
+                    <h4 class="mb-0">Student Registration (Horizontal Form)</h4>
+                </div>
+
+                <div class="card-body p-4">
+                    <!-- Message shown after a successful submit (filled by JS) -->
+                    <div
+                        id="resultMsg"
+                        class="alert alert-success d-none"
+                        role="alert"
+                    ></div>
+
+                    <!-- Horizontal form layout: every field is a .row with a label column and an input column -->
+                    <form id="regForm" novalidate>
+                        <!-- Full name -->
+                        <div class="row mb-3">
+                            <label
+                                for="fullName"
+                                class="col-sm-3 col-form-label fw-semibold"
+                                >Full Name</label
+                            >
+                            <div class="col-sm-9">
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="fullName"
+                                    placeholder="Enter your full name"
+                                />
+                                <div class="invalid-feedback">
+                                    Please enter your name (at least 3 letters).
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="row mb-3">
+                            <label
+                                for="email"
+                                class="col-sm-3 col-form-label fw-semibold"
+                                >Email</label
+                            >
+                            <div class="col-sm-9">
+                                <input
+                                    type="email"
+                                    class="form-control"
+                                    id="email"
+                                    placeholder="name@example.com"
+                                />
+                                <div class="invalid-feedback">
+                                    Enter a valid email, for example
+                                    user@example.com.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="row mb-3">
+                            <label
+                                for="phone"
+                                class="col-sm-3 col-form-label fw-semibold"
+                                >Phone</label
+                            >
+                            <div class="col-sm-9">
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="phone"
+                                    placeholder="10-digit mobile number"
+                                    maxlength="10"
+                                />
+                                <div class="invalid-feedback">
+                                    Phone number must contain exactly 10 digits.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Password with show / hide button -->
+                        <div class="row mb-3">
+                            <label
+                                for="password"
+                                class="col-sm-3 col-form-label fw-semibold"
+                                >Password</label
+                            >
+                            <div class="col-sm-9">
+                                <div class="input-group">
+                                    <input
+                                        type="password"
+                                        class="form-control"
+                                        id="password"
+                                        placeholder="Minimum 6 characters"
+                                    />
+                                    <button
+                                        class="btn btn-outline-secondary"
+                                        type="button"
+                                        id="togglePwd"
+                                    >
+                                        Show
+                                    </button>
+                                    <div class="invalid-feedback">
+                                        Password must be at least 6 characters
+                                        long.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Course (dropdown) -->
+                        <div class="row mb-3">
+                            <label
+                                for="course"
+                                class="col-sm-3 col-form-label fw-semibold"
+                                >Course</label
+                            >
+                            <div class="col-sm-9">
+                                <select class="form-select" id="course">
+                                    <option value="">Select a course</option>
+                                    <option>M.Sc. (IT)</option>
+                                    <option>M.Sc. (CS)</option>
+                                    <option>B.Sc. (IT)</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Please choose a course.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Checkbox: offset-sm-3 aligns it under the input column -->
+                        <div class="row mb-3">
+                            <div class="col-sm-9 offset-sm-3">
+                                <div class="form-check">
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        id="agree"
+                                    />
+                                    <label class="form-check-label" for="agree"
+                                        >I agree to the terms and
+                                        conditions</label
+                                    >
+                                    <div class="invalid-feedback">
+                                        You must accept the terms to continue.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="row">
+                            <div class="col-sm-9 offset-sm-3">
+                                <button
+                                    type="submit"
+                                    class="btn btn-teal px-4 me-2"
+                                >
+                                    Register
+                                </button>
+                                <button
+                                    type="reset"
+                                    class="btn btn-outline-secondary px-4"
+                                >
+                                    Reset
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+
+        <!-- Bootstrap 5.3 JS bundle -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+        <!-- ===================== CUSTOM JAVASCRIPT ===================== -->
+        <script>
+            // Get the form and its fields
+            const form = document.getElementById("regForm");
+            const resultMsg = document.getElementById("resultMsg");
+            const fullName = document.getElementById("fullName");
+            const email = document.getElementById("email");
+            const phone = document.getElementById("phone");
+            const password = document.getElementById("password");
+            const course = document.getElementById("course");
+            const agree = document.getElementById("agree");
+
+            // Regular expressions used for validation
+            const emailPattern = /^[\w.-]+@[\w-]+\.[a-zA-Z]{2,}$/; // user@example.com
+            const phonePattern = /^\d{10}$/; // exactly 10 digits
+
+            // Marks a field as valid (green) or invalid (red) and returns the result
+            function setState(field, isValid) {
+                field.classList.toggle("is-valid", isValid);
+                field.classList.toggle("is-invalid", !isValid);
+                return isValid;
+            }
+
+            // One check function for each field
+            const checks = [
+                () => setState(fullName, fullName.value.trim().length >= 3),
+                () => setState(email, emailPattern.test(email.value.trim())),
+                () => setState(phone, phonePattern.test(phone.value.trim())),
+                () => setState(password, password.value.length >= 6),
+                () => setState(course, course.value !== ""),
+                () => setState(agree, agree.checked),
+            ];
+
+            // Check each text field when the user leaves it (blur event)
+            [fullName, email, phone, password].forEach(function (field, index) {
+                field.addEventListener("blur", checks[index]);
+            });
+
+            // Show / hide the password
+            const toggleButton = document.getElementById("togglePwd");
+            toggleButton.addEventListener("click", function () {
+                const hidden = password.type === "password";
+                password.type = hidden ? "text" : "password";
+                toggleButton.textContent = hidden ? "Hide" : "Show";
+            });
+
+            // Handle form submit
+            form.addEventListener("submit", function (event) {
+                event.preventDefault(); // stop the page from reloading
+
+                // Run every check (map runs all of them, so every error is shown at once)
+                const allValid = checks
+                    .map(function (check) {
+                        return check();
+                    })
+                    .every(function (ok) {
+                        return ok;
+                    });
+
+                if (allValid) {
+                    resultMsg.textContent =
+                        "Thank you, " +
+                        fullName.value.trim() +
+                        "! You are registered for " +
+                        course.value +
+                        ".";
+                    resultMsg.classList.remove("d-none");
+                    form.reset();
+                    form.querySelectorAll(".is-valid").forEach(function (el) {
+                        el.classList.remove("is-valid");
+                    });
+                } else {
+                    resultMsg.classList.add("d-none");
+                }
+            });
+
+            // Clear all messages when the form is reset
+            form.addEventListener("reset", function () {
+                form.querySelectorAll(".is-valid, .is-invalid").forEach(
+                    function (el) {
+                        el.classList.remove("is-valid", "is-invalid");
+                    },
+                );
+                resultMsg.classList.add("d-none");
+            });
+        </script>
+    </body>
+</html>
+---
+
+---
+
+### **3. Key Implementation Highlights**
+
+1. **`row` Grid Container per Field:** Each label and input control pair is placed inside a `.row` container to create horizontal alignment.
+2. **Column Proportioning (`col-sm-3` & `col-sm-9`):**
+   * The `<label>` takes up **3 columns** (`col-sm-3`), while the `<input>` wrapper occupies the remaining **9 columns** (`col-sm-9`) within Bootstrap's 12-column grid.
+3. **Vertical Alignment (`col-form-label`):** Vertically centers the label text relative to the adjacent input box.
+4. **Column Offsetting (`offset-sm-3`):** Pushes the checkbox and button to start at column 4, aligning them directly under the input fields.
+
+---
+
+Whenever you are ready, please share **Question 7**!
+
+===================================================================================================================================================================================================================
+
+### **Unit 1 & Unit 2 – Assignment 1**
+
+#### **Question 7: Use `<iframe>` and demonstrate its target attribute.** *(1 Mark)*
+
+---
+
+### **1. Concept Explanation**
+
+* **Inline Frame (`<iframe>`):** The `<iframe>` tag embeds an external HTML document or web page within the current page, acting as a separate browsing context.
+* **Demonstrating `target` with `<iframe>`:** 
+  * To target an inline frame, the `<iframe>` element must be assigned a unique **`name` attribute** (e.g., `<iframe name="contentFrame">`).
+  * Hyperlinks (`<a>`) or forms (`<form>`) can then specify **`target="contentFrame"`**. When a user clicks the link, the destination URL loads directly *inside* that designated iframe rather than navigating away from the current page or opening a new tab.
+
+---
+
+### **2. Complete HTML5 Code**
+
+```html
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iframe and Target Attribute Demo</title>
+
+  <!-- Bootstrap 5.3 CSS (CDN) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Small custom CSS: navy and amber theme -->
+  <style>
+    body { background-color: #0b1d3a; }
+    .page-card { border: 0; border-top: 6px solid #ffb703; border-radius: 1rem; }
+    .navy-bar { background-color: #14305c; color: #ffb703; }
+    .nav-pills .nav-link { color: #14305c; font-weight: 600; }
+    .nav-pills .nav-link:hover { background-color: #ffe8a3; }
+    .btn-amber { background-color: #ffb703; border-color: #ffb703; color: #0b1d3a; font-weight: 600; }
+    .btn-amber:hover { background-color: #e0a000; border-color: #e0a000; color: #0b1d3a; }
+  </style>
+</head>
+<body>
+
+  <main class="container py-4">
+
+    <div class="card page-card shadow-lg">
+
+      <!-- Header -->
+      <div class="card-header navy-bar py-3">
+        <h1 class="h4 mb-0">&lt;iframe&gt; and the target Attribute</h1>
+      </div>
+
+      <div class="card-body">
+
+        <p class="text-body-secondary">
+          The frame below has <code>name="contentFrame"</code>.
+          Each link uses <code>target="contentFrame"</code>, so the page opens
+          <strong>inside the frame</strong> and this page does not reload.
+        </p>
+
+        <!-- Links: target matches the iframe name -->
+        <ul class="nav nav-pills mb-3 gap-2">
+          <li class="nav-item">
+            <a class="nav-link bg-warning-subtle" href="https://www.openstreetmap.org/export/embed.html?bbox=73.75%2C18.45%2C73.95%2C18.60&amp;layer=mapnik" target="contentFrame">Map of Pune</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link bg-warning-subtle" href="https://example.com" target="contentFrame">Example.com</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link bg-warning-subtle" href="https://www.w3.org/" target="contentFrame">W3C Home</a>
+          </li>
+        </ul>
+
+        <!-- Responsive iframe (16:9) with a name so links can target it -->
+        <div class="ratio ratio-16x9 border border-3 rounded overflow-hidden mb-4">
+          <iframe
+            name="contentFrame"
+            title="Target frame: clicked links open here"
+            srcdoc="<body style='font-family:Arial;text-align:center;padding-top:80px;background:#fff8e1'><h2>Frame is empty</h2><p>Click a link above to load a page here.</p></body>">
+          </iframe>
+        </div>
+
+        <!-- Form that also targets the frame -->
+        <h2 class="h5">A form can target the frame too</h2>
+        <form action="https://www.bing.com/search" method="get" target="contentFrame" class="row g-2">
+          <div class="col-12 col-sm-9">
+            <input type="text" name="q" class="form-control" placeholder="Type a search word" aria-label="Search">
+          </div>
+          <div class="col-12 col-sm-3 d-grid">
+            <button type="submit" class="btn btn-amber">Search</button>
+          </div>
+        </form>
+
+        <!-- Other target values for the report -->
+        <div class="table-responsive mt-4">
+          <table class="table table-bordered table-sm mb-0">
+            <caption class="caption-top">Common values of the target attribute</caption>
+            <thead class="table-dark">
+              <tr><th>Value</th><th>Where the link opens</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>_self</code></td><td>Same window (default)</td></tr>
+              <tr><td><code>_blank</code></td><td>New tab or window</td></tr>
+              <tr><td><code>_parent</code></td><td>Parent frame</td></tr>
+              <tr><td><code>_top</code></td><td>Full window</td></tr>
+              <tr><td><code>frameName</code></td><td>The iframe with that name</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+</body>
+</html>
+---
+
+### **3. Key Implementation Highlights**
+
+1. **`<iframe>` Definition:** Uses `<iframe name="contentFrame">` to establish an embedded frame container with a unique target identifier.
+2. **`target` Attribute Linkage:** The hyperlinks use `target="contentFrame"`, instructing the browser to render the clicked URL inside the matching named frame instead of reloading the page or opening a new window.
+3. **Accessibility:** Includes a descriptive `title="Targeted Content Display Window"` attribute for screen readers.
+
+---
+
+Whenever you are ready, please share **Question 8**!
+
+
+===================================================================================================================================================================================================================
+
+
+===================================================================================================================================================================================================================
+
+
+Q2. JavaScript (13 Marks)
+
+
+### **Unit 2 – Basics of JavaScript**
+
+#### **Section Q2: JavaScript (13 Marks)**
+#### **Question 1: Demonstrate JavaScript data types, keywords, and operators.** *(2 Marks)*
+
+---
+
+### **1. Concept Explanation**
+
+* **Keywords:** Reserved words in JavaScript that have predefined meanings and cannot be used as variable or function names. Examples include declaration keywords (`var`, `let`, `const`, `function`), control flow keywords (`if`, `else`, `return`), and operator keywords (`typeof`, `new`, `this`).
+* **Data Types:** JavaScript is a dynamically typed language where variable types are evaluated at runtime. Data types are divided into:
+  1. **Primitive Data Types (Immutable, stored by value):** `Number`, `String`, `Boolean`, `Undefined`, `Null`, `Symbol` (ES6), and `BigInt` (ES2020).
+  2. **Non-Primitive / Reference Data Types (Mutable, stored by reference):** `Object`, `Array`, and `Function`.
+* **Operators:** Symbols used to compute or evaluate values:
+  * **Arithmetic Operators:** `+`, `-`, `*`, `/`, `%`.
+  * **Assignment Operators:** `=`, `+=`, `-=`, `*=`, `/=`.
+  * **Comparison Operators:** `==` (loose equality with type coercion) vs. `===` (strict equality checking both value and type), `!=`, `!==`, `>`, `<`, `>=`, `<=`.
+  * **Logical Operators:** `&&` (AND), `||` (OR), `!` (NOT).
+  * **Type Operator:** `typeof` returns the data type of a variable or value.
+
+---
+
+### **2. Complete Webpage Code**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Data Types, Keywords and Operators</title>
+
+  <!-- ===================== CSS: dark terminal theme ===================== -->
+  <style>
+    :root {
+      --bg: #0d1117;
+      --panel: #161b22;
+      --green: #39ff88;
+      --pink: #ff4fa3;
+      --text: #e6edf3;
+    }
+    body {
+      margin: 0;
+      padding: 16px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Consolas, "Courier New", monospace;
+      line-height: 1.5;
+    }
+    h1 { color: var(--green); font-size: 1.4rem; text-align: center; }
+    h2 { color: var(--pink); font-size: 1.1rem; border-bottom: 1px dashed var(--pink); padding-bottom: 4px; }
+    section {
+      max-width: 900px;
+      margin: 0 auto 24px;
+      background: var(--panel);
+      padding: 14px;
+      border-radius: 8px;
+      border-left: 5px solid var(--green);
+    }
+    .scroll { overflow-x: auto; }          /* table scrolls on small phones */
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #30363d; padding: 6px 10px; text-align: left; }
+    th { background: #21262d; color: var(--green); }
+    .prim { color: var(--green); }         /* primitive rows */
+    .ref  { color: var(--pink); }          /* reference rows */
+    .note { color: #8b949e; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+
+  <h1>&gt; JavaScript: Keywords, Data Types and Operators_</h1>
+
+  <section>
+    <h2>1. Keywords (reserved words)</h2>
+    <div class="scroll"><table id="keywordTable"></table></div>
+  </section>
+
+  <section>
+    <h2>2. Data Types (checked with typeof)</h2>
+    <div class="scroll"><table id="typeTable"></table></div>
+    <p class="note" id="typeNote"></p>
+  </section>
+
+  <section>
+    <h2>3. Operators</h2>
+    <div class="scroll"><table id="opTable"></table></div>
+  </section>
+
+  <!-- ===================== JAVASCRIPT ===================== -->
+  <script>
+    // Helper: build a table from a header array and a rows array
+    function buildTable(id, headers, rows) {
+      let html = "<tr>";
+      for (const h of headers) { html += "<th>" + h + "</th>"; }
+      html += "</tr>";
+      for (const row of rows) {
+        html += "<tr class='" + (row.cls || "") + "'>";
+        for (const cell of row.cells) { html += "<td>" + cell + "</td>"; }
+        html += "</tr>";
+      }
+      document.getElementById(id).innerHTML = html;
+    }
+
+    // Helper: turn any value into readable text (Symbol cannot be joined to a string directly)
+    function show(v) {
+      if (typeof v === "symbol")   { return v.toString(); }
+      if (typeof v === "function") { return "function greet() { ... }"; }
+      if (typeof v === "object" && v !== null) { return JSON.stringify(v); }
+      return String(v);
+    }
+
+    // ---------- 1. KEYWORDS ----------
+    const keywords = {
+      "Declaration":      ["var", "let", "const", "function", "class"],
+      "Conditional":      ["if", "else", "switch", "case", "default"],
+      "Looping":          ["for", "while", "do", "break", "continue"],
+      "Function-related": ["return", "yield"],
+      "Object-related":   ["new", "this", "delete", "typeof", "instanceof"],
+      "Error handling":   ["try", "catch", "finally", "throw"],
+      "Value":            ["true", "false", "null", "undefined"],
+      "Others":           ["import", "export", "async", "await", "in", "of", "void"]
+    };
+
+    const keywordRows = [];
+    for (const category in keywords) {                    // for...in loop over object keys
+      keywordRows.push({ cells: [category, keywords[category].join(", ")] });
+    }
+    buildTable("keywordTable", ["Category", "Keywords"], keywordRows);
+
+    // ---------- 2. DATA TYPES ----------
+    // Primitive types (stored by value)
+    let num      = 25;                  // Number
+    let str      = "Web Techniques";    // String
+    let flag     = true;                // Boolean
+    let notSet;                         // Undefined (declared, not assigned)
+    let empty    = null;                // Null (intentional empty value)
+    let id       = Symbol("id");        // Symbol (ES6)
+    let big      = 123n;                // BigInt (ES2020)
+
+    // Reference types (stored by reference)
+    let student = { name: "Asha", course: "M.Sc. IT" };   // Object
+    let marks   = [88, 92, 75];                           // Array
+    function greet() { return "Hello!"; }                 // Function
+
+    const typeList = [
+      ["Number",    num,     "Primitive"],
+      ["String",    str,     "Primitive"],
+      ["Boolean",   flag,    "Primitive"],
+      ["Undefined", notSet,  "Primitive"],
+      ["Null",      empty,   "Primitive"],
+      ["Symbol",    id,      "Primitive"],
+      ["BigInt",    big,     "Primitive"],
+      ["Object",    student, "Reference"],
+      ["Array",     marks,   "Reference"],
+      ["Function",  greet,   "Reference"]
+    ];
+
+    const typeRows = typeList.map(function (item) {
+      return {
+        cls: item[2] === "Primitive" ? "prim" : "ref",
+        cells: [item[0], show(item[1]), "<b>" + typeof item[1] + "</b>", item[2]]
+      };
+    });
+    buildTable("typeTable", ["Type", "Example value", "typeof result", "Kind"], typeRows);
+
+    document.getElementById("typeNote").innerHTML =
+      "Note: typeof null gives \"object\" (a known JavaScript quirk). " +
+      "typeof [] also gives \"object\", so Array.isArray(marks) is used to confirm an array: <b>" +
+      Array.isArray(marks) + "</b>.";
+
+    // ---------- 3. OPERATORS ----------
+    let a = 17, b = 5, age = 20;
+    let x = 10;                         // used for assignment operators
+
+    const opRows = [];
+    // helper to add one row: category, expression text, computed result
+    function addOp(category, expression, result) {
+      opRows.push({ cells: [category, expression, "<b>" + result + "</b>"] });
+    }
+
+    // Arithmetic
+    addOp("Arithmetic", "17 + 5", a + b);
+    addOp("Arithmetic", "17 - 5", a - b);
+    addOp("Arithmetic", "17 * 5", a * b);
+    addOp("Arithmetic", "17 / 5", a / b);
+    addOp("Arithmetic", "17 % 5 (remainder)", a % b);
+
+    // Assignment (x starts at 10)
+    x += 5;  addOp("Assignment", "x = 10; x += 5", x);
+    x -= 3;  addOp("Assignment", "x -= 3", x);
+    x *= 2;  addOp("Assignment", "x *= 2", x);
+
+    // Comparison: loose (==) versus strict (===)
+    addOp("Comparison", "25 == \"25\" (type coercion)", 25 == "25");
+    addOp("Comparison", "25 === \"25\" (value and type)", 25 === "25");
+    addOp("Comparison", "25 != \"25\"", 25 != "25");
+    addOp("Comparison", "25 !== \"25\"", 25 !== "25");
+    addOp("Comparison", "17 > 5", a > b);
+    addOp("Comparison", "17 <= 5", a <= b);
+
+    // Logical
+    addOp("Logical", "(17 > 10) && (5 > 10)", (a > 10) && (b > 10));
+    addOp("Logical", "(17 > 10) || (5 > 10)", (a > 10) || (b > 10));
+    addOp("Logical", "!(17 > 10)", !(a > 10));
+
+    // Bitwise
+    addOp("Bitwise", "17 & 5", a & b);
+    addOp("Bitwise", "17 | 5", a | b);
+    addOp("Bitwise", "17 ^ 5", a ^ b);
+    addOp("Bitwise", "~17", ~a);
+    addOp("Bitwise", "17 << 1", a << 1);
+    addOp("Bitwise", "17 >> 1", a >> 1);
+
+    // Ternary
+    addOp("Ternary", "age >= 18 ? \"Adult\" : \"Minor\" (age = 20)", age >= 18 ? "Adult" : "Minor");
+
+    // Type operators
+    addOp("Type", "typeof str", typeof str);
+    addOp("Type", "marks instanceof Array", marks instanceof Array);
+
+    buildTable("opTable", ["Category", "Expression", "Result"], opRows);
+
+    // Also print a summary in the browser console (press F12 to see it)
+    console.log("Data types shown:", typeList.length, "| Operator examples shown:", opRows.length);
+  </script>
+</body>
+</html>
+```
+
+---
+
+### **3. Key Implementation Highlights**
+
+1. **Keywords Demonstrated:** Uses reserved words like `let`, `const`, `function`, `return`, `typeof`, `true`, `false`, and `null`.
+2. **Data Type Verification:** Uses the `typeof` operator to dynamically verify primitive (`number`, `string`, `boolean`, `undefined`, `symbol`, `bigint`) and non-primitive (`object`, `function`) types.
+3. **Operators Evaluated:** Demonstrates arithmetic addition (`+`), compound assignment (`+=`), logical AND (`&&`), and highlights the difference between loose equality (`==`) and strict equality (`===`).
+
+---
+
+Whenever you are ready, please share **Question 2 of Section Q2**!
+
+===================================================================================================================================================================================================================
+
+
+### **Unit 2 – Basics of JavaScript**
+
+#### **Section Q2: JavaScript (13 Marks)**
+#### **Question 2: Implement conditional statements and loops.** *(2 Marks)*
+
+---
+
+### **1. Concept Explanation**
+
+* **Conditional Statements:** Used to execute different blocks of code based on logical conditions:
+  * `if / else if / else`: Evaluates boolean conditions sequentially; executes the first block where the condition evaluates to `true`.
+  * `switch`: Evaluates an expression against multiple `case` values and executes matching statements until a `break` is encountered.
+* **Loops (Control Structures):** Used to repeatedly execute a block of code as long as a specified condition remains true:
+  * `for` loop: Used when the exact number of iterations is known in advance.
+  * `while` loop: Checks the condition *before* each iteration (pre-test loop).
+  * `do...while` loop: Checks the condition *after* each iteration (post-test loop), guaranteeing execution at least once.
+  * `for...in` loop: Iterates over enumerable property keys of an object.
+  * `for...of` loop: Iterates over values of an iterable object (such as an array).
+
+---
+
+### **2. Complete Webpage Code**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conditionals and Loops | Sunset Plum Theme</title>
+  <style>
+    /* Theme: plum + coral on warm cream (plain CSS, no Bootstrap) */
+    :root { --plum:#4a1942; --coral:#ff6b6b; --cream:#fff4e6; --gold:#f4a259; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:Georgia, serif; background:var(--cream); color:var(--plum); }
+    header { background:linear-gradient(120deg, var(--plum), #8e3b6e); color:#fff;
+             padding:24px 16px; text-align:center; border-bottom:6px solid var(--coral); }
+    header h1 { margin:0; font-size:1.6rem; }
+    header p { margin:6px 0 0; color:var(--gold); }
+    /* Responsive grid: cards wrap automatically on small screens */
+    #app { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+           gap:16px; padding:20px; max-width:1100px; margin:auto; }
+    .card { background:#fff; border-left:6px solid var(--coral); border-radius:8px;
+            padding:14px 16px; box-shadow:0 3px 8px rgba(74,25,66,.15); }
+    .card h3 { margin:0 0 8px; color:var(--coral); font-size:1.05rem; }
+    .card p { margin:4px 0; font-size:.95rem; word-break:break-word; }
+    .tag { background:var(--plum); color:#fff; border-radius:4px; padding:0 6px; font-size:.8rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Conditional Statements &amp; Loops</h1>
+    <p>Unit 2 | JavaScript Basics</p>
+  </header>
+
+  <!-- Only one empty container; JavaScript builds everything -->
+  <div id="app"></div>
+
+  <script>
+    const app = document.getElementById("app");
+
+    // Helper: builds one card and adds it to the page (innerHTML output method)
+    function addCard(title, lines) {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `<h3>${title}</h3>` + lines.map(l => `<p>${l}</p>`).join("");
+      app.appendChild(card);
+    }
+
+    // ---------- CONDITIONAL STATEMENTS ----------
+
+    // 1. if / else if / else  (age category)
+    let age = 17;
+    let category;
+    if (age < 13) {
+      category = "Child";
+    } else if (age < 20) {
+      category = "Teenager";
+    } else {
+      category = "Adult";
+    }
+
+    // 2. if / else if / else  (marks to grade)
+    let marks = 85;
+    let grade;
+    if (marks >= 90)      { grade = "A+"; }
+    else if (marks >= 80) { grade = "A"; }
+    else if (marks >= 70) { grade = "B"; }
+    else                  { grade = "C"; }
+
+    // 3. switch (day number to day name; break stops fall-through)
+    let day = 3;
+    let dayName;
+    switch (day) {
+      case 1: dayName = "Monday"; break;
+      case 2: dayName = "Tuesday"; break;
+      case 3: dayName = "Wednesday"; break;
+      default: dayName = "Invalid day";
+    }
+
+    // 4. Ternary operator (shorthand if/else)
+    let result = marks >= 40 ? "Pass" : "Fail";
+
+    addCard("if / else if / else", [
+      `Age <b>${age}</b> &rarr; <span class="tag">${category}</span>`,
+      `Marks <b>${marks}</b> &rarr; Grade <span class="tag">${grade}</span>`
+    ]);
+    addCard("switch + ternary", [
+      `Day <b>${day}</b> &rarr; <span class="tag">${dayName}</span>`,
+      `Marks <b>${marks}</b> &rarr; <span class="tag">${result}</span> (ternary ?:)`
+    ]);
+
+    // ---------- LOOPS ----------
+
+    // 5. for loop (known count): table of 5
+    let table = [];
+    for (let i = 1; i <= 5; i++) {
+      table.push(`5 x ${i} = ${5 * i}`);
+    }
+    addCard("for loop (known count)", [table.join(" | ")]);
+
+    // 6. while loop (condition checked BEFORE each run): countdown
+    let countdown = [];
+    let n = 5;
+    while (n > 0) {
+      countdown.push(n);
+      n--;
+    }
+    addCard("while loop (pre-test)", [`Countdown: ${countdown.join(", ")}, Go!`]);
+
+    // 7. do...while loop (condition checked AFTER; runs at least once)
+    let runs = 0;
+    let k = 10;                 // condition k < 5 is false from the start
+    do {
+      runs++;
+      k++;
+    } while (k < 5);
+    addCard("do...while (post-test)", [
+      `Condition was false at the start, body still ran <b>${runs}</b> time(s).`
+    ]);
+
+    // 8. for...in loop (keys of an object)
+    let student = { rollNo: 101, name: "Rahul", course: "M.Sc. IT" };
+    let pairs = [];
+    for (let key in student) {
+      pairs.push(`<b>${key}</b>: ${student[key]}`);
+    }
+    addCard("for...in (object keys)", pairs);
+
+    // 9. for...of loop (values of an array) + break/continue
+    let subjects = ["HTML5", "Bootstrap", "JavaScript", "DOM", "jQuery", "JSON"];
+    let shown = [];
+    for (let sub of subjects) {
+      if (sub === "Bootstrap") continue;   // skip this value
+      if (sub === "JSON") break;           // stop the loop here
+      shown.push(sub);
+    }
+    addCard("for...of (array values)", [
+      `Printed: ${shown.join(" &bull; ")}`,
+      `<i>continue</i> skipped Bootstrap, <i>break</i> stopped at JSON.`
+    ]);
+  </script>
+</body>
+</html>
+```
+
+---
+
+### **3. Key Implementation Highlights**
+
+1. **Conditionals Demonstrated:**
+   * **`if / else if / else`**: Evaluates numerical `marks` to assign a grade.
+   * **`switch`**: Matches `dayNumber` against `case` clauses to return the day name.
+2. **Loops Demonstrated:**
+   * **`for`**: Iterates a known count from `1` to `3`.
+   * **`while`**: Evaluates condition before executing loop body.
+   * **`do...while`**: Guarantees execution at least once before testing condition.
+   * **`for...in`**: Enumerates object keys (`rollNo`, `name`, `course`).
+   * **`for...of`**: Iterates directly over values in the `subjects` array.
+
+===================================================================================================================================================================================================================
+
+### **Unit 2 – Basics of JavaScript**
+
+#### **Section Q2: JavaScript (13 Marks)**
+#### **Question 3: Create functions using parameters and return values. Demonstrate local and global variables.** *(2 Marks)*
+
+---
+
+### **1. Concept Explanation**
+
+* **Functions:** A reusable block of code designed to perform a specific task. Functions reduce code duplication and help organize logic into modular components.
+* **Parameters and Arguments:**
+  * **Parameters:** Variables declared in the function header that act as placeholders for incoming data.
+  * **Arguments:** The actual values supplied to the function when it is invoked/called.
+  * **Default Parameters:** Fallback values assigned to parameters if no argument is passed during function invocation.
+* **Return Values:** 
+  * The `return` statement immediately terminates function execution and sends a value back to the caller.
+  * If a function executes without an explicit `return` statement, it automatically returns `undefined`.
+* **Local vs. Global Variables (Scope):**
+  * **Global Variables:** Variables declared *outside* any function; they are accessible from anywhere throughout the script.
+  * **Local Variables:** Variables declared *inside* a function; they are accessible only within that specific function's scope. Attempting to access them outside the function causes a reference error.
+
+---
+
+### **2. Complete Webpage Code**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Functions and Scope | Lemon and Charcoal Theme</title>
+  <style>
+    /* Theme: lemon yellow + charcoal, with a red accent (plain CSS, no Bootstrap) */
+    :root { --lemon:#fff176; --char:#263238; --red:#e53935; --paper:#fffde7; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:"Trebuchet MS", sans-serif; background:var(--lemon); color:var(--char); }
+    header { background:var(--char); color:var(--lemon); padding:22px 16px; text-align:center;
+             border-bottom:6px solid var(--red); }
+    header h1 { margin:0; font-size:1.5rem; letter-spacing:1px; }
+    header p { margin:6px 0 0; color:#fff; font-size:.9rem; }
+    /* Single centred column that shrinks on small screens */
+    #app { max-width:760px; margin:0 auto; padding:18px 14px 30px; }
+    .panel { background:var(--paper); border:3px solid var(--char); border-radius:10px;
+             margin-bottom:16px; box-shadow:5px 5px 0 var(--char); overflow:hidden; }
+    .panel h3 { margin:0; background:var(--char); color:var(--lemon); padding:8px 14px; font-size:1rem; }
+    .panel .body { padding:10px 14px; }
+    .panel p { margin:6px 0; word-break:break-word; }
+    code { background:#fff; border:1px solid var(--char); border-radius:4px; padding:0 5px; color:var(--red); }
+    .ok { color:#2e7d32; font-weight:bold; }
+    .err { color:var(--red); font-weight:bold; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Functions, Parameters &amp; Scope</h1>
+    <p>Unit 2 | JavaScript Basics</p>
+  </header>
+
+  <!-- Only one empty container; JavaScript builds everything -->
+  <div id="app"></div>
+
+  <script>
+    const app = document.getElementById("app");
+
+    // Helper: creates one panel and adds it to the page
+    function addPanel(title, lines) {
+      const panel = document.createElement("div");
+      panel.className = "panel";
+      panel.innerHTML = `<h3>${title}</h3><div class="body">` +
+                        lines.map(l => `<p>${l}</p>`).join("") + `</div>`;
+      app.appendChild(panel);
+    }
+
+    // ================= GLOBAL VARIABLES (declared outside any function) =================
+    let appName = "Smart Student Portal";   // visible everywhere
+    let visits = 0;                         // global counter, changed inside a function
+
+    // ================= FUNCTIONS =================
+
+    // 1. Parameters + return value. 'total' is a LOCAL variable.
+    function calculateTotal(webTech, dbms) {
+      let total = webTech + dbms;           // exists only inside this function
+      return total;                         // sends the value back to the caller
+    }
+
+    // 2. Default parameter: passMarks = 80 is used when no argument is passed
+    function checkResult(score, passMarks = 80) {
+      if (score >= 120)           { return "Pass with Distinction"; }
+      else if (score >= passMarks) { return "Pass"; }
+      else                         { return "Fail"; }
+    }
+
+    // 3. Default parameter for text
+    function greetUser(name = "Guest") {
+      return "Welcome, " + name;
+    }
+
+    // 4. Function expression and arrow function (ES6)
+    const cube = function (n) { return n * n * n; };
+    const square = (n) => n * n;
+
+    // 5. Function WITHOUT a return statement gives undefined
+    function noReturn() {
+      let temp = 10;                        // local variable, nothing returned
+    }
+
+    // 6. Global variable READ and CHANGED inside a function
+    function countVisit() {
+      visits++;                             // modifies the global variable
+      return appName + " visit no. " + visits;
+    }
+
+    // 7. Local variable with the same name hides (shadows) the global one
+    function shadowDemo() {
+      let appName = "Local Copy";           // a different variable, only inside this function
+      return appName;
+    }
+
+    // ================= CALLING THE FUNCTIONS (arguments passed here) =================
+    let s1 = calculateTotal(85, 90);        // 85 and 90 are arguments
+    let s2 = calculateTotal(35, 30);
+    let s3 = calculateTotal(50, 40);
+
+    addPanel("1. Parameters and return values", [
+      `Student 1: <code>calculateTotal(85, 90)</code> = <b>${s1}</b> &rarr; ${checkResult(s1)}`,
+      `Student 2: <code>calculateTotal(35, 30)</code> = <b>${s2}</b> &rarr; ${checkResult(s2)}`,
+      `Student 3 with custom pass marks: <code>checkResult(${s3}, 90)</code> &rarr; ${checkResult(s3, 90)}`
+    ]);
+
+    addPanel("2. Default parameters and other function types", [
+      `<code>greetUser()</code> &rarr; ${greetUser()}`,
+      `<code>greetUser("Rahul")</code> &rarr; ${greetUser("Rahul")}`,
+      `Function expression <code>cube(3)</code> = <b>${cube(3)}</b>`,
+      `Arrow function <code>square(5)</code> = <b>${square(5)}</b>`,
+      `No return statement: <code>noReturn()</code> gives <b>${noReturn()}</b>`
+    ]);
+
+    // ================= SCOPE DEMONSTRATION =================
+    let first = countVisit();
+    let second = countVisit();              // global 'visits' keeps its changed value
+
+    // Trying to use the local variable 'total' outside its function
+    let scopeMsg;
+    try {
+      scopeMsg = total;                     // 'total' does not exist here
+    } catch (err) {
+      scopeMsg = `<span class="err">${err.name}: ${err.message}</span>`;
+    }
+
+    addPanel("3. Global variables", [
+      `Global <code>appName</code> used outside functions: <b>${appName}</b>`,
+      `Used and changed inside a function: ${first}`,
+      `Called again: ${second} (global value was kept)`
+    ]);
+
+    addPanel("4. Local variables", [
+      `<code>total</code> is declared inside <code>calculateTotal()</code>.`,
+      `Access outside the function &rarr; ${scopeMsg}`,
+      `Shadowing: <code>shadowDemo()</code> returns <b>${shadowDemo()}</b>, ` +
+      `but global <code>appName</code> is still <span class="ok">${appName}</span>`
+    ]);
+  </script>
+</body>
+</html>
+```
+
+---
+
+### **3. Key Implementation Highlights**
+
+1. **Parameters & Return Values:**
+   * `calculateTotalMarks(webTech, dbms, passMarks = 40)` receives arguments, computes the sum, and uses `return total;` to pass the result back to the caller.
+   * Demonstrates a default parameter (`passMarks = 40`).
+2. **Global Variable Demonstration:**
+   * `globalAppName` is declared globally and accessed both inside the function (`console.log`) and outside during DOM rendering.
+3. **Local Variable Demonstration:**
+   * `total` is declared inside `calculateTotalMarks()`. Attempting to access `total` outside the function triggers a scope reference error, which is caught using `try...catch` to verify local scope isolation.
+
+---
+
+💡 *Whenever you are ready, please share **Question 4 of Section Q2**!*
+
+===================================================================================================================================================================================================================
+
+### **Unit 2 – Basics of JavaScript**
+
+#### **Section Q2: JavaScript (13 Marks)**
+#### **Question 4: Create and manipulate arrays using array access methods.** *(2 Marks)*
+
+---
+
+### **1. Concept Explanation**
+
+* **Array Declaration:** An array is an ordered collection of values stored under a single variable name. It can be declared using:
+  1. **Array Literal Syntax (`[...]`):** The standard and recommended syntax.
+  2. **Array Constructor (`new Array(...)`):** Initializing using the `Array` function.
+* **Accessing Array Elements:** Elements are retrieved using **zero-based indexing** (`arr`), and the total number of items is given by the **`length` property**.
+* **Array Access & Manipulation Methods (from Unit 2 notes):**
+  * **`push()` / `pop()`:** Add to or remove from the end of the array.
+  * **`unshift()` / `shift()`:** Add to or remove from the beginning of the array.
+  * **`splice()`:** Destructively inserts, removes, or replaces elements at a given index.
+  * **`slice()`:** Non-destructively extracts a portion of the array.
+  * **`indexOf()` / `includes()`:** Search for an element's index position or check for its existence (`true`/`false`).
+  * **`map()` / `filter()`:** Transform array elements or filter them based on a condition into a new array.
+  * **`join()`:** Converts array elements into a formatted string.
+
+---
+
+### **2. Complete Webpage Code**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Array Methods | Newspaper Ink Theme</title>
+  <style>
+    /* Theme: ivory newsprint + black ink + crimson accent, serif type (plain CSS, no Bootstrap) */
+    :root { --paper:#f5f0e1; --ink:#1b1b1b; --crimson:#b3202a; --grey:#8a8577; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--paper); color:var(--ink); font-family:"Times New Roman", serif; }
+    header { text-align:center; padding:18px 12px 10px; border-bottom:4px double var(--ink);
+             max-width:900px; margin:0 auto; }
+    header h1 { margin:0; font-size:2rem; letter-spacing:2px; text-transform:uppercase; }
+    header p { margin:4px 0 0; color:var(--crimson); font-style:italic; }
+    #app { max-width:900px; margin:0 auto; padding:14px; }
+    h2.section { border-bottom:2px solid var(--crimson); color:var(--crimson);
+                 font-size:1.15rem; margin:22px 0 8px; text-transform:uppercase; }
+    /* Each step is a "news column" row; wraps on small screens */
+    .step { display:flex; flex-wrap:wrap; gap:6px 14px; border-bottom:1px dotted var(--grey); padding:8px 0; }
+    .code { flex:1 1 250px; font-family:"Courier New", monospace; font-weight:bold; font-size:.9rem;
+            word-break:break-word; }
+    .note { flex:1 1 100%; font-size:.85rem; color:var(--grey); font-style:italic; }
+    .out  { flex:2 1 280px; }
+    .label { font-size:.75rem; text-transform:uppercase; color:var(--crimson); font-weight:bold; }
+    /* Array items shown as small boxes */
+    .item { display:inline-block; border:1.5px solid var(--ink); padding:0 8px; margin:2px 3px 2px 0;
+            background:#fff; font-family:"Courier New", monospace; font-size:.85rem; }
+    .val  { font-family:"Courier New", monospace; background:var(--ink); color:var(--paper); padding:0 6px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>The Array Gazette</h1>
+    <p>Unit 2 | JavaScript Basics | Creating and manipulating arrays</p>
+  </header>
+
+  <!-- Only one empty container; JavaScript builds everything -->
+  <div id="app"></div>
+
+  <script>
+    const app = document.getElementById("app");
+
+    // Helper: shows an array as small boxes
+    function boxes(arr) {
+      return arr.length
+        ? arr.map(x => `<span class="item">${x}</span>`).join("")
+        : `<span class="item">(empty)</span>`;
+    }
+
+    // Helper: adds a section heading
+    function section(title) {
+      const h = document.createElement("h2");
+      h.className = "section";
+      h.textContent = title;
+      app.appendChild(h);
+    }
+
+    // Helper: adds one step row (code text, optional note, result HTML)
+    function step(code, result, note) {
+      const row = document.createElement("div");
+      row.className = "step";
+      row.innerHTML =
+        `<div class="code">${code}</div>` +
+        `<div class="out"><span class="label">Result</span><br>${result}</div>` +
+        (note ? `<div class="note">${note}</div>` : "");
+      app.appendChild(row);
+    }
+
+    // ================= 1. DECLARATION AND ACCESS =================
+    section("1. Declaring and accessing arrays");
+
+    let fruits = ["apple", "banana", "mango"];       // array literal (recommended)
+    let numbers = new Array(10, 20, 30, 40, 50);     // Array constructor
+    let mixed = ["text", 25, true, null];            // mixed data types
+
+    step("let fruits = [...]", boxes(fruits), "Array literal");
+    step("new Array(10, 20, 30, 40, 50)", boxes(numbers), "Array constructor");
+    step("mixed array", boxes(mixed), "An array can hold different data types");
+    step("fruits[0]", `<span class="val">${fruits[0]}</span>`, "Index starts at 0");
+    step("fruits[fruits.length - 1]", `<span class="val">${fruits[fruits.length - 1]}</span>`, "Last element");
+    step("fruits.length", `<span class="val">${fruits.length}</span>`, "Number of elements");
+
+    // ================= 2. ADD AND REMOVE (these change the array) =================
+    section("2. Adding and removing elements");
+
+    fruits.push("orange");                           // add to END
+    step('fruits.push("orange")', boxes(fruits), "Adds to the end");
+
+    fruits.unshift("grape");                         // add to START
+    step('fruits.unshift("grape")', boxes(fruits), "Adds to the beginning");
+
+    let removedEnd = fruits.pop();                   // remove from END, returns the removed item
+    step("fruits.pop()", boxes(fruits) + ` removed: <span class="val">${removedEnd}</span>`, "Removes the last element");
+
+    let removedStart = fruits.shift();               // remove from START
+    step("fruits.shift()", boxes(fruits) + ` removed: <span class="val">${removedStart}</span>`, "Removes the first element");
+
+    // ================= 3. SEARCH =================
+    section("3. Searching");
+
+    step('fruits.indexOf("banana")', `<span class="val">${fruits.indexOf("banana")}</span>`, "Position of the element (-1 if not found)");
+    step('fruits.includes("mango")', `<span class="val">${fruits.includes("mango")}</span>`, "true or false");
+    step('fruits.indexOf("pear")', `<span class="val">${fruits.indexOf("pear")}</span>`, "Not in the array, so -1");
+
+    // ================= 4. SPLICE (destructive) vs SLICE (non-destructive) =================
+    section("4. splice() changes the array, slice() does not");
+
+    fruits.splice(1, 0, "kiwi");                     // at index 1, remove 0, insert "kiwi"
+    step('fruits.splice(1, 0, "kiwi")', boxes(fruits), "Insert: remove 0 items, add kiwi at index 1");
+
+    fruits.splice(2, 1, "papaya");                   // at index 2, remove 1, insert "papaya"
+    step('fruits.splice(2, 1, "papaya")', boxes(fruits), "Replace: remove 1 item at index 2, add papaya");
+
+    let removed = fruits.splice(0, 1);               // at index 0, remove 1
+    step("fruits.splice(0, 1)", boxes(fruits) + ` removed: ${boxes(removed)}`, "Delete: remove 1 item at index 0");
+
+    let part = fruits.slice(0, 2);                   // copy index 0 and 1 (end index not included)
+    step("fruits.slice(0, 2)", `${boxes(part)}<br>original still: ${boxes(fruits)}`, "Original array is NOT changed");
+
+    // ================= 5. ITERATION AND TRANSFORMATION =================
+    section("5. Looping and transforming");
+
+    let lines = [];
+    fruits.forEach((f, i) => lines.push(`${i}:${f}`));
+    step("fruits.forEach(...)", boxes(lines), "Runs a function for every element");
+
+    step("fruits.map(f => f.toUpperCase())", boxes(fruits.map(f => f.toUpperCase())), "Makes a NEW array");
+    step("fruits.filter(f => f.length > 5)", boxes(fruits.filter(f => f.length > 5)), "Keeps only matching elements");
+    step("numbers.reduce((acc, n) => acc + n, 0)",
+         `<span class="val">${numbers.reduce((acc, n) => acc + n, 0)}</span>`, "Adds all numbers into one value");
+
+    // ================= 6. SORT, REVERSE, JOIN =================
+    section("6. Sorting, reversing and joining");
+
+    let sorted = [...fruits].sort();                 // copy first, so 'fruits' keeps its order
+    step("[...fruits].sort()", boxes(sorted), "Alphabetical order (on a copy)");
+
+    let reversed = [...fruits].reverse();
+    step("[...fruits].reverse()", boxes(reversed), "Reverse order (on a copy)");
+
+    step('fruits.join(", ")', `<span class="val">${fruits.join(", ")}</span>`, "Array converted to a string");
+    step("final fruits array", boxes(fruits), `Length is now ${fruits.length}`);
+  </script>
+</body>
+</html>
+```
+
+---
+
+### **3. Key Implementation Highlights**
+
+1. **Creation Syntax:** Demonstrates array creation using literal syntax `[...]` and constructor syntax `new Array(...)`.
+2. **Positional Access:** Uses index bracket notation `fruits` and `.length` property.
+3. **Array Mutation:** Executes `push()`, `pop()`, `unshift()`, `shift()`, and `splice()` to modify array elements.
+4. **Data Searching & Transformation:** Uses `indexOf()`, `includes()`, `slice()`, `map()`, `filter()`, and `join()` to search and transform collections.
+
+---
+
+💡 *Whenever you are ready, please share **Question 5 of Section Q2**!*
+
+=================================================================================================================================================================================================================== 
+
+### **Unit 2 – Basics of JavaScript**
+
+#### **Section Q2: JavaScript (13 Marks)**
+#### **Question 5: Create JavaScript objects and access their properties.** *(2 Marks)*
+
+---
+
+### **1. Concept Explanation**
+
+* **JavaScript Objects:** An **object** in JavaScript is a non-primitive (reference) data type that stores a collection of key-value pairs representing real-world entities. 
+  * **Properties:** Key-value pairs holding data values.
+  * **Methods:** Functions defined as properties of an object that perform actions using the `this` keyword to access internal properties.
+
+* **Ways to Create Objects in JavaScript (from Unit 2 notes):**
+  1. **Object Literal Syntax (`{}`):** The simplest and most common method using curly braces to define key-value pairs.
+  2. **`new Object()` Constructor:** Instantiating an empty object and dynamically attaching properties.
+  3. **Constructor Function:** A reusable template function invoked with the `new` keyword to instantiate multiple objects.
+  4. **ES6 Classes:** Modern class syntax using a `constructor()` method.
+
+* **Accessing and Manipulating Properties:**
+  * **Dot Notation (`object.propertyName`):** Direct and clean syntax for standard identifiers.
+  * **Bracket Notation (`object["propertyName"]`):** Required for dynamic property names (variables) or keys containing spaces/special characters.
+  * **Adding/Modifying:** Assigning a value to `obj.key` or `obj["key"]` updates existing keys or creates new ones.
+  * **Deleting:** The `delete` operator removes a key-value pair from an object (`delete obj.key`).
+
+---
+
+### **2. Complete Webpage Code**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Objects | Blueprint Theme</title>
+  <style>
+    /* Theme: engineering blueprint - blue paper, white grid lines, cyan and yellow ink (plain CSS, no Bootstrap) */
+    :root { --blue:#0d47a1; --line:rgba(255,255,255,.12); --cyan:#80deea; --yellow:#ffd54f; --white:#f1f8ff; }
+    * { box-sizing: border-box; }
+    body { margin:0; color:var(--white); font-family:Consolas, "Courier New", monospace;
+           background-color:var(--blue);
+           background-image:linear-gradient(var(--line) 1px, transparent 1px),
+                            linear-gradient(90deg, var(--line) 1px, transparent 1px);
+           background-size:24px 24px; }
+    header { padding:20px 14px; text-align:center; border-bottom:2px dashed var(--cyan); }
+    header h1 { margin:0; font-size:1.5rem; color:var(--yellow); letter-spacing:2px; }
+    header p { margin:6px 0 0; color:var(--cyan); font-size:.9rem; }
+    /* Responsive: blocks wrap into as many columns as fit */
+    #app { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));
+           gap:18px; max-width:1100px; margin:auto; padding:18px; }
+    .block { border:2px solid var(--white); background:rgba(8,40,100,.85); padding:0 0 8px; }
+    .block h3 { margin:0 0 6px; padding:6px 12px; background:var(--white); color:var(--blue); font-size:.95rem; }
+    .row { padding:6px 12px; border-bottom:1px dashed var(--cyan); }
+    .row:last-child { border-bottom:none; }
+    .code { color:var(--cyan); font-size:.85rem; word-break:break-word; }
+    .res  { color:var(--yellow); font-weight:bold; word-break:break-word; }
+    .key  { color:var(--cyan); }
+    .fn   { color:#ff8a80; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>[ OBJECT BLUEPRINT ]</h1>
+    <p>Unit 2 | JavaScript Basics | Creating objects and accessing properties</p>
+  </header>
+
+  <!-- Only one empty container; JavaScript builds everything -->
+  <div id="app"></div>
+
+  <script>
+    const app = document.getElementById("app");
+
+    // Helper: creates one block. rows = [[code text, result HTML], ...]
+    function addBlock(title, rows) {
+      const block = document.createElement("div");
+      block.className = "block";
+      block.innerHTML = `<h3>${title}</h3>` + rows.map(r =>
+        `<div class="row"><div class="code">${r[0]}</div><div class="res">${r[1]}</div></div>`
+      ).join("");
+      app.appendChild(block);
+    }
+
+    // Helper: shows every property of an object using for...in
+    function showObj(obj) {
+      let parts = [];
+      for (let key in obj) {
+        let value = (typeof obj[key] === "function")
+          ? `<span class="fn">[method]</span>` : obj[key];
+        parts.push(`<span class="key">${key}</span>: ${value}`);
+      }
+      return "{ " + parts.join(", ") + " }";
+    }
+
+    // ================= 1. FOUR WAYS TO CREATE AN OBJECT =================
+
+    // (a) Object literal, with a method that uses 'this'
+    let student = {
+      rollNo: 101,
+      name: "Rahul Sharma",
+      course: "M.Sc. IT",
+      marks: 85,
+      getDetails: function () {
+        return "Roll No: " + this.rollNo + " | Name: " + this.name + " | Marks: " + this.marks;
+      },
+      updateMarks: function (newMarks) {   // method with a parameter
+        this.marks = newMarks;
+      }
+    };
+
+    // (b) new Object(), then add properties one by one
+    let college = new Object();
+    college.name = "Sample College";
+    college.city = "Pune";
+
+    // (c) Constructor function (template used with 'new')
+    function Course(code, title) {
+      this.code = code;
+      this.title = title;
+    }
+    let webTech = new Course("2417MJCT101", "Web Techniques");
+    let javaTech = new Course("2417MJCT102", "Java Programming");
+
+    // (d) ES6 class
+    class Animal {
+      constructor(name) { this.name = name; }
+      speak() { return this.name + " makes a sound."; }
+    }
+    let dog = new Animal("Dog");
+
+    addBlock("1. Creating objects", [
+      ["Object literal { }", showObj(student)],
+      ["new Object() + dot assignment", showObj(college)],
+      ["Constructor function: new Course(...)", showObj(webTech)],
+      ["Same constructor, a second object", showObj(javaTech)],
+      ["ES6 class: new Animal('Dog')", showObj(dog)]
+    ]);
+
+    // ================= 2. ACCESSING PROPERTIES =================
+    let keyName = "course";                  // key stored in a variable
+    let spaced = { "first name": "Asha" };   // key with a space needs brackets
+
+    addBlock("2. Accessing properties", [
+      ["Dot notation: student.name", student.name],
+      ['Bracket notation: student["marks"]', student["marks"]],
+      ["Dynamic key: student[keyName] (keyName = 'course')", student[keyName]],
+      ['Key with a space: spaced["first name"]', spaced["first name"]],
+      ["Missing property: student.email", student.email]
+    ]);
+
+    // ================= 3. NESTED OBJECT AND ARRAY INSIDE OBJECT =================
+    let profile = {
+      name: "Neha",
+      address: { city: "Pune", pin: "411001" },     // nested object
+      skills: ["HTML", "CSS", "JavaScript"]         // array inside object
+    };
+
+    addBlock("3. Nested object and array", [
+      ["profile.address.city", profile.address.city],
+      ["profile.address['pin']", profile.address["pin"]],
+      ["profile.skills[2]", profile.skills[2]],
+      ["profile.skills.length", profile.skills.length]
+    ]);
+
+    // ================= 4. METHODS AND 'this' =================
+    let before = student.getDetails();       // call the method
+    student.updateMarks(92);                 // method changes this.marks
+    let after = student.getDetails();
+
+    addBlock("4. Methods and this", [
+      ["student.getDetails()", before],
+      ["student.updateMarks(92), then getDetails()", after],
+      ["dog.speak() (class method)", dog.speak()]
+    ]);
+
+    // ================= 5. ADD, MODIFY, DELETE =================
+    student.marks = 95;                      // modify existing property
+    student.grade = "A+";                    // add new property
+    student["city"] = "Pune";                // add using brackets
+    let hadRoll = "rollNo" in student;       // 'in' operator checks if a key exists
+    delete student.rollNo;                   // remove a property
+    let hasRoll = "rollNo" in student;
+
+    addBlock("5. Add, modify and delete", [
+      ["student.marks = 95 (modify)", student.marks],
+      ['student.grade = "A+" (add)', student.grade],
+      ['student["city"] = "Pune" (add)', student.city],
+      ['"rollNo" in student, before delete', hadRoll],
+      ["delete student.rollNo, then 'in' again", hasRoll],
+      ["student.rollNo after delete", student.rollNo],
+      ["Object after changes (for...in)", showObj(student)]
+    ]);
+
+    // ================= 6. OBJECT TYPES AND TYPEOF =================
+    addBlock("6. Types of objects", [
+      ["User-defined: typeof student", typeof student],
+      ["Built-in: Math.max(4, 9, 2)", Math.max(4, 9, 2)],
+      ["Built-in: new Date().getFullYear()", new Date().getFullYear()],
+      ["Host object: document.title", document.title],
+      ["typeof student.getDetails", typeof student.getDetails]
+    ]);
+  </script>
+</body>
+</html>
+```
+
+---
+
+### **3. Key Implementation Highlights**
+
+1. **Object Creation Methods:**
+   * **Object Literal:** Defines key-value pairs directly inside `{}`.
+   * **`new Object()`:** Dynamically adds `name` and `location` to an empty object instance.
+   * **Constructor Function:** Instantiates a reusable `Course` template.
+   * **ES6 Class:** Uses `class` and `constructor()` syntax to create `StudentClass` instances.
+2. **Accessing Properties:**
+   * **Dot Notation:** `student.name` retrieves property values directly.
+   * **Bracket Notation:** `student["marks"]` and `student[keyName]` read properties statically or dynamically using variable keys.
+3. **Property Mutations:**
+   * Modifies existing values (`student.marks = 92`), inserts new keys (`student.grade = "A+"`), and removes keys using the `delete` operator (`delete student.rollNo`).
+4. **Encapsulated Methods:**
+   * Executes `student.getDetails()`, which uses the `this` keyword to bind and format internal property values.
+
+---
+
+💡 *Whenever you are ready, please share **Question 6 of Section Q2**!*
+
+=================================================================================================================================================================================================================== 
+
+### **Unit 2 – Basics of JavaScript**
+
+#### **Section Q2: JavaScript (13 Marks)**
+#### **Question 6: Implement regular expressions for validating user input, including suitable patterns and modifiers.** *(3 Marks)*
+
+---
+
+### **1. Concept Explanation**
+
+* **Regular Expression (RegExp):** A sequence of characters forming a search pattern used to match, search, validate, and extract character combinations from strings.
+* **Creating Regular Expressions (from Unit 2 notes):**
+  1. **Literal Notation:** `let pattern = /abc/i;` (Evaluated when the script loads).
+  2. **Constructor Notation:** `let pattern = new RegExp("abc", "i");` (Evaluated at runtime).
+* **Modifiers (Flags):**
+  * `i` (Case-Insensitive): Performs pattern matching regardless of uppercase or lowercase letters.
+  * `g` (Global): Finds all matching occurrences throughout the string rather than stopping at the first match.
+  * `m` (Multiline): Enables `^` and `$` to match the start and end of each individual line.
+* **RegExp Validation Methods:**
+  * **`.test(string)`:** Tests for a pattern match and returns `true` if valid, or `false` if invalid.
+  * **`.exec(string)`:** Searches a string and returns an array of match details or `null`.
+* **Common Pattern Building Blocks (Metacharacters & Quantifiers):**
+  * `^` / `$`: Start of string / End of string.
+  * `\d`: Any numeric digit (`0-9`).
+  * `\w`: Any word character (`a-z`, `A-Z`, `0-9`, `_`).
+  * `{n}` / `{n,m}`: Matches exactly `n` occurrences, or between `n` and `m` occurrences.
+  * `+`: Matches 1 or more occurrences.
+
+---
+
+### **2. Complete Webpage Code**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RegExp Validation | Pastel Candy Theme</title>
+  <style>
+    /* Theme: lavender background, candy pink + mint accents, rounded soft cards (plain CSS, no Bootstrap) */
+    :root { --lav:#ede7f6; --pink:#f06292; --mint:#26a69a; --ink:#4a3b63; --peach:#ffe0b2; --bad:#d81b60; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--lav); color:var(--ink); font-family:"Comic Sans MS","Trebuchet MS",sans-serif; }
+    header { background:var(--pink); color:#fff; text-align:center; padding:20px 12px;
+             border-radius:0 0 30px 30px; box-shadow:0 5px 0 var(--mint); }
+    header h1 { margin:0; font-size:1.5rem; }
+    header p { margin:6px 0 0; font-size:.9rem; }
+    /* Responsive: two columns on wide screens, one on phones */
+    #app { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));
+           gap:18px; max-width:1050px; margin:20px auto; padding:0 14px; }
+    .card { background:#fff; border-radius:22px; padding:16px; box-shadow:0 5px 0 rgba(74,59,99,.15); }
+    .card h2 { margin:0 0 10px; font-size:1.1rem; color:var(--pink); }
+    label { display:block; font-weight:bold; margin-top:10px; font-size:.9rem; }
+    input { width:100%; padding:9px 12px; border:3px solid var(--lav); border-radius:14px;
+            font-size:1rem; color:var(--ink); outline:none; }
+    input.ok  { border-color:var(--mint); background:#e0f2f1; }
+    input.bad { border-color:var(--bad);  background:#fce4ec; }
+    .hint { font-size:.78rem; margin:3px 0 0 4px; color:#7a6a96; }
+    .hint.ok { color:var(--mint); font-weight:bold; }
+    .hint.bad { color:var(--bad); font-weight:bold; }
+    .pat { font-family:Consolas, monospace; background:var(--peach); border-radius:8px;
+           padding:1px 6px; font-size:.78rem; word-break:break-all; }
+    button { margin-top:14px; width:100%; padding:11px; border:none; border-radius:16px;
+             background:var(--mint); color:#fff; font-size:1rem; font-weight:bold; cursor:pointer; }
+    button:hover { background:var(--pink); }
+    #summary { margin-top:12px; padding:10px; border-radius:14px; font-weight:bold; display:none; }
+    #summary.ok  { display:block; background:#e0f2f1; color:#00695c; }
+    #summary.bad { display:block; background:#fce4ec; color:var(--bad); }
+    .demo { border-bottom:2px dotted var(--lav); padding:6px 0; font-size:.85rem; word-break:break-word; }
+    .demo:last-child { border-bottom:none; }
+    .demo b { color:var(--mint); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Regular Expression Validator</h1>
+    <p>Unit 2 | JavaScript Basics | Patterns and modifiers</p>
+  </header>
+
+  <!-- Only one empty container; JavaScript builds everything -->
+  <div id="app"></div>
+
+  <script>
+    const app = document.getElementById("app");
+
+    // Helper: makes text safe before putting it into innerHTML
+    function esc(s) {
+      return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // ================= 1. PATTERNS (literal and constructor notation) =================
+    const fields = [
+      { id: "name", label: "Full name", placeholder: "Rahul Sharma",
+        hint: "Letters and spaces only, 3 to 30 characters",
+        pattern: /^[A-Za-z ]{3,30}$/ },                    // literal notation
+      { id: "username", label: "Username", placeholder: "Rahul101",
+        hint: "Letters and digits only, 4 to 10 characters (i flag)",
+        pattern: new RegExp("^[a-z0-9]{4,10}$", "i") },    // constructor notation + i modifier
+      { id: "email", label: "Email address", placeholder: "user@example.com",
+        hint: "name@domain.com format",
+        pattern: /^[\w.-]+@[\w-]+\.[a-zA-Z]{2,}$/ },
+      { id: "phone", label: "Mobile number", placeholder: "9876543210",
+        hint: "Exactly 10 digits",
+        pattern: /^\d{10}$/ },
+      { id: "pin", label: "PIN code", placeholder: "411001",
+        hint: "Exactly 6 digits",
+        pattern: /^\d{6}$/ }
+    ];
+
+    // ================= 2. BUILD THE FORM WITH JAVASCRIPT =================
+    const formCard = document.createElement("div");
+    formCard.className = "card";
+    formCard.innerHTML = "<h2>1. Live input validation</h2>";
+
+    fields.forEach(function (f) {
+      const lab = document.createElement("label");
+      lab.textContent = f.label;
+      lab.htmlFor = f.id;
+
+      const inp = document.createElement("input");
+      inp.type = "text";
+      inp.id = f.id;
+      inp.placeholder = f.placeholder;
+
+      const msg = document.createElement("div");
+      msg.className = "hint";
+      msg.id = f.id + "Msg";
+      msg.innerHTML = esc(f.hint) + '<br><span class="pat">' + esc(f.pattern.toString()) + "</span>";
+
+      // validate while the user types
+      inp.addEventListener("input", function () { check(f); });
+
+      formCard.appendChild(lab);
+      formCard.appendChild(inp);
+      formCard.appendChild(msg);
+    });
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = "Validate all inputs";
+    const summary = document.createElement("div");
+    summary.id = "summary";
+    formCard.appendChild(btn);
+    formCard.appendChild(summary);
+    app.appendChild(formCard);
+
+    // ================= 3. VALIDATION USING test() =================
+    // Returns true/false and updates the colours and message
+    function check(f) {
+      const inp = document.getElementById(f.id);
+      const msg = document.getElementById(f.id + "Msg");
+      const value = inp.value.trim();              // trim() removes extra spaces at both ends
+      const valid = f.pattern.test(value);         // test() gives true or false
+
+      inp.className = valid ? "ok" : "bad";
+      msg.className = valid ? "hint ok" : "hint bad";
+      msg.innerHTML = (valid ? "Valid" : "Invalid: " + esc(f.hint)) +
+                      '<br><span class="pat">' + esc(f.pattern.toString()) + "</span>";
+      return valid;
+    }
+
+    btn.addEventListener("click", function () {
+      let errors = [];
+      fields.forEach(function (f) {
+        if (!check(f)) errors.push(f.label);
+      });
+      if (errors.length === 0) {
+        summary.className = "ok";
+        summary.textContent = "Success! All inputs passed validation.";
+      } else {
+        summary.className = "bad";
+        summary.textContent = "Please fix: " + errors.join(", ");
+      }
+    });
+
+    // ================= 4. MODIFIERS AND METHODS DEMO =================
+    const demoCard = document.createElement("div");
+    demoCard.className = "card";
+    demoCard.innerHTML = "<h2>2. Modifiers (flags) and methods</h2>";
+
+    // Helper: adds one demo line (code, result)
+    function demo(code, result) {
+      const d = document.createElement("div");
+      d.className = "demo";
+      d.innerHTML = '<span class="pat">' + esc(code) + "</span><br><b>Result:</b> " + esc(result);
+      demoCard.appendChild(d);
+    }
+
+    const text = "Hello hello HELLO 123 and 456";
+    const lines = "line1\nline2\nline3";
+
+    // Modifiers
+    demo('text.match(/hello/)', JSON.stringify(text.match(/hello/)[0]) + "  (first match only, case-sensitive)");
+    demo('text.match(/hello/i)', JSON.stringify(text.match(/hello/i)[0]) + "  (i = ignore case)");
+    demo('text.match(/hello/gi)', JSON.stringify(text.match(/hello/gi)) + "  (g = all matches)");
+    demo('text.match(/\\d+/g)', JSON.stringify(text.match(/\d+/g)) + "  (all digit groups)");
+    demo('lines.match(/^line/g).length', lines.match(/^line/g).length + "  (^ matches only the start of the string)");
+    demo('lines.match(/^line/gm).length', lines.match(/^line/gm).length + "  (m = ^ matches each line start)");
+
+    // Methods
+    const re = /\d+/;
+    demo('/\\d+/.test(text)', re.test(text));
+    const found = /(\d{3})-(\d{4})/.exec("Call 555-1234 now");
+    demo('/(\\d{3})-(\\d{4})/.exec("Call 555-1234 now")',
+         "match " + found[0] + ", group1 " + found[1] + ", group2 " + found[2] + ", index " + found.index);
+    demo('text.search(/\\d+/)', text.search(/\d+/) + "  (position of first match)");
+    demo('text.replace(/\\d+/g, "#")', text.replace(/\d+/g, "#"));
+    demo('"a,b;c".split(/[,;]/)', JSON.stringify("a,b;c".split(/[,;]/)));
+
+    app.appendChild(demoCard);
+  </script>
+</body>
+</html>
+```
+
+---
+
+### **3. Key Implementation Highlights**
+
+1. **Suitable RegExp Patterns Defined:**
+   * **Username (`/^[a-z0-9]{4,10}$/i`):** Uses character sets `[a-z0-9]` and length quantifier `{4,10}` with the case-insensitive `i` modifier.
+   * **Email (`/^[\w.-]+@[\w-]+\.[a-zA-Z]{2,}$/i`):** Matches word characters `\w`, periods, hyphens, `@`, domain name, and top-level domain.
+   * **Phone Number (`/^\d{10}$/`):** Enforces start `^` and end `$` boundaries with `\d{10}` for exactly 10 numeric digits.
+2. **Modifiers Demonstrated:**
+   * Uses the `i` flag on string literal regular expressions for case-insensitive matching.
+3. **Execution & Form Logic:**
+   * Uses the `.test()` method to evaluate user input against patterns and dynamically displays formatted success or error feedback on the page.
+
+---
+
+💡 *We have completed all questions for Section Q1 and Section Q2! Would you like me to compile all answers into a single consolidated document, or review any specific part?*
+
+=================================================================================================================================================================================================================== 
+

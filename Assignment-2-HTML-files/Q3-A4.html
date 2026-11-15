@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>JSON.parse() and JSON.stringify()</title>
+        <style>
+            :root {
+                --olive: #4f5d2f;
+                --terra: #c8553d;
+                --bone: #f6f1e3;
+                --ink: #2d2a22;
+            }
+            body {
+                margin: 0;
+                background: var(--bone);
+                color: var(--ink);
+                font-family: "Gill Sans", Calibri, sans-serif;
+                line-height: 1.5;
+            }
+            header {
+                background: var(--olive);
+                color: var(--bone);
+                text-align: center;
+                padding: 20px 12px;
+                border-bottom: 6px solid var(--terra);
+            }
+            header h1 {
+                margin: 0;
+                font-size: 1.5rem;
+            }
+            header p {
+                margin: 4px 0 0;
+                color: #f0c9b8;
+            }
+            main {
+                max-width: 980px;
+                margin: auto;
+                padding: 14px;
+            }
+            h2 {
+                color: var(--olive);
+                border-bottom: 3px solid var(--terra);
+                padding-bottom: 3px;
+                margin-top: 26px;
+                font-size: 1.1rem;
+            }
+            .flow {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                margin: 10px 0;
+            }
+            .flow span {
+                background: #fff;
+                border: 2px solid var(--olive);
+                padding: 6px 12px;
+                border-radius: 20px;
+                font-weight: bold;
+            }
+            .flow .arrow {
+                background: none;
+                border: 0;
+                color: var(--terra);
+            }
+            textarea {
+                width: 100%;
+                height: 150px;
+                font-family: Consolas, monospace;
+                font-size: 0.85rem;
+                padding: 8px;
+                border: 2px solid var(--olive);
+                border-radius: 8px;
+                box-sizing: border-box;
+            }
+            button {
+                background: var(--terra);
+                color: #fff;
+                border: 0;
+                padding: 9px 18px;
+                border-radius: 6px;
+                font-weight: bold;
+                cursor: pointer;
+                margin: 8px 0;
+            }
+            button:hover {
+                background: #a8402c;
+            }
+            pre {
+                background: #25281c;
+                color: #f2d9a6;
+                padding: 10px;
+                border-radius: 8px;
+                overflow-x: auto;
+                margin: 6px 0;
+                font-size: 0.85rem;
+                white-space: pre-wrap;
+                word-break: break-word;
+            }
+            .grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 12px;
+            }
+            .grid b {
+                color: var(--terra);
+            }
+            .err {
+                color: #ff8a80;
+            }
+            .scroll {
+                overflow-x: auto;
+            }
+            table {
+                border-collapse: collapse;
+                width: 100%;
+                background: #fff;
+                font-size: 0.85rem;
+            }
+            th,
+            td {
+                border: 1px solid #ddd2b8;
+                padding: 5px 8px;
+                text-align: left;
+            }
+            th {
+                background: var(--olive);
+                color: var(--bone);
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>JSON.parse() and JSON.stringify()</h1>
+            <p>Text to object, and object back to text</p>
+        </header>
+
+        <main>
+            <div class="flow">
+                <span>JSON text</span
+                ><span class="arrow">&rarr; JSON.parse() &rarr;</span>
+                <span>JavaScript object</span
+                ><span class="arrow">&rarr; JSON.stringify() &rarr;</span>
+                <span>JSON text</span>
+            </div>
+
+            <h2>1. Incoming JSON Text (edit it and press Run)</h2>
+            <textarea id="src" spellcheck="false"></textarea>
+            <button id="run">Run parse and stringify</button>
+
+            <h2>2. JSON.parse(text): text becomes an object</h2>
+            <pre id="o1"></pre>
+
+            <h2>3. Modify the Object (add, update, delete)</h2>
+            <pre id="o2"></pre>
+
+            <h2>4. JSON.stringify(object): object becomes text</h2>
+            <div class="grid">
+                <div>
+                    <b>Compact</b>
+                    <pre id="o3"></pre>
+                </div>
+                <div>
+                    <b>Pretty (indent 2)</b>
+                    <pre id="o4"></pre>
+                </div>
+                <div>
+                    <b>Replacer array (only chosen keys)</b>
+                    <pre id="o5"></pre>
+                </div>
+                <div>
+                    <b>Replacer function (hides "marks")</b>
+                    <pre id="o6"></pre>
+                </div>
+            </div>
+
+            <h2>5. Reviver: fix values while parsing</h2>
+            <pre id="o7"></pre>
+
+            <h2>6. Deep Copy using stringify + parse</h2>
+            <pre id="o8"></pre>
+
+            <h2>7. What stringify() Skips or Changes</h2>
+            <div class="scroll"><table id="quirks"></table></div>
+
+            <h2>8. Invalid JSON gives an Error</h2>
+            <pre id="o9"></pre>
+        </main>
+
+        <!-- ===================== JSON DATA (the incoming text) ===================== -->
+        <script type="application/json" id="data">
+            {
+                "studentId": 101,
+                "name": "Rahul Sharma",
+                "course": "M.Sc. IT",
+                "marks": [88, 92, 75],
+                "isPassed": true,
+                "scholarship": null,
+                "enrolledOn": "2025-07-15",
+                "address": { "city": "Pune", "pin": "411001" }
+            }
+        </script>
+
+        <!-- ===================== SHORT JAVASCRIPT ===================== -->
+        <script>
+            var src = document.getElementById("src");
+            function out(id, text) {
+                document.getElementById(id).textContent = text;
+            }
+
+            // Load the JSON text into the editor
+            src.value = JSON.stringify(
+                JSON.parse(document.getElementById("data").textContent),
+                null,
+                2,
+            );
+
+            function run() {
+                var text = src.value;
+
+                // ---- parse ----
+                var obj;
+                try {
+                    obj = JSON.parse(text);
+                } catch (e) {
+                    out("o1", "Invalid JSON: " + e.message);
+                    ["o2", "o3", "o4", "o5", "o6", "o7", "o8"].forEach(
+                        function (id) {
+                            out(id, "-");
+                        },
+                    );
+                    return;
+                }
+                out(
+                    "o1",
+                    "typeof text   : " +
+                        typeof text +
+                        "\n" +
+                        "typeof result : " +
+                        typeof obj +
+                        "\n" +
+                        "obj.name      : " +
+                        obj.name +
+                        "\n" +
+                        "obj.marks[1]  : " +
+                        (obj.marks ? obj.marks[1] : "n/a") +
+                        "\n" +
+                        "obj.address.city : " +
+                        (obj.address ? obj.address.city : "n/a"),
+                );
+
+                // ---- modify ----
+                obj.course = "M.Sc. Information Technology"; // update
+                obj.grade = "A"; // add
+                delete obj.scholarship; // delete
+                out(
+                    "o2",
+                    "course updated, grade added, scholarship deleted\n\nKeys now: " +
+                        Object.keys(obj).join(", "),
+                );
+
+                // ---- stringify (4 forms) ----
+                out("o3", JSON.stringify(obj));
+                out("o4", JSON.stringify(obj, null, 2));
+                out("o5", JSON.stringify(obj, ["name", "course", "grade"]));
+                out(
+                    "o6",
+                    JSON.stringify(
+                        obj,
+                        function (key, value) {
+                            return key === "marks" ? undefined : value; // returning undefined removes the key
+                        },
+                        2,
+                    ),
+                );
+
+                // ---- reviver ----
+                var withDate = JSON.parse(text, function (key, value) {
+                    return key === "enrolledOn" ? new Date(value) : value; // string -> Date object
+                });
+                out(
+                    "o7",
+                    "Without reviver : typeof enrolledOn = " +
+                        typeof obj.enrolledOn +
+                        "\n" +
+                        "With reviver    : typeof enrolledOn = " +
+                        typeof withDate.enrolledOn +
+                        "\n" +
+                        "Year            : " +
+                        (withDate.enrolledOn instanceof Date
+                            ? withDate.enrolledOn.getFullYear()
+                            : "n/a"),
+                );
+
+                // ---- deep copy ----
+                var copy = JSON.parse(JSON.stringify(obj));
+                copy.address.city = "Mumbai";
+                out(
+                    "o8",
+                    "copy.address.city     = " +
+                        copy.address.city +
+                        "\n" +
+                        "original city stays   = " +
+                        obj.address.city +
+                        "\n" +
+                        "copy === original ?   = " +
+                        (copy === obj),
+                );
+            }
+            document.getElementById("run").addEventListener("click", run);
+            run();
+
+            // ---- what stringify() skips or changes ----
+            var sample = {
+                text: "hi",
+                n: NaN,
+                inf: Infinity,
+                nothing: undefined,
+                fn: function () {},
+                day: new Date(0),
+                list: [undefined, 5],
+            };
+            var rows =
+                "<tr><th>JavaScript value</th><th>Result in JSON</th></tr>";
+            for (var k in sample) {
+                var single = JSON.stringify({ v: sample[k] });
+                var shown =
+                    typeof sample[k] === "function"
+                        ? "function"
+                        : String(sample[k]);
+                rows +=
+                    "<tr><td><code>" +
+                    k +
+                    " : " +
+                    shown +
+                    "</code></td><td><code>" +
+                    single +
+                    "</code></td></tr>";
+            }
+            document.getElementById("quirks").innerHTML = rows;
+
+            // ---- invalid JSON ----
+            var bad = [
+                "{ 'a': 1 }",
+                '{ "a": 1, }',
+                "{ a: 1 }",
+                '{"a": undefined}',
+            ];
+            out(
+                "o9",
+                bad
+                    .map(function (t) {
+                        try {
+                            JSON.parse(t);
+                            return t + "  ->  valid";
+                        } catch (e) {
+                            return t + "  ->  " + e.name + ": " + e.message;
+                        }
+                    })
+                    .join("\n\n"),
+            );
+        </script>
+    </body>
+</html>

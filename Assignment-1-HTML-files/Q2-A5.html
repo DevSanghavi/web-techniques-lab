@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>JavaScript Objects | Blueprint Theme</title>
+        <style>
+            /* Theme: engineering blueprint - blue paper, white grid lines, cyan and yellow ink (plain CSS, no Bootstrap) */
+            :root {
+                --blue: #0d47a1;
+                --line: rgba(255, 255, 255, 0.12);
+                --cyan: #80deea;
+                --yellow: #ffd54f;
+                --white: #f1f8ff;
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                color: var(--white);
+                font-family: Consolas, "Courier New", monospace;
+                background-color: var(--blue);
+                background-image:
+                    linear-gradient(var(--line) 1px, transparent 1px),
+                    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+                background-size: 24px 24px;
+            }
+            header {
+                padding: 20px 14px;
+                text-align: center;
+                border-bottom: 2px dashed var(--cyan);
+            }
+            header h1 {
+                margin: 0;
+                font-size: 1.5rem;
+                color: var(--yellow);
+                letter-spacing: 2px;
+            }
+            header p {
+                margin: 6px 0 0;
+                color: var(--cyan);
+                font-size: 0.9rem;
+            }
+            /* Responsive: blocks wrap into as many columns as fit */
+            #app {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 18px;
+                max-width: 1100px;
+                margin: auto;
+                padding: 18px;
+            }
+            .block {
+                border: 2px solid var(--white);
+                background: rgba(8, 40, 100, 0.85);
+                padding: 0 0 8px;
+            }
+            .block h3 {
+                margin: 0 0 6px;
+                padding: 6px 12px;
+                background: var(--white);
+                color: var(--blue);
+                font-size: 0.95rem;
+            }
+            .row {
+                padding: 6px 12px;
+                border-bottom: 1px dashed var(--cyan);
+            }
+            .row:last-child {
+                border-bottom: none;
+            }
+            .code {
+                color: var(--cyan);
+                font-size: 0.85rem;
+                word-break: break-word;
+            }
+            .res {
+                color: var(--yellow);
+                font-weight: bold;
+                word-break: break-word;
+            }
+            .key {
+                color: var(--cyan);
+            }
+            .fn {
+                color: #ff8a80;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>[ OBJECT BLUEPRINT ]</h1>
+            <p>
+                Unit 2 | JavaScript Basics | Creating objects and accessing
+                properties
+            </p>
+        </header>
+
+        <!-- Only one empty container; JavaScript builds everything -->
+        <div id="app"></div>
+
+        <script>
+            const app = document.getElementById("app");
+
+            // Helper: creates one block. rows = [[code text, result HTML], ...]
+            function addBlock(title, rows) {
+                const block = document.createElement("div");
+                block.className = "block";
+                block.innerHTML =
+                    `<h3>${title}</h3>` +
+                    rows
+                        .map(
+                            (r) =>
+                                `<div class="row"><div class="code">${r[0]}</div><div class="res">${r[1]}</div></div>`,
+                        )
+                        .join("");
+                app.appendChild(block);
+            }
+
+            // Helper: shows every property of an object using for...in
+            function showObj(obj) {
+                let parts = [];
+                for (let key in obj) {
+                    let value =
+                        typeof obj[key] === "function"
+                            ? `<span class="fn">[method]</span>`
+                            : obj[key];
+                    parts.push(`<span class="key">${key}</span>: ${value}`);
+                }
+                return "{ " + parts.join(", ") + " }";
+            }
+
+            // ================= 1. FOUR WAYS TO CREATE AN OBJECT =================
+
+            // (a) Object literal, with a method that uses 'this'
+            let student = {
+                rollNo: 101,
+                name: "Rahul Sharma",
+                course: "M.Sc. IT",
+                marks: 85,
+                getDetails: function () {
+                    return (
+                        "Roll No: " +
+                        this.rollNo +
+                        " | Name: " +
+                        this.name +
+                        " | Marks: " +
+                        this.marks
+                    );
+                },
+                updateMarks: function (newMarks) {
+                    // method with a parameter
+                    this.marks = newMarks;
+                },
+            };
+
+            // (b) new Object(), then add properties one by one
+            let college = new Object();
+            college.name = "Sample College";
+            college.city = "Pune";
+
+            // (c) Constructor function (template used with 'new')
+            function Course(code, title) {
+                this.code = code;
+                this.title = title;
+            }
+            let webTech = new Course("2417MJCT101", "Web Techniques");
+            let javaTech = new Course("2417MJCT102", "Java Programming");
+
+            // (d) ES6 class
+            class Animal {
+                constructor(name) {
+                    this.name = name;
+                }
+                speak() {
+                    return this.name + " makes a sound.";
+                }
+            }
+            let dog = new Animal("Dog");
+
+            addBlock("1. Creating objects", [
+                ["Object literal { }", showObj(student)],
+                ["new Object() + dot assignment", showObj(college)],
+                ["Constructor function: new Course(...)", showObj(webTech)],
+                ["Same constructor, a second object", showObj(javaTech)],
+                ["ES6 class: new Animal('Dog')", showObj(dog)],
+            ]);
+
+            // ================= 2. ACCESSING PROPERTIES =================
+            let keyName = "course"; // key stored in a variable
+            let spaced = { "first name": "Asha" }; // key with a space needs brackets
+
+            addBlock("2. Accessing properties", [
+                ["Dot notation: student.name", student.name],
+                ['Bracket notation: student["marks"]', student["marks"]],
+                [
+                    "Dynamic key: student[keyName] (keyName = 'course')",
+                    student[keyName],
+                ],
+                [
+                    'Key with a space: spaced["first name"]',
+                    spaced["first name"],
+                ],
+                ["Missing property: student.email", student.email],
+            ]);
+
+            // ================= 3. NESTED OBJECT AND ARRAY INSIDE OBJECT =================
+            let profile = {
+                name: "Neha",
+                address: { city: "Pune", pin: "411001" }, // nested object
+                skills: ["HTML", "CSS", "JavaScript"], // array inside object
+            };
+
+            addBlock("3. Nested object and array", [
+                ["profile.address.city", profile.address.city],
+                ["profile.address['pin']", profile.address["pin"]],
+                ["profile.skills[2]", profile.skills[2]],
+                ["profile.skills.length", profile.skills.length],
+            ]);
+
+            // ================= 4. METHODS AND 'this' =================
+            let before = student.getDetails(); // call the method
+            student.updateMarks(92); // method changes this.marks
+            let after = student.getDetails();
+
+            addBlock("4. Methods and this", [
+                ["student.getDetails()", before],
+                ["student.updateMarks(92), then getDetails()", after],
+                ["dog.speak() (class method)", dog.speak()],
+            ]);
+
+            // ================= 5. ADD, MODIFY, DELETE =================
+            student.marks = 95; // modify existing property
+            student.grade = "A+"; // add new property
+            student["city"] = "Pune"; // add using brackets
+            let hadRoll = "rollNo" in student; // 'in' operator checks if a key exists
+            delete student.rollNo; // remove a property
+            let hasRoll = "rollNo" in student;
+
+            addBlock("5. Add, modify and delete", [
+                ["student.marks = 95 (modify)", student.marks],
+                ['student.grade = "A+" (add)', student.grade],
+                ['student["city"] = "Pune" (add)', student.city],
+                ['"rollNo" in student, before delete', hadRoll],
+                ["delete student.rollNo, then 'in' again", hasRoll],
+                ["student.rollNo after delete", student.rollNo],
+                ["Object after changes (for...in)", showObj(student)],
+            ]);
+
+            // ================= 6. OBJECT TYPES AND TYPEOF =================
+            addBlock("6. Types of objects", [
+                ["User-defined: typeof student", typeof student],
+                ["Built-in: Math.max(4, 9, 2)", Math.max(4, 9, 2)],
+                [
+                    "Built-in: new Date().getFullYear()",
+                    new Date().getFullYear(),
+                ],
+                ["Host object: document.title", document.title],
+                ["typeof student.getDetails", typeof student.getDetails],
+            ]);
+        </script>
+    </body>
+</html>

@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>jQuery Event Methods | Galaxy Theme</title>
+        <style>
+            /* Theme: galaxy - deep indigo space, violet panels, lime and star-white accents (plain CSS, no Bootstrap) */
+            :root {
+                --space: #0e0a24;
+                --violet: #2b1d5c;
+                --purple: #7c4dff;
+                --lime: #b2ff59;
+                --star: #f3f0ff;
+                --pink: #ff6ec7;
+                --warn: #ffb74d;
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                color: var(--star);
+                font-family: "Segoe UI", Tahoma, sans-serif;
+                background-color: var(--space);
+                background-image:
+                    radial-gradient(
+                        1.5px 1.5px at 20px 30px,
+                        #fff,
+                        transparent
+                    ),
+                    radial-gradient(1px 1px at 90px 70px, #cfc4ff, transparent),
+                    radial-gradient(
+                        1.5px 1.5px at 150px 20px,
+                        #fff,
+                        transparent
+                    );
+                background-size: 180px 120px;
+            }
+            header {
+                text-align: center;
+                padding: 20px 10px;
+                background: linear-gradient(135deg, #1a1245, #4a2a9c);
+                border-bottom: 3px solid var(--lime);
+            }
+            header h1 {
+                margin: 0;
+                font-size: 1.6rem;
+                letter-spacing: 2px;
+            }
+            header p {
+                margin: 6px 0 0;
+                color: var(--lime);
+                font-size: 0.85rem;
+            }
+            /* Responsive: panels wrap by available width */
+            main {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+                gap: 18px;
+                max-width: 1250px;
+                margin: 20px auto;
+                padding: 0 14px;
+                align-items: start;
+            }
+            .panel {
+                background: rgba(43, 29, 92, 0.88);
+                border: 2px solid var(--purple);
+                border-radius: 14px;
+                padding: 14px;
+                box-shadow: 0 0 14px rgba(124, 77, 255, 0.4);
+            }
+            .panel h2 {
+                margin: 0 0 10px;
+                font-size: 1.02rem;
+                color: var(--lime);
+            }
+            .small {
+                font-size: 0.78rem;
+                color: #cfc4ff;
+                margin: 6px 0;
+            }
+            code {
+                font-family: Consolas, monospace;
+                font-size: 0.78rem;
+                color: var(--pink);
+            }
+            button {
+                background: var(--purple);
+                color: #fff;
+                border: none;
+                border-radius: 20px;
+                padding: 7px 13px;
+                margin: 3px 4px 3px 0;
+                font-size: 0.82rem;
+                cursor: pointer;
+            }
+            button:hover {
+                background: var(--lime);
+                color: #12082e;
+            }
+            label {
+                display: block;
+                font-weight: bold;
+                font-size: 0.85rem;
+                margin: 8px 0 3px;
+            }
+            input[type="text"],
+            select {
+                width: 100%;
+                padding: 8px;
+                border-radius: 8px;
+                border: 2px solid var(--purple);
+                background: #150f3a;
+                color: var(--star);
+                font-size: 0.95rem;
+            }
+            input.ok {
+                border-color: var(--lime);
+            }
+            input.bad {
+                border-color: var(--pink);
+            }
+            #clickBox {
+                border: 3px dashed var(--lime);
+                border-radius: 14px;
+                padding: 26px 10px;
+                text-align: center;
+                cursor: pointer;
+                user-select: none;
+                transition: background 0.2s;
+            }
+            #clickBox.single {
+                background: #3b7d2c;
+            }
+            #clickBox.double {
+                background: #a8325e;
+            }
+            .stats {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+                margin-top: 8px;
+            }
+            .stat {
+                background: #150f3a;
+                border-radius: 10px;
+                text-align: center;
+                padding: 6px;
+            }
+            .stat b {
+                display: block;
+                font-size: 1.6rem;
+                color: var(--lime);
+            }
+            .stat span {
+                font-size: 0.72rem;
+                font-family: Consolas, monospace;
+            }
+            #dyn {
+                min-height: 44px;
+                border: 2px dashed var(--purple);
+                border-radius: 10px;
+                padding: 6px;
+                margin: 8px 0;
+            }
+            #dyn button {
+                background: var(--pink);
+            }
+            #imgBox {
+                min-height: 70px;
+                border: 2px dashed var(--purple);
+                border-radius: 10px;
+                padding: 8px;
+                margin: 8px 0;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+            #imgBox img {
+                max-height: 54px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 0.76rem;
+            }
+            th,
+            td {
+                border: 1px solid var(--purple);
+                padding: 3px 5px;
+                text-align: left;
+                word-break: break-word;
+            }
+            th {
+                background: #150f3a;
+                color: var(--lime);
+            }
+            td.yes {
+                color: var(--lime);
+                font-weight: bold;
+            }
+            td.no {
+                color: var(--warn);
+                font-weight: bold;
+            }
+            #log {
+                background: #08051a;
+                border: 2px solid var(--purple);
+                border-radius: 10px;
+                height: 300px;
+                overflow-y: auto;
+                padding: 6px;
+                font-size: 0.78rem;
+            }
+            #log div {
+                border-bottom: 1px dotted #4a3a8c;
+                padding: 3px 0;
+                word-break: break-word;
+            }
+            #log .n {
+                color: var(--lime);
+                font-weight: bold;
+                margin-right: 4px;
+            }
+        </style>
+
+        <!-- INSTALLATION: local file from the js folder (relative path) -->
+        <script src="js/jquery-4.0.0.min.js"></script>
+        <script>
+            // If the local file is missing, window.jQuery is undefined, so load the official CDN copy
+            var source = window.jQuery
+                ? "local file js/jquery-4.0.0.min.js"
+                : "CDN code.jquery.com (fallback)";
+            if (!window.jQuery) {
+                document.write(
+                    '<script src="https://code.jquery.com/jquery-4.0.0.min.js"><\/script>',
+                );
+            }
+        </script>
+    </head>
+    <body>
+        <header>
+            <h1>jQuery Event Methods Galaxy</h1>
+            <p>
+                Unit 4 | jQuery | click(), dblclick(), blur(), change(), die()
+                and error()
+            </p>
+        </header>
+
+        <!-- Only the panel frames are written here; jQuery fills them -->
+        <main>
+            <section class="panel">
+                <h2>1. click() and dblclick()</h2>
+                <div id="p1"></div>
+            </section>
+            <section class="panel">
+                <h2>2. blur() and change()</h2>
+                <div id="p2"></div>
+            </section>
+            <section class="panel">
+                <h2>3. die() (removed) and its replacement</h2>
+                <div id="p3"></div>
+            </section>
+            <section class="panel">
+                <h2>4. error() (removed) and its replacement</h2>
+                <div id="p4"></div>
+            </section>
+            <section class="panel">
+                <h2>5. Method availability in this jQuery</h2>
+                <div id="p5"></div>
+            </section>
+            <section class="panel">
+                <h2>6. Event log</h2>
+                <div id="log"></div>
+                <button id="clearLog">Clear log</button>
+            </section>
+        </main>
+
+        <script>
+            // READY EVENT: runs after the DOM is loaded
+            $(function () {
+                var step = 0;
+
+                // log(): adds one numbered line to the log
+                function log(method, note) {
+                    step++;
+                    $("<div>")
+                        .append(
+                            $("<span>")
+                                .addClass("n")
+                                .text(step + "."),
+                        )
+                        .append($("<code>").text(method))
+                        .append($("<span>").text("  " + note))
+                        .appendTo("#log");
+                    $("#log").scrollTop($("#log").prop("scrollHeight"));
+                }
+                $("#clearLog").on("click", function () {
+                    $("#log").empty();
+                    step = 0;
+                });
+
+                // ================= PANEL 1: click() and dblclick() =================
+                var clicks = 0,
+                    dbls = 0;
+                $("#p1").append(
+                    $("<div>")
+                        .attr("id", "clickBox")
+                        .html("<b>Click me once, then double-click me</b>"),
+                    $("<div>")
+                        .addClass("stats")
+                        .append(
+                            $("<div>")
+                                .addClass("stat")
+                                .append(
+                                    $("<b>").attr("id", "cClick").text(0),
+                                    $("<span>").text("click()"),
+                                ),
+                            $("<div>")
+                                .addClass("stat")
+                                .append(
+                                    $("<b>").attr("id", "cDbl").text(0),
+                                    $("<span>").text("dblclick()"),
+                                ),
+                        ),
+                    $("<p>")
+                        .addClass("small")
+                        .text(
+                            "A double-click fires click() twice and then dblclick(). Watch the log.",
+                        ),
+                );
+
+                // click(handler): shorthand for .on("click", handler)
+                $("#clickBox").click(function (e) {
+                    clicks++;
+                    $("#cClick").text(clicks);
+                    $(this).removeClass("double").addClass("single");
+                    log(
+                        "click()",
+                        "fired, e.detail = " +
+                            e.detail +
+                            " (1st or 2nd press of a double-click)",
+                    );
+                });
+
+                // dblclick(handler): shorthand for .on("dblclick", handler)
+                $("#clickBox").dblclick(function () {
+                    dbls++;
+                    $("#cDbl").text(dbls);
+                    $(this)
+                        .removeClass("single")
+                        .addClass("double")
+                        .text("Double-clicked!");
+                    log("dblclick()", "fired after two clicks");
+                });
+
+                // ================= PANEL 2: blur() and change() =================
+                $("#p2").append(
+                    $("<label>")
+                        .attr("for", "user")
+                        .text(
+                            "Username (letters only, 3 to 12). Click away to fire blur().",
+                        ),
+                    $("<input>").attr({
+                        type: "text",
+                        id: "user",
+                        placeholder: "type, then click outside",
+                    }),
+                    $("<div>").addClass("small").attr("id", "userMsg"),
+                    $("<label>")
+                        .attr("for", "course")
+                        .text("Course. Pick another option to fire change()."),
+                    $("<select>")
+                        .attr("id", "course")
+                        .append(
+                            $.map(
+                                ["-- choose --", "M.Sc. IT", "M.Sc. CS", "MCA"],
+                                function (t, i) {
+                                    return $("<option>")
+                                        .val(i ? t : "")
+                                        .text(t)[0]; // $.map builds the list of options
+                                },
+                            ),
+                        ),
+                    $("<div>").addClass("small").attr("id", "courseMsg"),
+                );
+
+                // blur(handler): the field LOST focus
+                $("#user").blur(function () {
+                    var v = $(this)
+                        .val()
+                        .replace(/^\s+|\s+$/g, ""); // trim spaces
+                    var ok = /^[A-Za-z]{3,12}$/.test(v);
+                    $(this).toggleClass("ok", ok).toggleClass("bad", !ok);
+                    $("#userMsg").text(
+                        ok ? "Valid username" : "Invalid: use 3 to 12 letters",
+                    );
+                    log(
+                        "blur()",
+                        'input lost focus, value "' +
+                            v +
+                            '" is ' +
+                            (ok ? "valid" : "invalid"),
+                    );
+                });
+                // focus() is the opposite of blur(): used here to show the pair
+                $("#user").focus(function () {
+                    log("focus()", "input gained focus (opposite of blur)");
+                });
+
+                // change(handler): the value was changed and committed
+                $("#course").change(function () {
+                    var v = $(this).val();
+                    $("#courseMsg").text(
+                        v ? "Selected: " + v : "Nothing selected",
+                    );
+                    log(
+                        "change()",
+                        'select value changed to "' +
+                            v +
+                            '", selectedIndex ' +
+                            this.selectedIndex,
+                    );
+                });
+                // change() also works on a text box, but fires only when it loses focus after editing
+                $("#user").change(function () {
+                    log(
+                        "change()",
+                        "text input changed (fires when it loses focus)",
+                    );
+                });
+
+                // ================= PANEL 3: die() replacement =================
+                // live() and die() were removed in jQuery 1.9. A delegated on() / off() replaces them.
+                var made = 0;
+                $("#p3").append(
+                    $("<p>")
+                        .addClass("small")
+                        .html(
+                            "<code>live()</code> attached a handler to present AND future elements. <code>die()</code> removed it. Now: <code>on(event, selector, fn)</code> and <code>off()</code>.",
+                        ),
+                    $("<button>").attr("id", "add").text("Add dynamic button"),
+                    $("<button>")
+                        .attr("id", "die")
+                        .text("die() equivalent: off()"),
+                    $("<button>")
+                        .attr("id", "live")
+                        .text("live() equivalent: on()"),
+                    $("<div>").attr("id", "dyn"),
+                    $("<div>").addClass("small").attr("id", "dynState"),
+                );
+
+                function attachLive() {
+                    $("#dyn")
+                        .off("click.live") // never attach twice
+                        .on("click.live", ".dyn", function () {
+                            // delegated handler on the parent
+                            log(
+                                'on("click", ".dyn", fn)',
+                                'handled by parent for "' +
+                                    $(this).text() +
+                                    '"',
+                            );
+                            $(this).fadeOut(250, function () {
+                                $(this).remove();
+                            });
+                        });
+                    $("#dynState").text(
+                        "Delegated handler is ON: dynamic buttons respond.",
+                    );
+                }
+                $("#add").on("click", function () {
+                    made++;
+                    $("<button>")
+                        .addClass("dyn")
+                        .text("Dynamic " + made)
+                        .appendTo("#dyn");
+                    log(
+                        '$("<button>").appendTo("#dyn")',
+                        "new element added after the handler was attached",
+                    );
+                });
+                $("#die").on("click", function () {
+                    $("#dyn").off("click.live"); // this is what die() did
+                    $("#dynState").text(
+                        "Handler removed with off(): dynamic buttons do nothing.",
+                    );
+                    log(
+                        '$("#dyn").off("click.live")',
+                        "replacement for die(): handler removed",
+                    );
+                });
+                $("#live").on("click", function () {
+                    attachLive();
+                    log(
+                        '$("#dyn").on("click.live", ".dyn", fn)',
+                        "replacement for live(): handler attached again",
+                    );
+                });
+                attachLive();
+
+                // ================= PANEL 4: error() replacement =================
+                // error() was removed in jQuery 3.0. Use .on("error", fn). Attach the handlers BEFORE setting src.
+                $("#p4").append(
+                    $("<p>")
+                        .addClass("small")
+                        .html(
+                            "The <code>error</code> event fires when an image cannot load.",
+                        ),
+                    $("<button>")
+                        .attr("id", "badImg")
+                        .text("Load a missing image"),
+                    $("<button>")
+                        .attr("id", "goodImg")
+                        .text("Load a valid image"),
+                    $("<div>").attr("id", "imgBox").text("Image area"),
+                    $("<div>").addClass("small").attr("id", "imgMsg"),
+                );
+
+                function loadImage(src, label) {
+                    var $img = $("<img>")
+                        .attr("alt", label)
+                        .on("error", function () {
+                            // fires on a broken link
+                            $("#imgMsg")
+                                .css("color", "#ffb74d")
+                                .text(
+                                    "error event: " +
+                                        label +
+                                        " could not be loaded",
+                                );
+                            $(this).replaceWith(
+                                $("<b>").text("[image failed]"),
+                            ); // show a fallback instead
+                            log('.on("error", fn)', label + " failed to load");
+                        })
+                        .on("load", function () {
+                            // fires when loading works
+                            $("#imgMsg")
+                                .css("color", "#b2ff59")
+                                .text(
+                                    "load event: " +
+                                        label +
+                                        " loaded (" +
+                                        this.width +
+                                        " x " +
+                                        this.height +
+                                        ")",
+                                );
+                            log(
+                                '.on("load", fn)',
+                                label + " loaded successfully",
+                            );
+                        })
+                        .attr("src", src); // src is set LAST
+                    $("#imgBox").empty().append($img);
+                }
+                $("#badImg").on("click", function () {
+                    loadImage("images/does-not-exist.png", "missing image");
+                });
+                $("#goodImg").on("click", function () {
+                    loadImage(
+                        "data:image/svg+xml," +
+                            encodeURIComponent(
+                                '<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60"><circle cx="30" cy="30" r="26" fill="#7c4dff"/><circle cx="30" cy="30" r="10" fill="#b2ff59"/></svg>',
+                            ),
+                        "valid image",
+                    );
+                });
+
+                // ================= PANEL 5: which methods exist in this jQuery? =================
+                var methods = [
+                    ["click", "current (shortcut)"],
+                    ["dblclick", "current (shortcut)"],
+                    ["blur", "current (shortcut)"],
+                    ["change", "current (shortcut)"],
+                    ["on", "current, preferred"],
+                    ["off", "current, preferred"],
+                    ["bind", "deprecated 3.0, use on()"],
+                    ["live", "removed 1.9, use on()"],
+                    ["die", "removed 1.9, use off()"],
+                    ["error", "removed 3.0, use on('error')"],
+                ];
+                var $t = $("<table>").append(
+                    "<tr><th>Method</th><th>typeof $.fn.x</th><th>Status</th></tr>",
+                );
+                $.each(methods, function (i, m) {
+                    var t = typeof $.fn[m[0]]; // checks the real library
+                    $("<tr>")
+                        .append($("<td>").text("." + m[0] + "()"))
+                        .append(
+                            $("<td>")
+                                .addClass(t === "function" ? "yes" : "no")
+                                .text(t),
+                        )
+                        .append($("<td>").text(m[1]))
+                        .appendTo($t);
+                });
+                $("#p5").append(
+                    $t,
+                    $("<p>")
+                        .addClass("small")
+                        .text("jQuery " + $.fn.jquery + " from " + source),
+                );
+
+                log(
+                    "Ready",
+                    "jQuery " + $.fn.jquery + " loaded from " + source,
+                );
+            });
+        </script>
+    </body>
+</html>

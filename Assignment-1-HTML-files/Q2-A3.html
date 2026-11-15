@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Functions and Scope | Lemon and Charcoal Theme</title>
+        <style>
+            /* Theme: lemon yellow + charcoal, with a red accent (plain CSS, no Bootstrap) */
+            :root {
+                --lemon: #fff176;
+                --char: #263238;
+                --red: #e53935;
+                --paper: #fffde7;
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                font-family: "Trebuchet MS", sans-serif;
+                background: var(--lemon);
+                color: var(--char);
+            }
+            header {
+                background: var(--char);
+                color: var(--lemon);
+                padding: 22px 16px;
+                text-align: center;
+                border-bottom: 6px solid var(--red);
+            }
+            header h1 {
+                margin: 0;
+                font-size: 1.5rem;
+                letter-spacing: 1px;
+            }
+            header p {
+                margin: 6px 0 0;
+                color: #fff;
+                font-size: 0.9rem;
+            }
+            /* Single centred column that shrinks on small screens */
+            #app {
+                max-width: 760px;
+                margin: 0 auto;
+                padding: 18px 14px 30px;
+            }
+            .panel {
+                background: var(--paper);
+                border: 3px solid var(--char);
+                border-radius: 10px;
+                margin-bottom: 16px;
+                box-shadow: 5px 5px 0 var(--char);
+                overflow: hidden;
+            }
+            .panel h3 {
+                margin: 0;
+                background: var(--char);
+                color: var(--lemon);
+                padding: 8px 14px;
+                font-size: 1rem;
+            }
+            .panel .body {
+                padding: 10px 14px;
+            }
+            .panel p {
+                margin: 6px 0;
+                word-break: break-word;
+            }
+            code {
+                background: #fff;
+                border: 1px solid var(--char);
+                border-radius: 4px;
+                padding: 0 5px;
+                color: var(--red);
+            }
+            .ok {
+                color: #2e7d32;
+                font-weight: bold;
+            }
+            .err {
+                color: var(--red);
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>Functions, Parameters &amp; Scope</h1>
+            <p>Unit 2 | JavaScript Basics</p>
+        </header>
+
+        <!-- Only one empty container; JavaScript builds everything -->
+        <div id="app"></div>
+
+        <script>
+            const app = document.getElementById("app");
+
+            // Helper: creates one panel and adds it to the page
+            function addPanel(title, lines) {
+                const panel = document.createElement("div");
+                panel.className = "panel";
+                panel.innerHTML =
+                    `<h3>${title}</h3><div class="body">` +
+                    lines.map((l) => `<p>${l}</p>`).join("") +
+                    `</div>`;
+                app.appendChild(panel);
+            }
+
+            // ================= GLOBAL VARIABLES (declared outside any function) =================
+            let appName = "Smart Student Portal"; // visible everywhere
+            let visits = 0; // global counter, changed inside a function
+
+            // ================= FUNCTIONS =================
+
+            // 1. Parameters + return value. 'total' is a LOCAL variable.
+            function calculateTotal(webTech, dbms) {
+                let total = webTech + dbms; // exists only inside this function
+                return total; // sends the value back to the caller
+            }
+
+            // 2. Default parameter: passMarks = 80 is used when no argument is passed
+            function checkResult(score, passMarks = 80) {
+                if (score >= 120) {
+                    return "Pass with Distinction";
+                } else if (score >= passMarks) {
+                    return "Pass";
+                } else {
+                    return "Fail";
+                }
+            }
+
+            // 3. Default parameter for text
+            function greetUser(name = "Guest") {
+                return "Welcome, " + name;
+            }
+
+            // 4. Function expression and arrow function (ES6)
+            const cube = function (n) {
+                return n * n * n;
+            };
+            const square = (n) => n * n;
+
+            // 5. Function WITHOUT a return statement gives undefined
+            function noReturn() {
+                let temp = 10; // local variable, nothing returned
+            }
+
+            // 6. Global variable READ and CHANGED inside a function
+            function countVisit() {
+                visits++; // modifies the global variable
+                return appName + " visit no. " + visits;
+            }
+
+            // 7. Local variable with the same name hides (shadows) the global one
+            function shadowDemo() {
+                let appName = "Local Copy"; // a different variable, only inside this function
+                return appName;
+            }
+
+            // ================= CALLING THE FUNCTIONS (arguments passed here) =================
+            let s1 = calculateTotal(85, 90); // 85 and 90 are arguments
+            let s2 = calculateTotal(35, 30);
+            let s3 = calculateTotal(50, 40);
+
+            addPanel("1. Parameters and return values", [
+                `Student 1: <code>calculateTotal(85, 90)</code> = <b>${s1}</b> &rarr; ${checkResult(s1)}`,
+                `Student 2: <code>calculateTotal(35, 30)</code> = <b>${s2}</b> &rarr; ${checkResult(s2)}`,
+                `Student 3 with custom pass marks: <code>checkResult(${s3}, 90)</code> &rarr; ${checkResult(s3, 90)}`,
+            ]);
+
+            addPanel("2. Default parameters and other function types", [
+                `<code>greetUser()</code> &rarr; ${greetUser()}`,
+                `<code>greetUser("Rahul")</code> &rarr; ${greetUser("Rahul")}`,
+                `Function expression <code>cube(3)</code> = <b>${cube(3)}</b>`,
+                `Arrow function <code>square(5)</code> = <b>${square(5)}</b>`,
+                `No return statement: <code>noReturn()</code> gives <b>${noReturn()}</b>`,
+            ]);
+
+            // ================= SCOPE DEMONSTRATION =================
+            let first = countVisit();
+            let second = countVisit(); // global 'visits' keeps its changed value
+
+            // Trying to use the local variable 'total' outside its function
+            let scopeMsg;
+            try {
+                scopeMsg = total; // 'total' does not exist here
+            } catch (err) {
+                scopeMsg = `<span class="err">${err.name}: ${err.message}</span>`;
+            }
+
+            addPanel("3. Global variables", [
+                `Global <code>appName</code> used outside functions: <b>${appName}</b>`,
+                `Used and changed inside a function: ${first}`,
+                `Called again: ${second} (global value was kept)`,
+            ]);
+
+            addPanel("4. Local variables", [
+                `<code>total</code> is declared inside <code>calculateTotal()</code>.`,
+                `Access outside the function &rarr; ${scopeMsg}`,
+                `Shadowing: <code>shadowDemo()</code> returns <b>${shadowDemo()}</b>, ` +
+                    `but global <code>appName</code> is still <span class="ok">${appName}</span>`,
+            ]);
+        </script>
+    </body>
+</html>

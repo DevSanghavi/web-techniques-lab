@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>DOM Access and Manipulation | Woodland Theme</title>
+        <style>
+            /* Theme: dark forest green + bark brown + orange, cream paper (plain CSS, no Bootstrap) */
+            :root {
+                --bg: #1c2b1e;
+                --moss: #7cb342;
+                --bark: #5d4037;
+                --orange: #ff9800;
+                --cream: #f4ecd4;
+                --ink: #2b2b20;
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                background: var(--bg);
+                color: var(--cream);
+                font-family: "Segoe UI", Tahoma, sans-serif;
+            }
+            header {
+                text-align: center;
+                padding: 20px 12px;
+                background: var(--bark);
+                border-bottom: 5px solid var(--orange);
+            }
+            header h1 {
+                margin: 0;
+                font-size: 1.5rem;
+            }
+            header p {
+                margin: 6px 0 0;
+                color: var(--orange);
+                font-size: 0.9rem;
+            }
+            /* Responsive: 3 panels on wide screens, stacked on phones */
+            main {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 16px;
+                max-width: 1250px;
+                margin: auto;
+                padding: 16px;
+            }
+            .panel {
+                background: rgba(255, 255, 255, 0.06);
+                border: 2px solid var(--moss);
+                border-radius: 10px;
+                padding: 12px;
+            }
+            .panel h2 {
+                margin: 0 0 10px;
+                font-size: 1rem;
+                color: var(--moss);
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+            /* The stage is the page area that JavaScript will access and change */
+            #stage {
+                background: var(--cream);
+                color: var(--ink);
+                border-radius: 8px;
+                padding: 12px;
+                border: 4px solid var(--bark);
+            }
+            #stage h2 {
+                color: var(--bark);
+                text-transform: none;
+                letter-spacing: 0;
+                font-size: 1.2rem;
+            }
+            #stage h2.big {
+                font-size: 1.7rem;
+            }
+            .hit {
+                outline: 3px dashed var(--orange);
+                background: #ffe0b2;
+            }
+            button {
+                background: var(--moss);
+                color: #12200f;
+                border: none;
+                border-radius: 6px;
+                padding: 8px 10px;
+                margin: 3px 3px 3px 0;
+                font-weight: bold;
+                cursor: pointer;
+            }
+            button:hover {
+                background: var(--orange);
+            }
+            button.reset {
+                background: #ef9a9a;
+            }
+            #log {
+                font-size: 0.85rem;
+                min-height: 90px;
+            }
+            #log div {
+                border-left: 4px solid var(--orange);
+                padding: 3px 8px;
+                margin: 5px 0;
+                background: rgba(0, 0, 0, 0.25);
+                word-break: break-word;
+            }
+            #log code {
+                color: var(--orange);
+            }
+            #tree {
+                margin: 0;
+                font-family: Consolas, monospace;
+                font-size: 0.8rem;
+                color: var(--cream);
+                white-space: pre;
+                overflow-x: auto;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>Document Object Model (DOM)</h1>
+            <p>Unit 3 | Access and manipulation methods</p>
+        </header>
+
+        <main>
+            <!-- Panel 1: the stage (the elements JavaScript will work on) -->
+            <section class="panel">
+                <h2>1. Stage (the web page part)</h2>
+                <div id="stage">
+                    <h2 id="mainHeading">Original Heading Text</h2>
+                    <p class="note">
+                        This is the
+                        <span id="targetSpan">first description</span>
+                        paragraph.
+                    </p>
+                    <p class="note">
+                        This is the second description paragraph.
+                    </p>
+                    <ul id="itemList">
+                        <li>Existing Item 1</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Panel 2: buttons (created by JavaScript) and the explanation log -->
+            <section class="panel">
+                <h2>2. Controls and log</h2>
+                <div id="buttons"></div>
+                <div id="log"></div>
+            </section>
+
+            <!-- Panel 3: live DOM tree, redrawn after every action -->
+            <section class="panel">
+                <h2>3. Live DOM tree</h2>
+                <pre id="tree"></pre>
+            </section>
+        </main>
+
+        <script>
+            const stage = document.getElementById("stage");
+            const logBox = document.getElementById("log");
+            const treeBox = document.getElementById("tree");
+            const originalStage = stage.innerHTML; // saved copy, used by Reset
+            let itemCount = 1;
+
+            // ---------- helpers ----------
+            // Adds one explanation line to the log (createElement + appendChild)
+            function log(method, text) {
+                const d = document.createElement("div");
+                d.innerHTML = "<code>" + method + "</code> &rarr; " + text;
+                logBox.appendChild(d);
+            }
+
+            // Draws the element tree of 'el' as text, one line per element
+            function treeText(el, depth) {
+                let s =
+                    "  ".repeat(depth) +
+                    "<" +
+                    el.tagName.toLowerCase() +
+                    (el.id ? "#" + el.id : "") +
+                    (el.classList.length
+                        ? "." + Array.from(el.classList).join(".")
+                        : "") +
+                    ">";
+                if (el.children.length === 0) {
+                    s += ' "' + el.textContent.slice(0, 22) + '"';
+                }
+                s += "\n";
+                for (const child of el.children) {
+                    s += treeText(child, depth + 1);
+                }
+                return s;
+            }
+
+            // Clears the log, runs one action, then redraws the tree
+            function run(action) {
+                logBox.textContent = "";
+                action();
+                treeBox.textContent = treeText(stage, 0); // textContent shows tags as plain text
+            }
+
+            // ---------- ACTIONS (each one demonstrates DOM methods) ----------
+
+            // A. DOM ACCESS: finding elements
+            function accessDemo() {
+                const h = document.getElementById("mainHeading"); // one element by id
+                const ps = document.getElementsByTagName("p"); // live HTMLCollection
+                const notes = document.getElementsByClassName("note"); // HTMLCollection
+                const first = document.querySelector(".note"); // first CSS match only
+                const items = document.querySelectorAll("#itemList li"); // NodeList of all matches
+
+                h.classList.add("hit");
+                notes[1].classList.add("hit"); // a collection must be used with an index
+                first.classList.add("hit");
+
+                log(
+                    'getElementById("mainHeading")',
+                    "found <b>" + h.tagName + "</b>, one element",
+                );
+                log(
+                    'getElementsByTagName("p")',
+                    "found <b>" +
+                        ps.length +
+                        "</b> paragraphs (HTMLCollection)",
+                );
+                log(
+                    'getElementsByClassName("note")',
+                    "found <b>" +
+                        notes.length +
+                        "</b>; notes[1] is the second one",
+                );
+                log('querySelector(".note")', "returns only the FIRST match");
+                log(
+                    'querySelectorAll("#itemList li")',
+                    "found <b>" + items.length + "</b> item(s) (NodeList)",
+                );
+            }
+
+            // B. DOM TREE NAVIGATION: moving between related nodes
+            function navigateDemo() {
+                const ul = document.getElementById("itemList");
+                log(
+                    "ul.parentNode",
+                    "<b>" + ul.parentNode.id + "</b> (the parent)",
+                );
+                log(
+                    "ul.previousElementSibling",
+                    "<b>" +
+                        ul.previousElementSibling.tagName +
+                        "</b> (element before it)",
+                );
+                log(
+                    "ul.nextElementSibling",
+                    ul.nextElementSibling
+                        ? ul.nextElementSibling.tagName
+                        : "<b>null</b> (nothing after it)",
+                );
+                log(
+                    "ul.children.length",
+                    "<b>" + ul.children.length + "</b> element child(ren)",
+                );
+                log(
+                    "ul.childNodes.length",
+                    "<b>" +
+                        ul.childNodes.length +
+                        "</b> nodes (includes text nodes of spaces)",
+                );
+                if (ul.firstElementChild) {
+                    log(
+                        "ul.firstElementChild",
+                        '"' + ul.firstElementChild.textContent + '"',
+                    );
+                    log(
+                        "ul.lastElementChild",
+                        '"' + ul.lastElementChild.textContent + '"',
+                    );
+                }
+            }
+
+            // C. CONTENT: innerHTML vs textContent
+            function contentDemo() {
+                const span = document.getElementById("targetSpan");
+                const h = document.getElementById("mainHeading");
+
+                log("span.innerHTML (read)", "<b>" + span.innerHTML + "</b>");
+                span.innerHTML = "<b><i>bold italic</i> via innerHTML</b>"; // HTML tags are interpreted
+                h.textContent = "<u>tags</u> shown as text"; // tags are NOT interpreted
+                log(
+                    "span.innerHTML = '<b>...</b>'",
+                    "HTML tags are <b>rendered</b> as formatting",
+                );
+                log(
+                    "h.textContent = '<u>tags</u>'",
+                    "tags appear as <b>plain text</b> (safer for user input)",
+                );
+            }
+
+            // D. STYLE, CLASS AND ATTRIBUTES
+            function styleDemo() {
+                const h = document.getElementById("mainHeading");
+                const ul = document.getElementById("itemList");
+
+                h.style.color = "#2e7d32"; // inline CSS property
+                h.style.backgroundColor = "#dcedc8";
+                h.style.borderBottom = "3px solid #ff9800";
+                h.classList.toggle("big"); // add/remove a CSS class
+                log(
+                    "h.style.color / backgroundColor / borderBottom",
+                    "inline CSS changed from JavaScript",
+                );
+                log(
+                    'h.classList.toggle("big")',
+                    "class on heading now: <b>" +
+                        (h.className || "(none)") +
+                        "</b>",
+                );
+
+                ul.setAttribute("title", "My list"); // create/change an attribute
+                ul.setAttribute("data-x", "42");
+                log(
+                    'ul.setAttribute("title", "My list")',
+                    'getAttribute gives <b>"' +
+                        ul.getAttribute("title") +
+                        '"</b>',
+                );
+                log(
+                    'ul.hasAttribute("data-x")',
+                    "<b>" + ul.hasAttribute("data-x") + "</b>",
+                );
+                ul.removeAttribute("data-x");
+                log(
+                    'ul.removeAttribute("data-x")',
+                    "hasAttribute now <b>" + ul.hasAttribute("data-x") + "</b>",
+                );
+            }
+
+            // E. CREATE AND APPEND
+            function createDemo() {
+                const ul = document.getElementById("itemList");
+                itemCount++;
+                const li = document.createElement("li"); // 1. create element in memory
+                li.textContent = "Dynamic Item " + itemCount; // 2. add text
+                li.setAttribute("data-id", itemCount); // 3. add attribute
+                li.appendChild(document.createTextNode(" (new)")); // 4. create and add a text node
+                ul.appendChild(li); // 5. attach as LAST child
+                log(
+                    'document.createElement("li")',
+                    "new element created in memory only",
+                );
+                log(
+                    "ul.appendChild(li)",
+                    "now part of the page as the last child",
+                );
+                log(
+                    "document.createTextNode()",
+                    "creates a text node, added inside the li",
+                );
+            }
+
+            // F. INSERT BEFORE and REPLACE
+            function insertDemo() {
+                const ul = document.getElementById("itemList");
+                itemCount++;
+                const li = document.createElement("li");
+                li.textContent = "Inserted at top " + itemCount;
+                ul.insertBefore(li, ul.firstElementChild); // add before the first child
+                log(
+                    "ul.insertBefore(li, ul.firstElementChild)",
+                    "new item placed at the <b>top</b>",
+                );
+
+                if (ul.children.length > 1) {
+                    const rep = document.createElement("li");
+                    rep.textContent = "Replaced last item";
+                    ul.replaceChild(rep, ul.lastElementChild); // new node replaces old node
+                    log(
+                        "ul.replaceChild(new, old)",
+                        "last item swapped for a new one",
+                    );
+                }
+            }
+
+            // G. REMOVE
+            function removeDemo() {
+                const ul = document.getElementById("itemList");
+                if (ul.lastElementChild) {
+                    const text = ul.lastElementChild.textContent;
+                    ul.lastElementChild.remove(); // element removes itself
+                    log("element.remove()", 'removed <b>"' + text + '"</b>');
+                } else {
+                    log("element.remove()", "nothing left to remove");
+                }
+            }
+
+            function removeChildDemo() {
+                const ul = document.getElementById("itemList");
+                if (ul.firstElementChild) {
+                    const text = ul.firstElementChild.textContent;
+                    ul.removeChild(ul.firstElementChild); // parent removes the child
+                    log(
+                        "parent.removeChild(child)",
+                        'removed <b>"' + text + '"</b>',
+                    );
+                } else {
+                    log("parent.removeChild(child)", "nothing left to remove");
+                }
+            }
+
+            // H. RESET: put the stage back to its first state
+            function resetDemo() {
+                stage.innerHTML = originalStage;
+                itemCount = 1;
+                log(
+                    "stage.innerHTML = saved copy",
+                    "stage restored to the original state",
+                );
+            }
+
+            // ---------- BUILD THE BUTTONS WITH JAVASCRIPT ----------
+            const actions = [
+                ["1. Access elements", accessDemo],
+                ["2. Navigate tree", navigateDemo],
+                ["3. innerHTML / textContent", contentDemo],
+                ["4. Style, class, attributes", styleDemo],
+                ["5. Create + append", createDemo],
+                ["6. insertBefore + replaceChild", insertDemo],
+                ["7. remove()", removeDemo],
+                ["8. removeChild()", removeChildDemo],
+                ["Reset", resetDemo],
+            ];
+            const buttons = document.getElementById("buttons");
+            actions.forEach(function (a) {
+                const b = document.createElement("button");
+                b.textContent = a[0];
+                if (a[0] === "Reset") b.className = "reset";
+                b.addEventListener("click", function () {
+                    run(a[1]);
+                }); // event handling
+                buttons.appendChild(b);
+            });
+
+            // Show the starting tree when the page loads
+            treeBox.textContent = treeText(stage, 0);
+            log(
+                "Ready",
+                "click the buttons in order and watch the tree on the right change",
+            );
+        </script>
+    </body>
+</html>

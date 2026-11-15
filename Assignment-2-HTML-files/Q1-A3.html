@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Event Bubbling and Capturing | Metro Line Theme</title>
+        <style>
+            /* Theme: metro transit map - light grey board, bold line colours red/blue/green/amber (plain CSS, no Bootstrap) */
+            :root {
+                --board: #eceff1;
+                --ink: #263238;
+                --red: #e53935;
+                --blue: #1e88e5;
+                --green: #43a047;
+                --amber: #fdb813;
+                --purple: #8e24aa;
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                background: var(--board);
+                color: var(--ink);
+                font-family: Verdana, Geneva, sans-serif;
+            }
+            header {
+                background: #fff;
+                text-align: center;
+                padding: 18px 10px 14px;
+                border-bottom: 4px solid var(--ink);
+                position: relative;
+            }
+            header::after {
+                content: "";
+                position: absolute;
+                left: 0;
+                right: 0;
+                bottom: -12px;
+                height: 8px;
+                background: linear-gradient(
+                    90deg,
+                    var(--red) 25%,
+                    var(--blue) 25% 50%,
+                    var(--green) 50% 75%,
+                    var(--amber) 75%
+                );
+            }
+            header h1 {
+                margin: 0;
+                font-size: 1.45rem;
+            }
+            header p {
+                margin: 6px 0 0;
+                font-size: 0.85rem;
+                color: #607d8b;
+            }
+            /* Responsive: panels wrap by available width */
+            main {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+                gap: 18px;
+                max-width: 1200px;
+                margin: 26px auto 20px;
+                padding: 0 14px;
+            }
+            .panel {
+                background: #fff;
+                border-radius: 12px;
+                padding: 14px;
+                border-top: 8px solid var(--purple);
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            }
+            .panel:nth-child(2) {
+                border-top-color: var(--blue);
+            }
+            .panel:nth-child(3) {
+                border-top-color: var(--green);
+            }
+            .panel h2 {
+                margin: 0 0 10px;
+                font-size: 1.05rem;
+            }
+            .opt {
+                display: block;
+                margin: 5px 0;
+                font-size: 0.85rem;
+                cursor: pointer;
+            }
+            select {
+                width: 100%;
+                padding: 6px;
+                margin: 4px 0 8px;
+                font-size: 0.85rem;
+            }
+            button {
+                background: var(--ink);
+                color: #fff;
+                border: none;
+                border-radius: 6px;
+                padding: 8px 12px;
+                margin: 4px 4px 4px 0;
+                cursor: pointer;
+                font-size: 0.85rem;
+            }
+            /* Nested stations */
+            #docbar {
+                background: var(--ink);
+                color: #fff;
+                border-radius: 10px;
+                padding: 8px;
+                margin: 8px 0;
+            }
+            .lbl {
+                display: block;
+                font-weight: bold;
+                font-size: 0.8rem;
+                pointer-events: none;
+                margin-bottom: 6px;
+            }
+            .stn {
+                border-radius: 8px;
+                padding: 10px;
+                margin-top: 6px;
+                color: #fff;
+                transition: all 0.2s;
+            }
+            #grand {
+                background: var(--red);
+            }
+            #parent {
+                background: var(--blue);
+            }
+            #child {
+                background: var(--green);
+            }
+            #btn {
+                display: block;
+                width: 100%;
+                background: var(--amber);
+                color: var(--ink);
+                border: none;
+                border-radius: 6px;
+                padding: 10px;
+                font-weight: bold;
+                margin: 6px 0 0;
+                cursor: pointer;
+            }
+            .lit {
+                outline: 5px solid #fff;
+                box-shadow: 0 0 0 8px #000;
+                transform: scale(1.03);
+                filter: brightness(1.25);
+                position: relative;
+                z-index: 2;
+            }
+            #summary {
+                font-size: 0.82rem;
+                background: var(--board);
+                border-radius: 8px;
+                padding: 8px;
+                margin-bottom: 8px;
+                min-height: 70px;
+            }
+            #log {
+                background: var(--ink);
+                border-radius: 8px;
+                height: 250px;
+                overflow-y: auto;
+                padding: 8px;
+                font-family: Consolas, monospace;
+                font-size: 0.78rem;
+            }
+            #log div {
+                padding: 2px 0;
+                word-break: break-word;
+            }
+            .cap {
+                color: #90caf9;
+            }
+            .tgt {
+                color: var(--amber);
+            }
+            .bub {
+                color: #ef9a9a;
+            }
+            .inf {
+                color: #fff;
+            }
+            .sep {
+                color: #a5d6a7;
+                border-top: 1px dashed #78909c;
+                margin-top: 6px;
+                padding-top: 4px;
+            }
+            #fbox {
+                border: 3px dashed var(--green);
+                border-radius: 8px;
+                padding: 10px;
+                margin: 8px 0;
+            }
+            #fbox input {
+                width: 100%;
+                padding: 8px;
+            }
+            .small {
+                font-size: 0.78rem;
+                color: #607d8b;
+                margin: 4px 0;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>Event Capturing &amp; Bubbling</h1>
+            <p>Unit 3 | DOM | Event propagation</p>
+        </header>
+
+        <!-- Only an empty <main>; JavaScript builds everything -->
+        <main id="app"></main>
+
+        <script>
+            const app = document.getElementById("app");
+
+            // ---------- helpers (createElement + appendChild) ----------
+            function el(tag, cls, text) {
+                const e = document.createElement(tag);
+                if (cls) e.className = cls;
+                if (text) e.textContent = text;
+                return e;
+            }
+            function makePanel(title) {
+                const p = el("section", "panel");
+                p.appendChild(el("h2", "", title));
+                app.appendChild(p);
+                return p;
+            }
+            function makeRadio(parent, value, text, checked) {
+                const lab = el("label", "opt");
+                const r = document.createElement("input");
+                r.type = "radio";
+                r.name = "mode";
+                r.value = value;
+                r.checked = checked;
+                lab.appendChild(r);
+                lab.appendChild(document.createTextNode(" " + text));
+                parent.appendChild(lab);
+                return r;
+            }
+
+            // ================= PANEL 1: CONTROLS + NESTED ELEMENTS =================
+            const p1 = makePanel("1. Click inside the stations");
+
+            const radios = [
+                makeRadio(p1, "both", "Capturing + bubbling listeners", true),
+                makeRadio(
+                    p1,
+                    "capture",
+                    "Capturing only (useCapture = true)",
+                    false,
+                ),
+                makeRadio(
+                    p1,
+                    "bubble",
+                    "Bubbling only (useCapture = false)",
+                    false,
+                ),
+            ];
+
+            // Where should stopPropagation() be called? (value = elementName-phase)
+            const stopSel = document.createElement("select");
+            [
+                ["none", "No stopPropagation()"],
+                ["grand-capture", "Stop in OUTER capture listener"],
+                ["btn-target", "Stop at the BUTTON (target)"],
+                ["parent-bubble", "Stop in MIDDLE bubble listener"],
+            ].forEach(function (o) {
+                const op = document.createElement("option");
+                op.value = o[0];
+                op.textContent = o[1];
+                stopSel.appendChild(op);
+            });
+            p1.appendChild(stopSel);
+
+            const animCb = document.createElement("input");
+            animCb.type = "checkbox";
+            animCb.checked = true;
+            const animLab = el("label", "opt");
+            animLab.appendChild(animCb);
+            animLab.appendChild(
+                document.createTextNode(
+                    " Animate the path (stations light up in order)",
+                ),
+            );
+            p1.appendChild(animLab);
+
+            // Nested structure: document bar > outer > middle > inner > button
+            const docbar = el("div");
+            docbar.id = "docbar";
+            docbar.appendChild(el("span", "lbl", "DOCUMENT"));
+            const grand = el("div", "stn");
+            grand.id = "grand";
+            grand.appendChild(el("span", "lbl", "OUTER"));
+            const parent = el("div", "stn");
+            parent.id = "parent";
+            parent.appendChild(el("span", "lbl", "MIDDLE"));
+            const child = el("div", "stn");
+            child.id = "child";
+            child.appendChild(el("span", "lbl", "INNER"));
+            const btn = el("button", "", "BUTTON (target)");
+            btn.id = "btn";
+            child.appendChild(btn);
+            parent.appendChild(child);
+            grand.appendChild(parent);
+            docbar.appendChild(grand);
+            p1.appendChild(docbar);
+            p1.appendChild(
+                el(
+                    "p",
+                    "small",
+                    "Click the button, then click only the INNER, MIDDLE or OUTER area. The target changes, so the path changes.",
+                ),
+            );
+
+            // ================= PANEL 2: SUMMARY + LOG =================
+            const p2 = makePanel("2. Order of execution");
+            const summary = el("div");
+            summary.id = "summary";
+            summary.textContent = "Click a station to see the order here.";
+            p2.appendChild(summary);
+            const logBox = el("div");
+            logBox.id = "log";
+            p2.appendChild(logBox);
+            const clearBtn = el("button", "", "Clear log");
+            p2.appendChild(clearBtn);
+
+            let step = 0;
+            function log(msg, cls) {
+                step++;
+                const d = el("div", cls || "inf");
+                d.innerHTML = step + ". " + msg;
+                logBox.appendChild(d);
+                logBox.scrollTop = logBox.scrollHeight;
+            }
+            clearBtn.addEventListener("click", function () {
+                logBox.textContent = "";
+                step = 0;
+                summary.textContent = "Click a station to see the order here.";
+            });
+
+            // ================= LISTENERS: capture, target, bubble =================
+            const nodes = {
+                document: document,
+                grand: grand,
+                parent: parent,
+                child: child,
+                btn: btn,
+            };
+            const labels = {
+                document: "DOCUMENT",
+                grand: "OUTER",
+                parent: "MIDDLE",
+                child: "INNER",
+                btn: "BUTTON",
+            };
+            const visual = {
+                document: docbar,
+                grand: grand,
+                parent: parent,
+                child: child,
+                btn: btn,
+            };
+            const phaseName = { 1: "capture", 2: "target", 3: "bubble" };
+            const phaseClass = { capture: "cap", target: "tgt", bubble: "bub" };
+
+            let registered = []; // remembers listeners so they can be removed when the mode changes
+            let current = []; // listeners that ran for the latest click
+
+            // Builds one handler for the element called 'name'
+            function makeHandler(name) {
+                return function (e) {
+                    const ph = phaseName[e.eventPhase]; // 1, 2 or 3 -> capture, target, bubble
+                    current.push({ name: name, ph: ph });
+                    log(
+                        "[" +
+                            ph.toUpperCase() +
+                            "] listener on <b>" +
+                            labels[name] +
+                            "</b>",
+                        phaseClass[ph],
+                    );
+                    if (stopSel.value === name + "-" + ph) {
+                        e.stopPropagation(); // event goes no further
+                        log(
+                            "stopPropagation() called here, the event STOPS",
+                            "inf",
+                        );
+                    }
+                };
+            }
+
+            function add(name, useCapture) {
+                const f = makeHandler(name);
+                nodes[name].addEventListener("click", f, useCapture); // third argument: true = capturing
+                registered.push({ n: nodes[name], f: f, c: useCapture });
+            }
+
+            // (Re)attach listeners according to the selected mode
+            function attach() {
+                registered.forEach(function (r) {
+                    r.n.removeEventListener("click", r.f, r.c);
+                });
+                registered = [];
+                const mode = radios.filter(function (r) {
+                    return r.checked;
+                })[0].value;
+                Object.keys(nodes).forEach(function (name) {
+                    if (name === "btn") {
+                        add("btn", mode === "capture"); // target: one listener only
+                    } else {
+                        if (mode === "both" || mode === "capture")
+                            add(name, true);
+                        if (mode === "both" || mode === "bubble")
+                            add(name, false);
+                    }
+                });
+                log(
+                    "Mode changed to <b>" +
+                        mode +
+                        "</b>. Listeners re-attached.",
+                    "inf",
+                );
+            }
+            radios.forEach(function (r) {
+                r.addEventListener("change", attach);
+            });
+
+            // Bookkeeping listener on window (capture): runs FIRST for every click inside the demo
+            window.addEventListener(
+                "click",
+                function (e) {
+                    if (!docbar.contains(e.target)) return;
+                    current = [];
+                    log(
+                        "--- click started on <b>" +
+                            (e.target.id || e.target.tagName) +
+                            "</b> (event.target) ---",
+                        "sep",
+                    );
+                    setTimeout(finish, 0); // runs after all listeners are done
+                },
+                true,
+            );
+
+            // Shows the summary and plays the light-up animation
+            function finish() {
+                const part = function (ph) {
+                    return (
+                        current
+                            .filter(function (x) {
+                                return x.ph === ph;
+                            })
+                            .map(function (x) {
+                                return labels[x.name];
+                            })
+                            .join(" &rarr; ") || "none"
+                    );
+                };
+                summary.innerHTML =
+                    "<b>Capturing (down):</b> " +
+                    part("capture") +
+                    "<br><b>Target:</b> " +
+                    part("target") +
+                    "<br><b>Bubbling (up):</b> " +
+                    part("bubble");
+                if (!animCb.checked) return;
+                current.forEach(function (x, i) {
+                    setTimeout(function () {
+                        visual[x.name].classList.add("lit");
+                        setTimeout(function () {
+                            visual[x.name].classList.remove("lit");
+                        }, 420);
+                    }, i * 500);
+                });
+            }
+
+            // ================= PANEL 3: EVENTS THAT DO NOT BUBBLE =================
+            const p3 = makePanel("3. Not every event bubbles");
+            p3.appendChild(
+                el(
+                    "p",
+                    "small",
+                    "Click inside the input. Parent DIV has 3 listeners.",
+                ),
+            );
+            const fbox = el("div");
+            fbox.id = "fbox";
+            fbox.appendChild(el("span", "small", "Parent DIV"));
+            const inp = document.createElement("input");
+            inp.type = "text";
+            inp.placeholder = "focus me";
+            fbox.appendChild(inp);
+            p3.appendChild(fbox);
+            p3.appendChild(
+                el(
+                    "p",
+                    "small",
+                    "Compare with a click, which always has e.bubbles = true.",
+                ),
+            );
+
+            fbox.addEventListener(
+                "focus",
+                function (e) {
+                    log(
+                        "focus, BUBBLE listener ran (e.bubbles = " +
+                            e.bubbles +
+                            ")",
+                        "bub",
+                    ); // never runs
+                },
+                false,
+            );
+            fbox.addEventListener(
+                "focus",
+                function (e) {
+                    log(
+                        "focus, CAPTURE listener ran (capturing still works)",
+                        "cap",
+                    );
+                },
+                true,
+            );
+            fbox.addEventListener("focusin", function (e) {
+                log(
+                    "focusin ran (e.bubbles = " +
+                        e.bubbles +
+                        "), the bubbling version of focus",
+                    "tgt",
+                );
+            });
+            window.addEventListener("click", function (e) {
+                if (e.target === inp) {
+                    /* only to show that click does bubble */ log(
+                        "click on input: e.bubbles = " + e.bubbles,
+                        "inf",
+                    );
+                }
+            });
+
+            attach(); // start with both capturing and bubbling listeners
+        </script>
+    </body>
+</html>

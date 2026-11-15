@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Conditionals and Loops | Sunset Plum Theme</title>
+        <style>
+            /* Theme: plum + coral on warm cream (plain CSS, no Bootstrap) */
+            :root {
+                --plum: #4a1942;
+                --coral: #ff6b6b;
+                --cream: #fff4e6;
+                --gold: #f4a259;
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                font-family: Georgia, serif;
+                background: var(--cream);
+                color: var(--plum);
+            }
+            header {
+                background: linear-gradient(120deg, var(--plum), #8e3b6e);
+                color: #fff;
+                padding: 24px 16px;
+                text-align: center;
+                border-bottom: 6px solid var(--coral);
+            }
+            header h1 {
+                margin: 0;
+                font-size: 1.6rem;
+            }
+            header p {
+                margin: 6px 0 0;
+                color: var(--gold);
+            }
+            /* Responsive grid: cards wrap automatically on small screens */
+            #app {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+                gap: 16px;
+                padding: 20px;
+                max-width: 1100px;
+                margin: auto;
+            }
+            .card {
+                background: #fff;
+                border-left: 6px solid var(--coral);
+                border-radius: 8px;
+                padding: 14px 16px;
+                box-shadow: 0 3px 8px rgba(74, 25, 66, 0.15);
+            }
+            .card h3 {
+                margin: 0 0 8px;
+                color: var(--coral);
+                font-size: 1.05rem;
+            }
+            .card p {
+                margin: 4px 0;
+                font-size: 0.95rem;
+                word-break: break-word;
+            }
+            .tag {
+                background: var(--plum);
+                color: #fff;
+                border-radius: 4px;
+                padding: 0 6px;
+                font-size: 0.8rem;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>Conditional Statements &amp; Loops</h1>
+            <p>Unit 2 | JavaScript Basics</p>
+        </header>
+
+        <!-- Only one empty container; JavaScript builds everything -->
+        <div id="app"></div>
+
+        <script>
+            const app = document.getElementById("app");
+
+            // Helper: builds one card and adds it to the page (innerHTML output method)
+            function addCard(title, lines) {
+                const card = document.createElement("div");
+                card.className = "card";
+                card.innerHTML =
+                    `<h3>${title}</h3>` +
+                    lines.map((l) => `<p>${l}</p>`).join("");
+                app.appendChild(card);
+            }
+
+            // ---------- CONDITIONAL STATEMENTS ----------
+
+            // 1. if / else if / else  (age category)
+            let age = 17;
+            let category;
+            if (age < 13) {
+                category = "Child";
+            } else if (age < 20) {
+                category = "Teenager";
+            } else {
+                category = "Adult";
+            }
+
+            // 2. if / else if / else  (marks to grade)
+            let marks = 85;
+            let grade;
+            if (marks >= 90) {
+                grade = "A+";
+            } else if (marks >= 80) {
+                grade = "A";
+            } else if (marks >= 70) {
+                grade = "B";
+            } else {
+                grade = "C";
+            }
+
+            // 3. switch (day number to day name; break stops fall-through)
+            let day = 3;
+            let dayName;
+            switch (day) {
+                case 1:
+                    dayName = "Monday";
+                    break;
+                case 2:
+                    dayName = "Tuesday";
+                    break;
+                case 3:
+                    dayName = "Wednesday";
+                    break;
+                default:
+                    dayName = "Invalid day";
+            }
+
+            // 4. Ternary operator (shorthand if/else)
+            let result = marks >= 40 ? "Pass" : "Fail";
+
+            addCard("if / else if / else", [
+                `Age <b>${age}</b> &rarr; <span class="tag">${category}</span>`,
+                `Marks <b>${marks}</b> &rarr; Grade <span class="tag">${grade}</span>`,
+            ]);
+            addCard("switch + ternary", [
+                `Day <b>${day}</b> &rarr; <span class="tag">${dayName}</span>`,
+                `Marks <b>${marks}</b> &rarr; <span class="tag">${result}</span> (ternary ?:)`,
+            ]);
+
+            // ---------- LOOPS ----------
+
+            // 5. for loop (known count): table of 5
+            let table = [];
+            for (let i = 1; i <= 5; i++) {
+                table.push(`5 x ${i} = ${5 * i}`);
+            }
+            addCard("for loop (known count)", [table.join(" | ")]);
+
+            // 6. while loop (condition checked BEFORE each run): countdown
+            let countdown = [];
+            let n = 5;
+            while (n > 0) {
+                countdown.push(n);
+                n--;
+            }
+            addCard("while loop (pre-test)", [
+                `Countdown: ${countdown.join(", ")}, Go!`,
+            ]);
+
+            // 7. do...while loop (condition checked AFTER; runs at least once)
+            let runs = 0;
+            let k = 10; // condition k < 5 is false from the start
+            do {
+                runs++;
+                k++;
+            } while (k < 5);
+            addCard("do...while (post-test)", [
+                `Condition was false at the start, body still ran <b>${runs}</b> time(s).`,
+            ]);
+
+            // 8. for...in loop (keys of an object)
+            let student = { rollNo: 101, name: "Rahul", course: "M.Sc. IT" };
+            let pairs = [];
+            for (let key in student) {
+                pairs.push(`<b>${key}</b>: ${student[key]}`);
+            }
+            addCard("for...in (object keys)", pairs);
+
+            // 9. for...of loop (values of an array) + break/continue
+            let subjects = [
+                "HTML5",
+                "Bootstrap",
+                "JavaScript",
+                "DOM",
+                "jQuery",
+                "JSON",
+            ];
+            let shown = [];
+            for (let sub of subjects) {
+                if (sub === "Bootstrap") continue; // skip this value
+                if (sub === "JSON") break; // stop the loop here
+                shown.push(sub);
+            }
+            addCard("for...of (array values)", [
+                `Printed: ${shown.join(" &bull; ")}`,
+                `<i>continue</i> skipped Bootstrap, <i>break</i> stopped at JSON.`,
+            ]);
+        </script>
+    </body>
+</html>

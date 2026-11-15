@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>JavaScript Data Types, Keywords and Operators</title>
+
+        <!-- ===================== CSS: dark terminal theme ===================== -->
+        <style>
+            :root {
+                --bg: #0d1117;
+                --panel: #161b22;
+                --green: #39ff88;
+                --pink: #ff4fa3;
+                --text: #e6edf3;
+            }
+            body {
+                margin: 0;
+                padding: 16px;
+                background: var(--bg);
+                color: var(--text);
+                font-family: Consolas, "Courier New", monospace;
+                line-height: 1.5;
+            }
+            h1 {
+                color: var(--green);
+                font-size: 1.4rem;
+                text-align: center;
+            }
+            h2 {
+                color: var(--pink);
+                font-size: 1.1rem;
+                border-bottom: 1px dashed var(--pink);
+                padding-bottom: 4px;
+            }
+            section {
+                max-width: 900px;
+                margin: 0 auto 24px;
+                background: var(--panel);
+                padding: 14px;
+                border-radius: 8px;
+                border-left: 5px solid var(--green);
+            }
+            .scroll {
+                overflow-x: auto;
+            } /* table scrolls on small phones */
+            table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+            th,
+            td {
+                border: 1px solid #30363d;
+                padding: 6px 10px;
+                text-align: left;
+            }
+            th {
+                background: #21262d;
+                color: var(--green);
+            }
+            .prim {
+                color: var(--green);
+            } /* primitive rows */
+            .ref {
+                color: var(--pink);
+            } /* reference rows */
+            .note {
+                color: #8b949e;
+                font-size: 0.85rem;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>&gt; JavaScript: Keywords, Data Types and Operators_</h1>
+
+        <section>
+            <h2>1. Keywords (reserved words)</h2>
+            <div class="scroll"><table id="keywordTable"></table></div>
+        </section>
+
+        <section>
+            <h2>2. Data Types (checked with typeof)</h2>
+            <div class="scroll"><table id="typeTable"></table></div>
+            <p class="note" id="typeNote"></p>
+        </section>
+
+        <section>
+            <h2>3. Operators</h2>
+            <div class="scroll"><table id="opTable"></table></div>
+        </section>
+
+        <!-- ===================== JAVASCRIPT ===================== -->
+        <script>
+            // Helper: build a table from a header array and a rows array
+            function buildTable(id, headers, rows) {
+                let html = "<tr>";
+                for (const h of headers) {
+                    html += "<th>" + h + "</th>";
+                }
+                html += "</tr>";
+                for (const row of rows) {
+                    html += "<tr class='" + (row.cls || "") + "'>";
+                    for (const cell of row.cells) {
+                        html += "<td>" + cell + "</td>";
+                    }
+                    html += "</tr>";
+                }
+                document.getElementById(id).innerHTML = html;
+            }
+
+            // Helper: turn any value into readable text (Symbol cannot be joined to a string directly)
+            function show(v) {
+                if (typeof v === "symbol") {
+                    return v.toString();
+                }
+                if (typeof v === "function") {
+                    return "function greet() { ... }";
+                }
+                if (typeof v === "object" && v !== null) {
+                    return JSON.stringify(v);
+                }
+                return String(v);
+            }
+
+            // ---------- 1. KEYWORDS ----------
+            const keywords = {
+                Declaration: ["var", "let", "const", "function", "class"],
+                Conditional: ["if", "else", "switch", "case", "default"],
+                Looping: ["for", "while", "do", "break", "continue"],
+                "Function-related": ["return", "yield"],
+                "Object-related": [
+                    "new",
+                    "this",
+                    "delete",
+                    "typeof",
+                    "instanceof",
+                ],
+                "Error handling": ["try", "catch", "finally", "throw"],
+                Value: ["true", "false", "null", "undefined"],
+                Others: [
+                    "import",
+                    "export",
+                    "async",
+                    "await",
+                    "in",
+                    "of",
+                    "void",
+                ],
+            };
+
+            const keywordRows = [];
+            for (const category in keywords) {
+                // for...in loop over object keys
+                keywordRows.push({
+                    cells: [category, keywords[category].join(", ")],
+                });
+            }
+            buildTable("keywordTable", ["Category", "Keywords"], keywordRows);
+
+            // ---------- 2. DATA TYPES ----------
+            // Primitive types (stored by value)
+            let num = 25; // Number
+            let str = "Web Techniques"; // String
+            let flag = true; // Boolean
+            let notSet; // Undefined (declared, not assigned)
+            let empty = null; // Null (intentional empty value)
+            let id = Symbol("id"); // Symbol (ES6)
+            let big = 123n; // BigInt (ES2020)
+
+            // Reference types (stored by reference)
+            let student = { name: "Asha", course: "M.Sc. IT" }; // Object
+            let marks = [88, 92, 75]; // Array
+            function greet() {
+                return "Hello!";
+            } // Function
+
+            const typeList = [
+                ["Number", num, "Primitive"],
+                ["String", str, "Primitive"],
+                ["Boolean", flag, "Primitive"],
+                ["Undefined", notSet, "Primitive"],
+                ["Null", empty, "Primitive"],
+                ["Symbol", id, "Primitive"],
+                ["BigInt", big, "Primitive"],
+                ["Object", student, "Reference"],
+                ["Array", marks, "Reference"],
+                ["Function", greet, "Reference"],
+            ];
+
+            const typeRows = typeList.map(function (item) {
+                return {
+                    cls: item[2] === "Primitive" ? "prim" : "ref",
+                    cells: [
+                        item[0],
+                        show(item[1]),
+                        "<b>" + typeof item[1] + "</b>",
+                        item[2],
+                    ],
+                };
+            });
+            buildTable(
+                "typeTable",
+                ["Type", "Example value", "typeof result", "Kind"],
+                typeRows,
+            );
+
+            document.getElementById("typeNote").innerHTML =
+                'Note: typeof null gives "object" (a known JavaScript quirk). ' +
+                'typeof [] also gives "object", so Array.isArray(marks) is used to confirm an array: <b>' +
+                Array.isArray(marks) +
+                "</b>.";
+
+            // ---------- 3. OPERATORS ----------
+            let a = 17,
+                b = 5,
+                age = 20;
+            let x = 10; // used for assignment operators
+
+            const opRows = [];
+            // helper to add one row: category, expression text, computed result
+            function addOp(category, expression, result) {
+                opRows.push({
+                    cells: [category, expression, "<b>" + result + "</b>"],
+                });
+            }
+
+            // Arithmetic
+            addOp("Arithmetic", "17 + 5", a + b);
+            addOp("Arithmetic", "17 - 5", a - b);
+            addOp("Arithmetic", "17 * 5", a * b);
+            addOp("Arithmetic", "17 / 5", a / b);
+            addOp("Arithmetic", "17 % 5 (remainder)", a % b);
+
+            // Assignment (x starts at 10)
+            x += 5;
+            addOp("Assignment", "x = 10; x += 5", x);
+            x -= 3;
+            addOp("Assignment", "x -= 3", x);
+            x *= 2;
+            addOp("Assignment", "x *= 2", x);
+
+            // Comparison: loose (==) versus strict (===)
+            addOp("Comparison", '25 == "25" (type coercion)', 25 == "25");
+            addOp("Comparison", '25 === "25" (value and type)', 25 === "25");
+            addOp("Comparison", '25 != "25"', 25 != "25");
+            addOp("Comparison", '25 !== "25"', 25 !== "25");
+            addOp("Comparison", "17 > 5", a > b);
+            addOp("Comparison", "17 <= 5", a <= b);
+
+            // Logical
+            addOp("Logical", "(17 > 10) && (5 > 10)", a > 10 && b > 10);
+            addOp("Logical", "(17 > 10) || (5 > 10)", a > 10 || b > 10);
+            addOp("Logical", "!(17 > 10)", !(a > 10));
+
+            // Bitwise
+            addOp("Bitwise", "17 & 5", a & b);
+            addOp("Bitwise", "17 | 5", a | b);
+            addOp("Bitwise", "17 ^ 5", a ^ b);
+            addOp("Bitwise", "~17", ~a);
+            addOp("Bitwise", "17 << 1", a << 1);
+            addOp("Bitwise", "17 >> 1", a >> 1);
+
+            // Ternary
+            addOp(
+                "Ternary",
+                'age >= 18 ? "Adult" : "Minor" (age = 20)',
+                age >= 18 ? "Adult" : "Minor",
+            );
+
+            // Type operators
+            addOp("Type", "typeof str", typeof str);
+            addOp("Type", "marks instanceof Array", marks instanceof Array);
+
+            buildTable("opTable", ["Category", "Expression", "Result"], opRows);
+
+            // Also print a summary in the browser console (press F12 to see it)
+            console.log(
+                "Data types shown:",
+                typeList.length,
+                "| Operator examples shown:",
+                opRows.length,
+            );
+        </script>
+    </body>
+</html>

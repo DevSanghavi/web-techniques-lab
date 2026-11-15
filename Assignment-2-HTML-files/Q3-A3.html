@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>JSON Objects, Arrays, Values and Syntax Rules</title>
+        <style>
+            :root {
+                --graphite: #22262b;
+                --lime: #a8e10c;
+                --paper: #f6f8f2;
+                --line: #d9dfcf;
+            }
+            body {
+                margin: 0;
+                background: var(--paper);
+                color: var(--graphite);
+                font-family: "Segoe UI", Tahoma, sans-serif;
+                line-height: 1.5;
+            }
+            header {
+                background: var(--graphite);
+                color: var(--lime);
+                text-align: center;
+                padding: 20px 12px;
+                border-bottom: 6px solid var(--lime);
+            }
+            header h1 {
+                margin: 0;
+                font-size: 1.5rem;
+            }
+            main {
+                max-width: 1000px;
+                margin: auto;
+                padding: 14px;
+            }
+            h2 {
+                background: var(--graphite);
+                color: var(--lime);
+                padding: 6px 12px;
+                border-radius: 6px;
+                font-size: 1.05rem;
+            }
+            pre {
+                background: #181b1f;
+                color: #d7f58a;
+                padding: 12px;
+                border-radius: 8px;
+                overflow-x: auto;
+                margin: 6px 0;
+                font-size: 0.85rem;
+            }
+            .scroll {
+                overflow-x: auto;
+            }
+            table {
+                border-collapse: collapse;
+                width: 100%;
+                background: #fff;
+                font-size: 0.85rem;
+            }
+            th,
+            td {
+                border: 1px solid var(--line);
+                padding: 5px 8px;
+                text-align: left;
+                vertical-align: top;
+            }
+            th {
+                background: var(--lime);
+                color: var(--graphite);
+            }
+            code {
+                font-family: Consolas, monospace;
+            }
+            .t-string {
+                color: #0b7a3b;
+                font-weight: bold;
+            }
+            .t-number {
+                color: #1a56c4;
+                font-weight: bold;
+            }
+            .t-boolean {
+                color: #b35a00;
+                font-weight: bold;
+            }
+            .t-null {
+                color: #7a7a7a;
+                font-weight: bold;
+            }
+            .t-object {
+                color: #8a2be2;
+                font-weight: bold;
+            }
+            .t-array {
+                color: #c2185b;
+                font-weight: bold;
+            }
+            .bad {
+                color: #c62828;
+                font-weight: bold;
+            }
+            .good {
+                color: #2e7d32;
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>{ } JSON: Objects, Arrays, Values and Syntax Rules</h1>
+        </header>
+
+        <main>
+            <h2>1. A JSON Document (objects, arrays and all 6 value types)</h2>
+            <pre id="raw"></pre>
+
+            <h2>2. Every Value Found Inside It (path, value, type)</h2>
+            <div class="scroll"><table id="walk"></table></div>
+
+            <h2>3. Accessing Objects and Arrays</h2>
+            <div class="scroll"><table id="access"></table></div>
+
+            <h2>
+                4. Syntax Rules: Invalid vs Valid (tested live with JSON.parse)
+            </h2>
+            <div class="scroll"><table id="rules"></table></div>
+        </main>
+
+        <!-- ===================== JSON 1: the main document ===================== -->
+        <script type="application/json" id="doc">
+            {
+                "instituteName": "MIT ACSC Alandi",
+                "academicYear": 2026,
+                "isSemesterActive": true,
+                "accreditationGrade": null,
+                "departmentDetails": {
+                    "deptCode": "IT-01",
+                    "name": "Information Technology",
+                    "totalLabs": 4
+                },
+                "courseModules": [
+                    "DOM Manipulation",
+                    "jQuery Essentials",
+                    "JSON Data Exchange"
+                ],
+                "labBatches": [
+                    ["Rahul", "Priya"],
+                    ["Sneha", "Neha"]
+                ],
+                "studentList": [
+                    {
+                        "rollNo": 101,
+                        "name": "Rahul Sharma",
+                        "marks": [88, 92, 75],
+                        "isPassed": true
+                    },
+                    {
+                        "rollNo": 102,
+                        "name": "Priya Verma",
+                        "marks": [79, 85, 90],
+                        "isPassed": true
+                    }
+                ]
+            }
+        </script>
+
+        <!-- ===================== JSON 2: the syntax rules ===================== -->
+        <script type="application/json" id="ruleData">
+            [
+                {
+                    "rule": "Keys must be in double quotes",
+                    "invalid": "{ rollNo: 101 }",
+                    "valid": "{ \"rollNo\": 101 }"
+                },
+                {
+                    "rule": "Strings must use double quotes",
+                    "invalid": "{ \"name\": 'Rahul' }",
+                    "valid": "{ \"name\": \"Rahul\" }"
+                },
+                {
+                    "rule": "Pairs are separated by commas",
+                    "invalid": "{ \"a\": 10 \"b\": 20 }",
+                    "valid": "{ \"a\": 10, \"b\": 20 }"
+                },
+                {
+                    "rule": "No trailing comma",
+                    "invalid": "{ \"a\": 10, \"b\": 20, }",
+                    "valid": "{ \"a\": 10, \"b\": 20 }"
+                },
+                {
+                    "rule": "Every key needs a value",
+                    "invalid": "{ \"marks\": }",
+                    "valid": "{ \"marks\": [88, 92] }"
+                },
+                {
+                    "rule": "No comments allowed",
+                    "invalid": "{ \"a\": 1 } // note",
+                    "valid": "{ \"a\": 1 }"
+                },
+                {
+                    "rule": "undefined is not a JSON value",
+                    "invalid": "{ \"a\": undefined }",
+                    "valid": "{ \"a\": null }"
+                },
+                {
+                    "rule": "Functions are not allowed",
+                    "invalid": "{ \"f\": function() {} }",
+                    "valid": "{ \"f\": null }"
+                }
+            ]
+        </script>
+
+        <!-- ===================== SHORT JAVASCRIPT: reads and tests the JSON ===================== -->
+        <script>
+            var text = document.getElementById("doc").textContent;
+            var data = JSON.parse(text); // JSON text -> JavaScript object
+
+            // 1. Show the raw JSON
+            document.getElementById("raw").textContent = text.trim();
+
+            // Find the JSON type of any value
+            function typeOf(v) {
+                if (v === null) {
+                    return "null";
+                }
+                if (Array.isArray(v)) {
+                    return "array";
+                }
+                return typeof v; // string, number, boolean, object
+            }
+
+            // 2. Walk through every value (recursive function)
+            var rows = "<tr><th>Path</th><th>Value</th><th>JSON type</th></tr>";
+            function walk(value, path) {
+                var t = typeOf(value);
+                if (t === "object") {
+                    rows +=
+                        "<tr><td><code>" +
+                        path +
+                        "</code></td><td>{ " +
+                        Object.keys(value).length +
+                        " keys }</td><td class='t-object'>object</td></tr>";
+                    for (var k in value) {
+                        walk(value[k], path + "." + k);
+                    }
+                } else if (t === "array") {
+                    rows +=
+                        "<tr><td><code>" +
+                        path +
+                        "</code></td><td>[ " +
+                        value.length +
+                        " items ]</td><td class='t-array'>array</td></tr>";
+                    value.forEach(function (item, i) {
+                        walk(item, path + "[" + i + "]");
+                    });
+                } else {
+                    rows +=
+                        "<tr><td><code>" +
+                        path +
+                        "</code></td><td>" +
+                        JSON.stringify(value) +
+                        "</td><td class='t-" +
+                        t +
+                        "'>" +
+                        t +
+                        "</td></tr>";
+                }
+            }
+            walk(data, "data");
+            document.getElementById("walk").innerHTML = rows;
+
+            // 3. Accessing values: dot notation, bracket notation, array index
+            var access = [
+                ["data.instituteName", data.instituteName, "dot notation"],
+                [
+                    "data.departmentDetails.name",
+                    data.departmentDetails.name,
+                    "nested object",
+                ],
+                [
+                    'data["academicYear"]',
+                    data["academicYear"],
+                    "bracket notation",
+                ],
+                [
+                    "data.courseModules[1]",
+                    data.courseModules[1],
+                    "array index starts at 0",
+                ],
+                [
+                    "data.labBatches[1][0]",
+                    data.labBatches[1][0],
+                    "array inside array",
+                ],
+                [
+                    "data.studentList[0].name",
+                    data.studentList[0].name,
+                    "array of objects",
+                ],
+                [
+                    "data.studentList[1].marks[2]",
+                    data.studentList[1].marks[2],
+                    "array inside object",
+                ],
+                [
+                    "data.accreditationGrade",
+                    data.accreditationGrade,
+                    "null value",
+                ],
+                [
+                    "data.studentList.length",
+                    data.studentList.length,
+                    "size of an array",
+                ],
+            ];
+            document.getElementById("access").innerHTML =
+                "<tr><th>Expression</th><th>Result</th><th>Concept</th></tr>" +
+                access
+                    .map(function (a) {
+                        return (
+                            "<tr><td><code>" +
+                            a[0] +
+                            "</code></td><td>" +
+                            JSON.stringify(a[1]) +
+                            "</td><td>" +
+                            a[2] +
+                            "</td></tr>"
+                        );
+                    })
+                    .join("");
+
+            // 4. Test each invalid and valid sample with JSON.parse
+            function test(sample) {
+                try {
+                    JSON.parse(sample);
+                    return "<span class='good'>Valid</span>";
+                } catch (e) {
+                    return "<span class='bad'>Error:</span> " + e.message;
+                }
+            }
+            var rules = JSON.parse(
+                document.getElementById("ruleData").textContent,
+            );
+            document.getElementById("rules").innerHTML =
+                "<tr><th>Rule</th><th>Invalid JSON</th><th>Result</th><th>Valid JSON</th><th>Result</th></tr>" +
+                rules
+                    .map(function (r) {
+                        return (
+                            "<tr><td>" +
+                            r.rule +
+                            "</td>" +
+                            "<td><code>" +
+                            r.invalid +
+                            "</code></td><td>" +
+                            test(r.invalid) +
+                            "</td>" +
+                            "<td><code>" +
+                            r.valid +
+                            "</code></td><td>" +
+                            test(r.valid) +
+                            "</td></tr>"
+                        );
+                    })
+                    .join("");
+        </script>
+    </body>
+</html>

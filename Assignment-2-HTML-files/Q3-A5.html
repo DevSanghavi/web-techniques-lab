@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Advantages and Disadvantages of JSON</title>
+        <style>
+            :root {
+                --violet: #3a2a78;
+                --mint: #2ee6a6;
+                --mist: #f3f0ff;
+                --ink: #1d1740;
+                --red: #d6336c;
+            }
+            body {
+                margin: 0;
+                background: var(--mist);
+                color: var(--ink);
+                font-family: "Lucida Sans", "Segoe UI", sans-serif;
+                line-height: 1.5;
+            }
+            header {
+                background: var(--violet);
+                color: #fff;
+                text-align: center;
+                padding: 22px 12px;
+                border-bottom: 6px solid var(--mint);
+            }
+            header h1 {
+                margin: 0;
+                font-size: 1.5rem;
+            }
+            header p {
+                margin: 4px 0 0;
+                color: var(--mint);
+            }
+            main {
+                max-width: 1000px;
+                margin: auto;
+                padding: 14px;
+            }
+            h2 {
+                color: var(--violet);
+                border-bottom: 3px solid var(--mint);
+                padding-bottom: 3px;
+                margin-top: 28px;
+                font-size: 1.1rem;
+            }
+            .cols {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 14px;
+            }
+            .col h3 {
+                margin: 0 0 8px;
+                padding: 8px 12px;
+                border-radius: 8px;
+                color: #fff;
+            }
+            .adv h3 {
+                background: var(--violet);
+            }
+            .dis h3 {
+                background: var(--red);
+            }
+            .item {
+                background: #fff;
+                border-radius: 8px;
+                padding: 8px 12px;
+                margin-bottom: 8px;
+                box-shadow: 0 1px 4px rgba(58, 42, 120, 0.15);
+            }
+            .adv .item {
+                border-left: 5px solid var(--mint);
+            }
+            .dis .item {
+                border-left: 5px solid var(--red);
+            }
+            .item b {
+                display: block;
+            }
+            pre {
+                background: #1d1740;
+                color: #b9f5de;
+                padding: 10px;
+                border-radius: 8px;
+                overflow-x: auto;
+                margin: 6px 0;
+                font-size: 0.82rem;
+                white-space: pre-wrap;
+                word-break: break-word;
+            }
+            .scroll {
+                overflow-x: auto;
+            }
+            table {
+                border-collapse: collapse;
+                width: 100%;
+                background: #fff;
+                font-size: 0.85rem;
+            }
+            th,
+            td {
+                border: 1px solid #d9d2f5;
+                padding: 6px 8px;
+                text-align: left;
+                vertical-align: top;
+            }
+            th {
+                background: var(--violet);
+                color: #fff;
+            }
+            .good {
+                color: #12805c;
+                font-weight: bold;
+            }
+            .bad {
+                color: var(--red);
+                font-weight: bold;
+            }
+            .bar {
+                height: 18px;
+                border-radius: 9px;
+                margin: 4px 0 10px;
+                color: #1d1740;
+                font-size: 0.75rem;
+                line-height: 18px;
+                padding-left: 8px;
+                font-weight: bold;
+            }
+            .bar.j {
+                background: var(--mint);
+            }
+            .bar.x {
+                background: #ffb3c7;
+            }
+            code {
+                font-family: Consolas, monospace;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>Advantages and Disadvantages of JSON</h1>
+            <p>
+                Every point below is read from a JSON document and then proved
+                live
+            </p>
+        </header>
+
+        <main>
+            <h2>1. Advantages and Disadvantages (read from JSON)</h2>
+            <div class="cols">
+                <div class="col adv">
+                    <h3>Advantages</h3>
+                    <div id="advList"></div>
+                </div>
+                <div class="col dis">
+                    <h3>Disadvantages</h3>
+                    <div id="disList"></div>
+                </div>
+            </div>
+
+            <h2>2. Proof: Lightweight (same records in JSON and XML)</h2>
+            <div id="sizeBars"></div>
+            <pre id="xmlSample"></pre>
+
+            <h2>
+                3. Proof: Fast Parsing (1000 parses each, time varies by device)
+            </h2>
+            <pre id="speed"></pre>
+
+            <h2>
+                4. Proof: Strict Syntax and No Comments (tested with JSON.parse)
+            </h2>
+            <div class="scroll"><table id="strict"></table></div>
+
+            <h2>5. Proof: Limited Data Types (what stringify does to them)</h2>
+            <div class="scroll"><table id="types"></table></div>
+
+            <h2>6. Proof: No Built-in Schema</h2>
+            <pre id="schema"></pre>
+
+            <h2>7. JSON vs XML (read from JSON)</h2>
+            <div class="scroll"><table id="cmp"></table></div>
+        </main>
+
+        <!-- ===================== JSON 1: points and comparison ===================== -->
+        <script type="application/json" id="points">
+            {
+                "advantages": [
+                    {
+                        "title": "Lightweight and fast transfer",
+                        "text": "No closing tags, so the same data is smaller and travels faster."
+                    },
+                    {
+                        "title": "Easy to read and write",
+                        "text": "Clear self-describing key and value pairs."
+                    },
+                    {
+                        "title": "Language independent",
+                        "text": "Plain text that Python, Java, PHP, C# and others can parse."
+                    },
+                    {
+                        "title": "Native JavaScript support",
+                        "text": "JSON.parse() and JSON.stringify() are built in."
+                    },
+                    {
+                        "title": "Fast parsing",
+                        "text": "Converts straight into objects, no DOM tree needed."
+                    },
+                    {
+                        "title": "Widely supported",
+                        "text": "Used by web APIs, mobile apps, microservices and MongoDB."
+                    }
+                ],
+                "disadvantages": [
+                    {
+                        "title": "No comments",
+                        "text": "// and /* */ are not allowed, so notes cannot live in the file."
+                    },
+                    {
+                        "title": "Strict syntax",
+                        "text": "One wrong quote or trailing comma makes parsing fail."
+                    },
+                    {
+                        "title": "Limited data types",
+                        "text": "No Date, function, undefined or binary data."
+                    },
+                    {
+                        "title": "No built-in schema",
+                        "text": "Structure and types are not enforced without extra tools."
+                    },
+                    {
+                        "title": "Needs transport security",
+                        "text": "Plain text has no encryption, so use HTTPS and validate input."
+                    }
+                ],
+                "comparison": [
+                    {
+                        "feature": "Data size",
+                        "json": "Smaller (no closing tags)",
+                        "xml": "Larger (opening and closing tags)"
+                    },
+                    {
+                        "feature": "Parsing speed",
+                        "json": "Fast, parses into objects",
+                        "xml": "Slower, needs a DOM parser"
+                    },
+                    {
+                        "feature": "Data types",
+                        "json": "String, number, boolean, null, object, array",
+                        "xml": "All data is text"
+                    },
+                    {
+                        "feature": "Arrays",
+                        "json": "Built in with [ ]",
+                        "xml": "Needs repeated tags"
+                    },
+                    {
+                        "feature": "Comments",
+                        "json": "Not allowed",
+                        "xml": "Allowed"
+                    },
+                    {
+                        "feature": "Best for",
+                        "json": "Web APIs and apps",
+                        "xml": "Documents and older systems"
+                    }
+                ]
+            }
+        </script>
+
+        <!-- ===================== JSON 2: sample records ===================== -->
+        <script type="application/json" id="records">
+            [
+                {
+                    "rollNo": 101,
+                    "name": "Rahul Sharma",
+                    "course": "M.Sc. IT",
+                    "marks": 88,
+                    "isPassed": true
+                },
+                {
+                    "rollNo": 102,
+                    "name": "Priya Verma",
+                    "course": "M.Sc. IT",
+                    "marks": 92,
+                    "isPassed": true
+                },
+                {
+                    "rollNo": 103,
+                    "name": "Amit Kulkarni",
+                    "course": "M.Sc. IT",
+                    "marks": 54,
+                    "isPassed": true
+                },
+                {
+                    "rollNo": 104,
+                    "name": "Sneha Patil",
+                    "course": "M.Sc. IT",
+                    "marks": 97,
+                    "isPassed": true
+                },
+                {
+                    "rollNo": 105,
+                    "name": "Rohan Deshmukh",
+                    "course": "M.Sc. IT",
+                    "marks": 31,
+                    "isPassed": false
+                },
+                {
+                    "rollNo": 106,
+                    "name": "Ananya Joshi",
+                    "course": "M.Sc. IT",
+                    "marks": 85,
+                    "isPassed": true
+                }
+            ]
+        </script>
+
+        <!-- ===================== SHORT JAVASCRIPT ===================== -->
+        <script>
+            function load(id) {
+                return JSON.parse(document.getElementById(id).textContent);
+            }
+            var points = load("points");
+            var records = load("records");
+
+            // 1. Advantage and disadvantage cards
+            function cards(list) {
+                return list
+                    .map(function (p, i) {
+                        return (
+                            "<div class='item'><b>" +
+                            (i + 1) +
+                            ". " +
+                            p.title +
+                            "</b>" +
+                            p.text +
+                            "</div>"
+                        );
+                    })
+                    .join("");
+            }
+            document.getElementById("advList").innerHTML = cards(
+                points.advantages,
+            );
+            document.getElementById("disList").innerHTML = cards(
+                points.disadvantages,
+            );
+
+            // 2. Size: build XML from the same records
+            var jsonText = JSON.stringify(records);
+            var xmlText =
+                "<students>" +
+                records
+                    .map(function (r) {
+                        var s = "<student>";
+                        for (var k in r) {
+                            s += "<" + k + ">" + r[k] + "</" + k + ">";
+                        }
+                        return s + "</student>";
+                    })
+                    .join("") +
+                "</students>";
+            var max = Math.max(jsonText.length, xmlText.length);
+            document.getElementById("sizeBars").innerHTML =
+                "JSON: " +
+                jsonText.length +
+                " characters" +
+                "<div class='bar j' style='width:" +
+                (jsonText.length / max) * 100 +
+                "%'>JSON</div>" +
+                "XML: " +
+                xmlText.length +
+                " characters" +
+                "<div class='bar x' style='width:" +
+                (xmlText.length / max) * 100 +
+                "%'>XML</div>" +
+                "<b>XML is " +
+                Math.round((xmlText.length / jsonText.length - 1) * 100) +
+                "% larger for the same data.</b>";
+            document.getElementById("xmlSample").textContent =
+                "First record as XML:\n" +
+                xmlText.split("</student>")[0] +
+                "</student>\n\n" +
+                "First record as JSON:\n" +
+                JSON.stringify(records[0]);
+
+            // 3. Parse speed
+            var parser = new DOMParser();
+            var t1 = performance.now();
+            for (var i = 0; i < 1000; i++) {
+                JSON.parse(jsonText);
+            }
+            var jsonMs = performance.now() - t1;
+            var t2 = performance.now();
+            for (var j = 0; j < 1000; j++) {
+                parser.parseFromString(xmlText, "application/xml");
+            }
+            var xmlMs = performance.now() - t2;
+            document.getElementById("speed").textContent =
+                "JSON.parse()   x1000 : " +
+                jsonMs.toFixed(2) +
+                " ms\n" +
+                "DOMParser(XML) x1000 : " +
+                xmlMs.toFixed(2) +
+                " ms\n" +
+                (jsonMs < xmlMs
+                    ? "JSON parsed faster on this device."
+                    : "Timing is close on this device, run again to compare.");
+
+            // 4. Strict syntax tests
+            var tests = [
+                ["Valid JSON", '{"a": 1}'],
+                ["Comment added", '{"a": 1} // note'],
+                ["Single quotes", "{'a': 1}"],
+                ["Key without quotes", "{a: 1}"],
+                ["Trailing comma", '{"a": 1,}'],
+                ["Missing comma", '{"a": 1 "b": 2}'],
+            ];
+            document.getElementById("strict").innerHTML =
+                "<tr><th>Test</th><th>Text</th><th>Result</th></tr>" +
+                tests
+                    .map(function (t) {
+                        var r;
+                        try {
+                            JSON.parse(t[1]);
+                            r = "<span class='good'>Valid</span>";
+                        } catch (e) {
+                            r = "<span class='bad'>Error</span> " + e.message;
+                        }
+                        return (
+                            "<tr><td>" +
+                            t[0] +
+                            "</td><td><code>" +
+                            t[1] +
+                            "</code></td><td>" +
+                            r +
+                            "</td></tr>"
+                        );
+                    })
+                    .join("");
+
+            // 5. Limited data types
+            var odd = [
+                ["Date object", new Date(0)],
+                ["undefined", undefined],
+                ["function", function () {}],
+                ["NaN", NaN],
+                ["Infinity", Infinity],
+                ["Number 25", 25],
+            ];
+            document.getElementById("types").innerHTML =
+                "<tr><th>JavaScript value</th><th>JSON.stringify({ v: value })</th><th>What happened</th></tr>" +
+                odd
+                    .map(function (o) {
+                        var out = JSON.stringify({ v: o[1] });
+                        var note =
+                            o[0] === "Number 25"
+                                ? "<span class='good'>Kept as it is</span>"
+                                : o[0] === "Date object"
+                                  ? "<span class='bad'>Became a string</span>"
+                                  : o[0] === "NaN" || o[0] === "Infinity"
+                                    ? "<span class='bad'>Became null</span>"
+                                    : "<span class='bad'>Key removed</span>";
+                        return (
+                            "<tr><td>" +
+                            o[0] +
+                            "</td><td><code>" +
+                            out +
+                            "</code></td><td>" +
+                            note +
+                            "</td></tr>"
+                        );
+                    })
+                    .join("");
+
+            // 6. No schema: JSON accepts wrong types without complaint
+            var wrong = JSON.parse(
+                '{"rollNo": "abc", "marks": "high", "isPassed": "maybe"}',
+            );
+            document.getElementById("schema").textContent =
+                "Expected: rollNo number, marks number, isPassed boolean\n" +
+                "Parsed without any error: " +
+                JSON.stringify(wrong) +
+                "\n" +
+                "typeof rollNo   = " +
+                typeof wrong.rollNo +
+                "\n" +
+                "typeof marks    = " +
+                typeof wrong.marks +
+                "\n" +
+                "typeof isPassed = " +
+                typeof wrong.isPassed +
+                "\n\n" +
+                "JSON.parse() checks syntax only. Types must be checked by your own code or a schema tool.";
+
+            // 7. Comparison table
+            document.getElementById("cmp").innerHTML =
+                "<tr><th>Feature</th><th>JSON</th><th>XML</th></tr>" +
+                points.comparison
+                    .map(function (c) {
+                        return (
+                            "<tr><td><b>" +
+                            c.feature +
+                            "</b></td><td>" +
+                            c.json +
+                            "</td><td>" +
+                            c.xml +
+                            "</td></tr>"
+                        );
+                    })
+                    .join("");
+        </script>
+    </body>
+</html>

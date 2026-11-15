@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Popup Boxes | Retro Desktop Theme</title>
+        <style>
+            /* Theme: retro 90s desktop - teal desktop, grey windows, navy title bars, beveled buttons (plain CSS, no Bootstrap) */
+            :root {
+                --desk: #008080;
+                --grey: #c0c0c0;
+                --navy: #000080;
+                --light: #ffffff;
+                --dark: #808080;
+                --black: #000;
+                --yellow: #ffff66;
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                background: var(--desk);
+                font-family: Tahoma, "MS Sans Serif", Arial, sans-serif;
+                font-size: 14px;
+                color: var(--black);
+            }
+            header {
+                background: var(--grey);
+                border-bottom: 3px solid var(--dark);
+                padding: 8px 12px;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                gap: 6px;
+            }
+            header h1 {
+                margin: 0;
+                font-size: 1.1rem;
+            }
+            header span {
+                font-size: 0.8rem;
+            }
+            /* Responsive: windows wrap by available width */
+            main {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+                gap: 18px;
+                max-width: 1200px;
+                margin: 18px auto;
+                padding: 0 12px;
+                align-items: start;
+            }
+            .win {
+                background: var(--grey);
+                border: 2px solid;
+                border-color: var(--light) var(--black) var(--black)
+                    var(--light);
+                box-shadow:
+                    inset -1px -1px var(--dark),
+                    4px 4px 0 rgba(0, 0, 0, 0.35);
+                padding: 3px;
+            }
+            .title {
+                background: linear-gradient(90deg, var(--navy), #1084d0);
+                color: #fff;
+                font-weight: bold;
+                padding: 3px 6px;
+                display: flex;
+                justify-content: space-between;
+            }
+            .body {
+                padding: 10px;
+            }
+            button {
+                background: var(--grey);
+                border: 2px solid;
+                border-color: var(--light) var(--black) var(--black)
+                    var(--light);
+                padding: 6px 12px;
+                margin: 3px 4px 3px 0;
+                font-family: inherit;
+                font-size: 0.9rem;
+                cursor: pointer;
+            }
+            button:active {
+                border-color: var(--black) var(--light) var(--light)
+                    var(--black);
+            }
+            .sunken {
+                background: #fff;
+                border: 2px solid;
+                border-color: var(--dark) var(--light) var(--light) var(--dark);
+                padding: 6px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 0.8rem;
+            }
+            th,
+            td {
+                border: 1px solid var(--dark);
+                padding: 3px 5px;
+                text-align: left;
+                word-break: break-word;
+            }
+            th {
+                background: var(--navy);
+                color: #fff;
+            }
+            td.hit {
+                background: var(--yellow);
+            }
+            code {
+                font-family: Consolas, monospace;
+                font-size: 0.8rem;
+                color: #800000;
+            }
+            .small {
+                font-size: 0.78rem;
+                margin: 6px 0;
+            }
+            #msg {
+                min-height: 70px;
+            }
+            ul#tasks {
+                list-style: none;
+                margin: 6px 0;
+                padding: 0;
+            }
+            ul#tasks li {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 6px;
+                border-bottom: 1px dotted var(--dark);
+                padding: 3px 0;
+                word-break: break-word;
+            }
+            #log {
+                height: 200px;
+                overflow-y: auto;
+                font-family: Consolas, monospace;
+                font-size: 0.76rem;
+                background: #000;
+                color: #33ff33;
+                padding: 6px;
+            }
+            #log div {
+                padding: 1px 0;
+                word-break: break-word;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>Popup Boxes Desktop</h1>
+            <span>Unit 3 | DOM | alert(), confirm(), prompt()</span>
+        </header>
+
+        <!-- Only an empty <main>; JavaScript builds every window -->
+        <main id="app"></main>
+
+        <script>
+            const app = document.getElementById("app");
+
+            // ---------- helpers (createElement + appendChild) ----------
+            function el(tag, cls, text) {
+                const e = document.createElement(tag);
+                if (cls) e.className = cls;
+                if (text) e.textContent = text;
+                return e;
+            }
+            // Builds one "window" and returns its body
+            function makeWindow(title) {
+                const w = el("section", "win");
+                const t = el("div", "title");
+                t.appendChild(el("span", "", title));
+                t.appendChild(el("span", "", "[_][X]"));
+                const b = el("div", "body");
+                w.appendChild(t);
+                w.appendChild(b);
+                app.appendChild(w);
+                return b;
+            }
+            function makeButton(parent, text, handler) {
+                const b = el("button", "", text);
+                b.addEventListener("click", handler);
+                parent.appendChild(b);
+                return b;
+            }
+
+            // ================= WINDOW 4 FIRST: LOG (used by all demos) =================
+            const w1 = makeWindow("1. Launcher");
+            const w2 = makeWindow("2. Return values");
+            const w3 = makeWindow("3. Practical use: task list");
+            const w4 = makeWindow("4. Event log");
+
+            const logBox = el("div");
+            logBox.id = "log";
+            w4.appendChild(logBox);
+            function log(msg) {
+                const d = el(
+                    "div",
+                    "",
+                    new Date().toLocaleTimeString() + "  " + msg,
+                );
+                logBox.appendChild(d);
+                logBox.scrollTop = logBox.scrollHeight;
+            }
+            makeButton(w4, "Clear log", function () {
+                logBox.textContent = "";
+            });
+
+            // ================= WINDOW 2: RETURN VALUE TABLE =================
+            const table = document.createElement("table");
+            const head = document.createElement("tr");
+            ["Method", "Returned value", "typeof"].forEach(function (t) {
+                head.appendChild(el("th", "", t));
+            });
+            table.appendChild(head);
+            const rows = {};
+            ["alert()", "confirm()", "prompt()"].forEach(function (m) {
+                const tr = document.createElement("tr");
+                const c1 = el("td", "", m),
+                    c2 = el("td", "", "-"),
+                    c3 = el("td", "", "-");
+                tr.appendChild(c1);
+                tr.appendChild(c2);
+                tr.appendChild(c3);
+                table.appendChild(tr);
+                rows[m] = { value: c2, type: c3 };
+            });
+            w2.appendChild(table);
+            w2.appendChild(
+                el(
+                    "p",
+                    "small",
+                    "The table updates with the real value each popup returns. Closing a box with X or Esc works like Cancel.",
+                ),
+            );
+
+            // Shows what a popup returned (String() so null and undefined are visible)
+            function showReturn(method, value) {
+                rows[method].value.textContent =
+                    typeof value === "string"
+                        ? '"' + value + '"'
+                        : String(value);
+                rows[method].type.textContent =
+                    value === null ? "object (null)" : typeof value;
+                rows[method].value.className = "hit";
+                setTimeout(function () {
+                    rows[method].value.className = "";
+                }, 600);
+            }
+
+            // ================= WINDOW 1: THE THREE POPUPS =================
+            const msg = el("div", "sunken");
+            msg.id = "msg";
+            msg.textContent =
+                "Click a button. The script PAUSES until you close the popup.";
+
+            // 1. alert(): message + OK button, returns undefined
+            makeButton(w1, "alert()", function () {
+                const before = Date.now();
+                log("before alert(): script is running");
+                const result = alert(
+                    "Welcome! This is an alert box. It only has an OK button.",
+                );
+                const waited = Date.now() - before; // time spent waiting = script was blocked
+                log("after alert(): resumed, waited " + waited + " ms");
+                showReturn("alert()", result);
+                msg.textContent =
+                    "alert() returned undefined. The code after it waited " +
+                    waited +
+                    " ms for OK.";
+            });
+
+            // 2. confirm(): OK = true, Cancel = false
+            makeButton(w1, "confirm()", function () {
+                const choice = confirm("Do you want to continue?");
+                showReturn("confirm()", choice);
+                log("confirm() returned " + choice);
+                msg.textContent = choice
+                    ? "You pressed OK, so confirm() returned true."
+                    : "You pressed Cancel (or closed it), so confirm() returned false.";
+            });
+
+            // 3. prompt(): text = string, Cancel = null, OK with empty box = ""
+            makeButton(w1, "prompt()", function () {
+                const name = prompt("Please enter your name:", "Guest"); // 2nd argument = default text
+                showReturn("prompt()", name);
+                log(
+                    "prompt() returned " +
+                        (name === null ? "null" : '"' + name + '"'),
+                );
+                if (name === null) {
+                    msg.textContent =
+                        "Cancel pressed, so prompt() returned null.";
+                } else if (name.trim() === "") {
+                    msg.textContent =
+                        "OK pressed with an empty box, so prompt() returned an empty string.";
+                } else {
+                    msg.textContent =
+                        "Hello, " + name.trim() + "! (text taken from prompt)"; // textContent keeps user text safe
+                }
+            });
+
+            // Combined flow: prompt -> convert to number -> confirm -> alert
+            makeButton(w1, "All three together", function () {
+                const input = prompt("Enter your age (number):");
+                if (input === null) {
+                    log("age prompt cancelled");
+                    return;
+                }
+                const age = Number(input); // prompt always returns a STRING
+                if (input.trim() === "" || isNaN(age) || age < 1 || age > 120) {
+                    alert("Invalid age: please enter a number from 1 to 120.");
+                    log("invalid age entered: " + input);
+                    return;
+                }
+                if (confirm("You entered " + age + ". Is this correct?")) {
+                    alert(age >= 18 ? "You are an adult." : "You are a minor.");
+                    msg.textContent =
+                        "Age " +
+                        age +
+                        " accepted: " +
+                        (age >= 18 ? "adult" : "minor");
+                    log("age " + age + " accepted");
+                } else {
+                    msg.textContent = "Age was not confirmed.";
+                    log("age not confirmed");
+                }
+            });
+
+            w1.appendChild(msg);
+            w1.appendChild(
+                el(
+                    "p",
+                    "small",
+                    "Dialogs are modal: the page cannot be used until the box is closed.",
+                ),
+            );
+
+            // ================= WINDOW 3: TASK LIST USING ALL THREE =================
+            const list = document.createElement("ul");
+            list.id = "tasks";
+            w3.appendChild(list);
+
+            function addTask(text) {
+                const li = el("li");
+                const span = el("span", "", text);
+                const box = el("span");
+                const edit = el("button", "", "Edit");
+                const del = el("button", "", "Delete");
+                edit.dataset.act = "edit";
+                del.dataset.act = "delete";
+                box.appendChild(edit);
+                box.appendChild(del);
+                li.appendChild(span);
+                li.appendChild(box);
+                list.appendChild(li);
+            }
+            ["Revise DOM methods", "Practise events"].forEach(addTask);
+
+            // Checks the text typed in a prompt: returns "" if OK, else an error message
+            function checkTask(t) {
+                if (t.length < 3)
+                    return "Task must have at least 3 characters.";
+                if (t.length > 30)
+                    return "Task must have at most 30 characters.";
+                return "";
+            }
+
+            makeButton(w3, "Add task (prompt)", function () {
+                const t = prompt("Enter a new task (3 to 30 characters):");
+                if (t === null) {
+                    log("add cancelled");
+                    return;
+                } // Cancel
+                const clean = t.trim();
+                const error = checkTask(clean);
+                if (error) {
+                    alert(error);
+                    log("add rejected: " + error);
+                    return;
+                } // alert used for errors
+                addTask(clean);
+                log('task added: "' + clean + '"');
+            });
+            w3.appendChild(
+                el(
+                    "p",
+                    "small",
+                    "Delete asks confirm(). Edit shows prompt() with the old text as default.",
+                ),
+            );
+
+            // Event delegation: ONE listener on the list handles every Edit/Delete button
+            list.addEventListener("click", function (e) {
+                const act = e.target.dataset.act;
+                if (!act) return;
+                const li = e.target.closest("li");
+                const span = li.firstElementChild;
+                if (act === "delete") {
+                    if (confirm('Delete "' + span.textContent + '"?')) {
+                        li.remove(); // DOM removal
+                        log("task deleted");
+                    } else {
+                        log("delete cancelled");
+                    }
+                } else {
+                    const t = prompt("Edit the task:", span.textContent); // default value = current text
+                    if (t === null) {
+                        log("edit cancelled");
+                        return;
+                    }
+                    const error = checkTask(t.trim());
+                    if (error) {
+                        alert(error);
+                        return;
+                    }
+                    span.textContent = t.trim();
+                    log('task changed to "' + t.trim() + '"');
+                }
+            });
+
+            log("Ready. Try each popup and watch the return values table.");
+        </script>
+    </body>
+</html>

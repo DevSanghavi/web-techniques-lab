@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>DOM Events | Terracotta Pottery Theme</title>
+        <style>
+            /* Theme: terracotta clay + sage green on warm sand, rounded "pottery" look (plain CSS, no Bootstrap) */
+            :root {
+                --clay: #c8553d;
+                --sage: #8fa98b;
+                --deep: #3d5a45;
+                --sand: #f3e5d0;
+                --brown: #4a2f27;
+                --cream: #fffaf1;
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                background: var(--sand);
+                color: var(--brown);
+                font-family: "Palatino Linotype", Palatino, serif;
+            }
+            header {
+                background: var(--clay);
+                color: var(--cream);
+                text-align: center;
+                padding: 20px 12px;
+                border-bottom: 8px double var(--sage);
+            }
+            header h1 {
+                margin: 0;
+                font-size: 1.5rem;
+                letter-spacing: 1px;
+            }
+            header p {
+                margin: 6px 0 0;
+                font-size: 0.9rem;
+                color: var(--sand);
+            }
+            /* Responsive: panels wrap by available width */
+            main {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+                gap: 18px;
+                max-width: 1200px;
+                margin: 20px auto;
+                padding: 0 14px;
+            }
+            .panel {
+                background: var(--cream);
+                border: 3px solid var(--brown);
+                border-radius: 18px;
+                padding: 14px;
+                box-shadow: 6px 6px 0 var(--sage);
+            }
+            .panel h2 {
+                margin: 0 0 10px;
+                font-size: 1.05rem;
+                color: var(--clay);
+            }
+            .small {
+                font-size: 0.8rem;
+                margin: 6px 0;
+                color: #7a5c52;
+            }
+
+            /* The event zone */
+            #zone {
+                background: var(--sage);
+                border: 4px dashed var(--deep);
+                border-radius: 16px;
+                padding: 34px 12px;
+                text-align: center;
+                cursor: pointer;
+                user-select: none;
+                transition: all 0.15s;
+            }
+            #zone * {
+                pointer-events: none;
+            } /* children never become the event target */
+            #zone h3 {
+                margin: 0 0 6px;
+                color: var(--brown);
+            }
+            #zone.over {
+                background: #b7cdb3;
+                border-color: var(--clay);
+            }
+            #zone.down {
+                background: var(--clay);
+                color: var(--cream);
+                transform: scale(0.97);
+            }
+            #zone.down h3 {
+                color: var(--cream);
+            }
+            button {
+                background: var(--deep);
+                color: var(--cream);
+                border: none;
+                border-radius: 20px;
+                padding: 8px 14px;
+                margin: 8px 6px 0 0;
+                cursor: pointer;
+                font-family: inherit;
+            }
+            button:hover {
+                background: var(--clay);
+            }
+            #imgBox {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-top: 10px;
+                font-size: 0.85rem;
+            }
+
+            /* Event monitor cards */
+            #cards {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .card {
+                border: 2px solid var(--brown);
+                border-radius: 12px;
+                padding: 8px;
+                background: #fff;
+                transition: background 0.3s;
+            }
+            .card b {
+                color: var(--clay);
+                font-size: 0.95rem;
+            }
+            .card .n {
+                font-size: 1.6rem;
+                font-weight: bold;
+                color: var(--deep);
+            }
+            .card .t {
+                font-size: 0.7rem;
+                color: #7a5c52;
+            }
+            .card.flash {
+                background: #ffd9a8;
+            }
+
+            /* Log */
+            #log {
+                background: var(--brown);
+                color: var(--sand);
+                border-radius: 12px;
+                height: 290px;
+                overflow-y: auto;
+                padding: 8px;
+                font-family: Consolas, monospace;
+                font-size: 0.76rem;
+            }
+            #log div {
+                padding: 2px 0;
+                border-bottom: 1px dotted #7a5c52;
+                word-break: break-word;
+            }
+            #log b {
+                color: #ffb199;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>DOM Events Workshop</h1>
+            <p>
+                Unit 3 | onload, onclick, onmouseover, onmouseout, onmousedown,
+                onmouseup
+            </p>
+        </header>
+
+        <!-- Only an empty <main>; JavaScript builds every panel -->
+        <main id="app"></main>
+
+        <script>
+            const app = document.getElementById("app");
+
+            // ---------- helper: creates one element (createElement) ----------
+            function el(tag, cls, text) {
+                const e = document.createElement(tag);
+                if (cls) e.className = cls;
+                if (text) e.textContent = text;
+                return e;
+            }
+            function makePanel(title) {
+                const p = el("section", "panel");
+                p.appendChild(el("h2", "", title));
+                app.appendChild(p);
+                return p;
+            }
+
+            // ================= PANEL 1: THE EVENT ZONE =================
+            const p1 = makePanel("1. Event zone (try every action)");
+            const zone = el("div");
+            zone.id = "zone";
+            zone.appendChild(el("h3", "", "Hover, press, release, click"));
+            const state = el("p", "", "Waiting for an event...");
+            zone.appendChild(state);
+            p1.appendChild(zone);
+            p1.appendChild(
+                el(
+                    "p",
+                    "small",
+                    "Press inside the box but release OUTSIDE it: mouseup will not fire on the box.",
+                ),
+            );
+
+            const colours = ["#8fa98b", "#e9b872", "#a7c4d9", "#d9a7b8"];
+            let colourIndex = 0;
+            const colourBtn = el("button", "", "Change zone colour (onclick)");
+            p1.appendChild(colourBtn);
+
+            const imgBox = el("div");
+            imgBox.id = "imgBox";
+            imgBox.appendChild(el("span", "", "Image onload:"));
+            p1.appendChild(imgBox);
+
+            // ================= PANEL 2: EVENT MONITOR =================
+            const p2 = makePanel("2. Event monitor (count of each event)");
+            const cardsBox = el("div");
+            cardsBox.id = "cards";
+            p2.appendChild(cardsBox);
+            p2.appendChild(
+                el("p", "small", "A card flashes every time its event fires."),
+            );
+
+            const names = [
+                "onload",
+                "onclick",
+                "onmouseover",
+                "onmouseout",
+                "onmousedown",
+                "onmouseup",
+            ];
+            const counts = {};
+            const cards = {};
+            names.forEach(function (n) {
+                counts[n] = 0;
+                const c = el("div", "card");
+                const title = el("b", "", n);
+                const num = el("div", "n", "0");
+                const time = el("div", "t", "not fired yet");
+                c.appendChild(title);
+                c.appendChild(num);
+                c.appendChild(time);
+                cardsBox.appendChild(c);
+                cards[n] = { box: c, num: num, time: time };
+            });
+
+            // ================= PANEL 3: LOG =================
+            const p3 = makePanel("3. Event log (order of events)");
+            const logBox = el("div");
+            logBox.id = "log";
+            p3.appendChild(logBox);
+            const clearBtn = el("button", "", "Clear log");
+            p3.appendChild(clearBtn);
+            let step = 0;
+            clearBtn.onclick = function () {
+                logBox.textContent = "";
+                step = 0;
+            };
+
+            // ---------- fire(): updates the card and the log for any event ----------
+            // e = the event object, extra = optional note
+            function fire(name, e, extra) {
+                counts[name]++;
+                cards[name].num.textContent = counts[name];
+                cards[name].time.textContent = new Date().toLocaleTimeString();
+                cards[name].box.classList.add("flash");
+                setTimeout(function () {
+                    cards[name].box.classList.remove("flash");
+                }, 300);
+
+                step++;
+                let info = "";
+                if (e && e.clientX !== undefined) {
+                    // mouse events carry pointer details
+                    info =
+                        " | x:" +
+                        e.clientX +
+                        " y:" +
+                        e.clientY +
+                        " | button:" +
+                        e.button;
+                }
+                const d = document.createElement("div");
+                d.innerHTML =
+                    step +
+                    ". <b>" +
+                    name +
+                    "</b> (e.type = " +
+                    e.type +
+                    ")" +
+                    info +
+                    (extra ? " | " + extra : "");
+                logBox.appendChild(d);
+                logBox.scrollTop = logBox.scrollHeight;
+            }
+
+            // ================= THE SIX EVENTS (DOM level 0 properties) =================
+
+            // 1. onmouseover: pointer moves ONTO the element
+            zone.onmouseover = function (e) {
+                zone.classList.add("over");
+                state.textContent = "onmouseover: pointer entered the box";
+                fire("onmouseover", e);
+            };
+
+            // 2. onmouseout: pointer moves OFF the element
+            zone.onmouseout = function (e) {
+                zone.classList.remove("over");
+                zone.classList.remove("down"); // reset the pressed look too
+                state.textContent = "onmouseout: pointer left the box";
+                fire("onmouseout", e);
+            };
+
+            // 3. onmousedown: mouse button PRESSED (not yet released)
+            zone.onmousedown = function (e) {
+                zone.classList.add("down");
+                state.textContent =
+                    "onmousedown: button pressed (button " + e.button + ")";
+                fire("onmousedown", e);
+            };
+
+            // 4. onmouseup: mouse button RELEASED over the element
+            zone.onmouseup = function (e) {
+                zone.classList.remove("down");
+                state.textContent = "onmouseup: button released";
+                fire("onmouseup", e);
+            };
+
+            // 5. onclick: a full press + release on the same element
+            zone.onclick = function (e) {
+                state.textContent =
+                    "onclick: click completed (" + counts.onclick + " so far)";
+                fire("onclick", e, "fires AFTER mousedown and mouseup");
+            };
+
+            // onclick on a button: changes the zone colour using the style property
+            colourBtn.onclick = function (e) {
+                colourIndex = (colourIndex + 1) % colours.length;
+                zone.style.backgroundColor = colours[colourIndex];
+                fire(
+                    "onclick",
+                    e,
+                    "button changed colour to " + colours[colourIndex],
+                );
+            };
+
+            // 6. onload (element): an image fires onload when it has finished loading
+            const img = new Image();
+            img.onload = function (e) {
+                // handler is set BEFORE src
+                imgBox.appendChild(img);
+                imgBox.appendChild(
+                    el(
+                        "span",
+                        "",
+                        img.width + " x " + img.height + " px loaded",
+                    ),
+                );
+                fire("onload", e, "image element loaded");
+            };
+            img.alt = "sample clay circle";
+            img.src =
+                "data:image/svg+xml," +
+                encodeURIComponent(
+                    '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">' +
+                        '<circle cx="24" cy="24" r="20" fill="#c8553d"/></svg>',
+                );
+
+            // 6. onload (window): fires when the WHOLE page and its resources are loaded
+            window.onload = function (e) {
+                state.textContent =
+                    "window.onload: page loaded, now interact with this box";
+                fire(
+                    "onload",
+                    e,
+                    "window loaded after " +
+                        Math.round(performance.now()) +
+                        " ms",
+                );
+            };
+        </script>
+    </body>
+</html>

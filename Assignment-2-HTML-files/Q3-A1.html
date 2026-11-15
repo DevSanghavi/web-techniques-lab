@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>JSON and its Characteristics</title>
+
+        <!-- ===================== CSS: crimson, ivory and gold theme ===================== -->
+        <style>
+            :root {
+                --crimson: #9b1d3a;
+                --crimson-dark: #6e1229;
+                --gold: #d4a017;
+                --ivory: #fffdf5;
+                --ink: #2a1a1f;
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                background: var(--ivory);
+                color: var(--ink);
+                font-family: "Trebuchet MS", Arial, sans-serif;
+                line-height: 1.6;
+            }
+            header {
+                background: linear-gradient(
+                    135deg,
+                    var(--crimson-dark),
+                    var(--crimson)
+                );
+                color: #fff;
+                text-align: center;
+                padding: 28px 16px;
+                border-bottom: 6px solid var(--gold);
+            }
+            header h1 {
+                margin: 0;
+                font-size: 1.7rem;
+                letter-spacing: 1px;
+            }
+            header p {
+                margin: 4px 0 0;
+                color: #ffe9a8;
+            }
+
+            main {
+                max-width: 960px;
+                margin: 0 auto;
+                padding: 16px;
+            }
+            h2 {
+                color: var(--crimson);
+                border-bottom: 3px solid var(--gold);
+                padding-bottom: 4px;
+                margin-top: 32px;
+            }
+
+            /* Fact list */
+            #facts {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+            #facts li {
+                background: #fff;
+                border-left: 5px solid var(--gold);
+                padding: 8px 12px;
+                margin-bottom: 8px;
+                border-radius: 6px;
+                box-shadow: 0 1px 4px rgba(110, 18, 41, 0.12);
+            }
+
+            /* Characteristic cards */
+            #cards {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 14px;
+            }
+            .card {
+                background: #fff;
+                border-top: 5px solid var(--crimson);
+                border-radius: 10px;
+                padding: 14px;
+                box-shadow: 0 3px 10px rgba(110, 18, 41, 0.15);
+                cursor: pointer;
+                transition: transform 0.2s;
+            }
+            .card:hover {
+                transform: translateY(-5px);
+            }
+            .card h3 {
+                margin: 0 0 6px;
+                color: var(--crimson);
+            }
+            .card .num {
+                display: inline-block;
+                background: var(--gold);
+                color: #fff;
+                width: 28px;
+                height: 28px;
+                line-height: 28px;
+                text-align: center;
+                border-radius: 50%;
+                margin-right: 6px;
+                font-weight: bold;
+            }
+            .card .more {
+                display: none;
+                margin-top: 8px;
+            }
+            .card pre {
+                margin: 6px 0 0;
+            }
+
+            /* Code and editor */
+            pre,
+            textarea {
+                font-family: Consolas, "Courier New", monospace;
+                font-size: 0.9rem;
+            }
+            pre {
+                background: #2a0f18;
+                color: #ffe9a8;
+                padding: 10px;
+                border-radius: 8px;
+                overflow-x: auto;
+            }
+            textarea {
+                width: 100%;
+                height: 210px;
+                padding: 10px;
+                border: 2px solid var(--crimson);
+                border-radius: 8px;
+                background: #fff;
+            }
+            .btns {
+                margin: 8px 0;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            button {
+                padding: 8px 16px;
+                border: 0;
+                border-radius: 6px;
+                background: var(--crimson);
+                color: #fff;
+                font-weight: bold;
+                cursor: pointer;
+            }
+            button:hover {
+                background: var(--crimson-dark);
+            }
+            button.alt {
+                background: var(--gold);
+                color: var(--ink);
+            }
+            #status {
+                font-weight: bold;
+                padding: 8px 12px;
+                border-radius: 6px;
+                display: none;
+            }
+            .ok {
+                background: #e3f6e8;
+                color: #1e7a3c;
+            }
+            .bad {
+                background: #fde6e6;
+                color: #b3261e;
+            }
+
+            /* Tables and two-column layout */
+            .scroll {
+                overflow-x: auto;
+            }
+            table {
+                border-collapse: collapse;
+                width: 100%;
+                background: #fff;
+            }
+            th,
+            td {
+                border: 1px solid #ead9b6;
+                padding: 8px 10px;
+                text-align: left;
+            }
+            th {
+                background: var(--crimson);
+                color: #fff;
+            }
+            .two {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+                gap: 14px;
+            }
+            footer {
+                text-align: center;
+                padding: 18px;
+                color: #7d5a63;
+                font-size: 0.9rem;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>{ JSON }: JavaScript Object Notation</h1>
+            <p>What it is and what makes it special</p>
+        </header>
+
+        <main>
+            <h2>1. What is JSON?</h2>
+            <ul id="facts"></ul>
+
+            <h2>2. Characteristics of JSON (click a card)</h2>
+            <div id="cards"></div>
+
+            <h2>3. Try It: Parse and Stringify</h2>
+            <p>
+                Edit the JSON below, then use the buttons. Break it on purpose
+                (single quotes, trailing comma) to see the error.
+            </p>
+            <textarea id="editor" spellcheck="false"></textarea>
+            <div class="btns">
+                <button id="btnValidate">Validate (JSON.parse)</button>
+                <button id="btnPretty" class="alt">
+                    Pretty Print (stringify)
+                </button>
+                <button id="btnMini" class="alt">Minify</button>
+                <button id="btnRead">Read Values</button>
+            </div>
+            <div id="status"></div>
+            <pre id="result">Result will appear here.</pre>
+
+            <h2>4. JSON Value Types</h2>
+            <div class="scroll"><table id="typeTable"></table></div>
+
+            <h2>5. JSON vs XML (same data)</h2>
+            <div class="two">
+                <div>
+                    <b>XML</b>
+                    <pre id="xmlBox"></pre>
+                </div>
+                <div>
+                    <b>JSON</b>
+                    <pre id="jsonBox"></pre>
+                </div>
+            </div>
+            <p id="sizeNote"></p>
+        </main>
+
+        <footer>Unit 5: JSON | Introduction and Characteristics</footer>
+
+        <!-- ===================== JAVASCRIPT ===================== -->
+        <script>
+            // The data for this page is itself written as JSON text, then parsed
+            var pageText = `{
+      "facts": [
+        "Full form: JavaScript Object Notation",
+        "Introduced by Douglas Crockford in the early 2000s",
+        "A simple text format to store and send data",
+        "File extension: .json",
+        "MIME type: application/json",
+        "Used in web APIs, config files, mobile apps and databases like MongoDB"
+      ],
+      "characteristics": [
+        { "title": "Lightweight", "text": "Small text, so it is fast to send.", "example": "{\\"a\\": 1}" },
+        { "title": "Easy to read", "text": "Clear key and value pairs that people can understand.", "example": "\\"name\\": \\"Asha\\"" },
+        { "title": "Language independent", "text": "Works with almost any language: JavaScript, Python, Java, PHP, C#.", "example": "JSON.parse(text)" },
+        { "title": "Hierarchical", "text": "Objects can sit inside objects and arrays.", "example": "{\\"address\\": {\\"city\\": \\"Pune\\"}}" },
+        { "title": "Self-describing", "text": "Keys explain what the values mean.", "example": "\\"marks\\": 88" },
+        { "title": "Text based", "text": "Plain text that opens in any editor.", "example": "data.json" }
+      ],
+      "types": [
+        { "type": "String",  "example": "\\"hello\\"",     "note": "Double quotes only" },
+        { "type": "Number",  "example": "25, 3.14, -7",   "note": "No quotes" },
+        { "type": "Boolean", "example": "true, false",    "note": "Lowercase, no quotes" },
+        { "type": "null",    "example": "null",           "note": "Means empty" },
+        { "type": "Object",  "example": "{ \\"a\\": 1 }", "note": "Pairs inside { }" },
+        { "type": "Array",   "example": "[1, 2, 3]",      "note": "List inside [ ]" }
+      ]
+    }`;
+            var page = JSON.parse(pageText); // text -> JavaScript object
+
+            // ---------- 1. Facts list ----------
+            var factsList = document.getElementById("facts");
+            for (var f of page.facts) {
+                // for...of loop over an array
+                var li = document.createElement("li");
+                li.textContent = f;
+                factsList.appendChild(li);
+            }
+
+            // ---------- 2. Characteristic cards ----------
+            var cardsBox = document.getElementById("cards");
+            page.characteristics.forEach(function (c, index) {
+                var card = document.createElement("div");
+                card.className = "card";
+                card.innerHTML =
+                    "<h3><span class='num'>" +
+                    (index + 1) +
+                    "</span>" +
+                    c.title +
+                    "</h3>" +
+                    "<div>" +
+                    c.text +
+                    "</div>" +
+                    "<div class='more'>Example:<pre></pre></div>";
+                card.querySelector("pre").textContent = c.example; // textContent keeps quotes safe
+                // Click a card to show or hide its example
+                card.addEventListener("click", function () {
+                    var more = card.querySelector(".more");
+                    more.style.display =
+                        more.style.display === "block" ? "none" : "block";
+                });
+                cardsBox.appendChild(card);
+            });
+
+            // ---------- 3. Editor: parse, stringify, minify ----------
+            var sample = {
+                name: "Asha",
+                age: 21,
+                student: true,
+                scholarship: null,
+                address: { city: "Pune", pin: "411001" },
+                skills: ["HTML", "CSS", "JavaScript"],
+            };
+            var editor = document.getElementById("editor");
+            var statusBox = document.getElementById("status");
+            var result = document.getElementById("result");
+            editor.value = JSON.stringify(sample, null, 2); // object -> pretty text
+
+            function showStatus(message, good) {
+                statusBox.style.display = "block";
+                statusBox.className = good ? "ok" : "bad";
+                statusBox.textContent = message;
+            }
+
+            // Try to parse the text; return the object, or null if the JSON is invalid
+            function tryParse() {
+                try {
+                    var obj = JSON.parse(editor.value);
+                    showStatus("Valid JSON: parsed without any error.", true);
+                    return obj;
+                } catch (e) {
+                    showStatus("Invalid JSON: " + e.message, false);
+                    result.textContent = "Fix the error and try again.";
+                    return null;
+                }
+            }
+
+            document
+                .getElementById("btnValidate")
+                .addEventListener("click", function () {
+                    var obj = tryParse();
+                    if (obj !== null) {
+                        result.textContent =
+                            "Type of parsed value: " +
+                            (Array.isArray(obj) ? "array" : typeof obj) +
+                            "\nNumber of top-level keys: " +
+                            Object.keys(obj).length;
+                    }
+                });
+
+            document
+                .getElementById("btnPretty")
+                .addEventListener("click", function () {
+                    var obj = tryParse();
+                    if (obj !== null) {
+                        editor.value = JSON.stringify(obj, null, 2); // 2-space indent
+                        result.textContent = editor.value;
+                    }
+                });
+
+            document
+                .getElementById("btnMini")
+                .addEventListener("click", function () {
+                    var obj = tryParse();
+                    if (obj !== null) {
+                        result.textContent = JSON.stringify(obj); // no spaces
+                    }
+                });
+
+            // Read values using dot notation, bracket notation and a for...in loop
+            document
+                .getElementById("btnRead")
+                .addEventListener("click", function () {
+                    var obj = tryParse();
+                    if (obj === null) {
+                        return;
+                    }
+                    var lines = [];
+                    for (var key in obj) {
+                        lines.push(
+                            key +
+                                " -> " +
+                                JSON.stringify(obj[key]) +
+                                "   (" +
+                                typeof obj[key] +
+                                ")",
+                        );
+                    }
+                    if (obj.address) {
+                        lines.push("\nobj.address.city = " + obj.address.city);
+                    }
+                    if (obj.skills) {
+                        lines.push("obj.skills[1] = " + obj.skills[1]);
+                    }
+                    result.textContent = lines.join("\n");
+                });
+
+            // ---------- 4. Value types table ----------
+            var tableHTML =
+                "<tr><th>Type</th><th>Example</th><th>Notes</th></tr>";
+            page.types.forEach(function (t) {
+                tableHTML +=
+                    "<tr><td><b>" +
+                    t.type +
+                    "</b></td><td><code></code>" +
+                    t.example.replace(/</g, "&lt;") +
+                    "</td><td>" +
+                    t.note +
+                    "</td></tr>";
+            });
+            document.getElementById("typeTable").innerHTML = tableHTML;
+
+            // ---------- 5. JSON vs XML ----------
+            var xmlText =
+                "<person>\n  <name>Asha</name>\n  <age>21</age>\n  <city>Pune</city>\n</person>";
+            var jsonText = JSON.stringify(
+                { name: "Asha", age: 21, city: "Pune" },
+                null,
+                2,
+            );
+            document.getElementById("xmlBox").textContent = xmlText;
+            document.getElementById("jsonBox").textContent = jsonText;
+            document.getElementById("sizeNote").textContent =
+                "Size: XML = " +
+                xmlText.length +
+                " characters, JSON = " +
+                jsonText.length +
+                " characters. JSON is shorter because it has no repeated end tags.";
+        </script>
+    </body>
+</html>

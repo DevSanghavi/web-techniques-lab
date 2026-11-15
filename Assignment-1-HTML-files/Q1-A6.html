@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Bootstrap Horizontal Form Layout</title>
+
+        <!-- Bootstrap 5.3 CSS (CDN) -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+        />
+
+        <!-- ===================== CUSTOM CSS ===================== -->
+        <style>
+            /* Teal and sand colour theme (colours kept in variables) */
+            :root {
+                --teal: #0f766e;
+                --teal-dark: #115e59;
+                --sand: #fdf6e9;
+            }
+
+            body {
+                background-color: var(--sand);
+            }
+
+            /* Form card with a teal top border */
+            .form-card {
+                border: 0;
+                border-top: 6px solid var(--teal);
+                border-radius: 1rem;
+                box-shadow: 0 10px 30px rgba(15, 118, 110, 0.15);
+            }
+
+            /* Teal heading area */
+            .form-card .card-header {
+                background-color: var(--teal);
+                color: #fff;
+                border-radius: 0.75rem 0.75rem 0 0;
+            }
+
+            /* Teal button that gets darker on hover */
+            .btn-teal {
+                background-color: var(--teal);
+                border-color: var(--teal);
+                color: #fff;
+            }
+            .btn-teal:hover {
+                background-color: var(--teal-dark);
+                border-color: var(--teal-dark);
+                color: #fff;
+            }
+
+            /* Teal glow when a field is selected */
+            .form-control:focus,
+            .form-select:focus {
+                border-color: var(--teal);
+                box-shadow: 0 0 0 0.25rem rgba(15, 118, 110, 0.25);
+            }
+
+            /* Teal checkbox when ticked */
+            .form-check-input:checked {
+                background-color: var(--teal);
+                border-color: var(--teal);
+            }
+
+            /* Smaller heading text on phones */
+            @media (max-width: 576px) {
+                .form-card .card-header h4 {
+                    font-size: 1.1rem;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <main class="container py-5" style="max-width: 680px">
+            <div class="card form-card">
+                <div class="card-header py-3">
+                    <h4 class="mb-0">Student Registration (Horizontal Form)</h4>
+                </div>
+
+                <div class="card-body p-4">
+                    <!-- Message shown after a successful submit (filled by JS) -->
+                    <div
+                        id="resultMsg"
+                        class="alert alert-success d-none"
+                        role="alert"
+                    ></div>
+
+                    <!-- Horizontal form layout: every field is a .row with a label column and an input column -->
+                    <form id="regForm" novalidate>
+                        <!-- Full name -->
+                        <div class="row mb-3">
+                            <label
+                                for="fullName"
+                                class="col-sm-3 col-form-label fw-semibold"
+                                >Full Name</label
+                            >
+                            <div class="col-sm-9">
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="fullName"
+                                    placeholder="Enter your full name"
+                                />
+                                <div class="invalid-feedback">
+                                    Please enter your name (at least 3 letters).
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="row mb-3">
+                            <label
+                                for="email"
+                                class="col-sm-3 col-form-label fw-semibold"
+                                >Email</label
+                            >
+                            <div class="col-sm-9">
+                                <input
+                                    type="email"
+                                    class="form-control"
+                                    id="email"
+                                    placeholder="name@example.com"
+                                />
+                                <div class="invalid-feedback">
+                                    Enter a valid email, for example
+                                    user@example.com.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="row mb-3">
+                            <label
+                                for="phone"
+                                class="col-sm-3 col-form-label fw-semibold"
+                                >Phone</label
+                            >
+                            <div class="col-sm-9">
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="phone"
+                                    placeholder="10-digit mobile number"
+                                    maxlength="10"
+                                />
+                                <div class="invalid-feedback">
+                                    Phone number must contain exactly 10 digits.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Password with show / hide button -->
+                        <div class="row mb-3">
+                            <label
+                                for="password"
+                                class="col-sm-3 col-form-label fw-semibold"
+                                >Password</label
+                            >
+                            <div class="col-sm-9">
+                                <div class="input-group">
+                                    <input
+                                        type="password"
+                                        class="form-control"
+                                        id="password"
+                                        placeholder="Minimum 6 characters"
+                                    />
+                                    <button
+                                        class="btn btn-outline-secondary"
+                                        type="button"
+                                        id="togglePwd"
+                                    >
+                                        Show
+                                    </button>
+                                    <div class="invalid-feedback">
+                                        Password must be at least 6 characters
+                                        long.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Course (dropdown) -->
+                        <div class="row mb-3">
+                            <label
+                                for="course"
+                                class="col-sm-3 col-form-label fw-semibold"
+                                >Course</label
+                            >
+                            <div class="col-sm-9">
+                                <select class="form-select" id="course">
+                                    <option value="">Select a course</option>
+                                    <option>M.Sc. (IT)</option>
+                                    <option>M.Sc. (CS)</option>
+                                    <option>B.Sc. (IT)</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Please choose a course.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Checkbox: offset-sm-3 aligns it under the input column -->
+                        <div class="row mb-3">
+                            <div class="col-sm-9 offset-sm-3">
+                                <div class="form-check">
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        id="agree"
+                                    />
+                                    <label class="form-check-label" for="agree"
+                                        >I agree to the terms and
+                                        conditions</label
+                                    >
+                                    <div class="invalid-feedback">
+                                        You must accept the terms to continue.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="row">
+                            <div class="col-sm-9 offset-sm-3">
+                                <button
+                                    type="submit"
+                                    class="btn btn-teal px-4 me-2"
+                                >
+                                    Register
+                                </button>
+                                <button
+                                    type="reset"
+                                    class="btn btn-outline-secondary px-4"
+                                >
+                                    Reset
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+
+        <!-- Bootstrap 5.3 JS bundle -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+        <!-- ===================== CUSTOM JAVASCRIPT ===================== -->
+        <script>
+            // Get the form and its fields
+            const form = document.getElementById("regForm");
+            const resultMsg = document.getElementById("resultMsg");
+            const fullName = document.getElementById("fullName");
+            const email = document.getElementById("email");
+            const phone = document.getElementById("phone");
+            const password = document.getElementById("password");
+            const course = document.getElementById("course");
+            const agree = document.getElementById("agree");
+
+            // Regular expressions used for validation
+            const emailPattern = /^[\w.-]+@[\w-]+\.[a-zA-Z]{2,}$/; // user@example.com
+            const phonePattern = /^\d{10}$/; // exactly 10 digits
+
+            // Marks a field as valid (green) or invalid (red) and returns the result
+            function setState(field, isValid) {
+                field.classList.toggle("is-valid", isValid);
+                field.classList.toggle("is-invalid", !isValid);
+                return isValid;
+            }
+
+            // One check function for each field
+            const checks = [
+                () => setState(fullName, fullName.value.trim().length >= 3),
+                () => setState(email, emailPattern.test(email.value.trim())),
+                () => setState(phone, phonePattern.test(phone.value.trim())),
+                () => setState(password, password.value.length >= 6),
+                () => setState(course, course.value !== ""),
+                () => setState(agree, agree.checked),
+            ];
+
+            // Check each text field when the user leaves it (blur event)
+            [fullName, email, phone, password].forEach(function (field, index) {
+                field.addEventListener("blur", checks[index]);
+            });
+
+            // Show / hide the password
+            const toggleButton = document.getElementById("togglePwd");
+            toggleButton.addEventListener("click", function () {
+                const hidden = password.type === "password";
+                password.type = hidden ? "text" : "password";
+                toggleButton.textContent = hidden ? "Hide" : "Show";
+            });
+
+            // Handle form submit
+            form.addEventListener("submit", function (event) {
+                event.preventDefault(); // stop the page from reloading
+
+                // Run every check (map runs all of them, so every error is shown at once)
+                const allValid = checks
+                    .map(function (check) {
+                        return check();
+                    })
+                    .every(function (ok) {
+                        return ok;
+                    });
+
+                if (allValid) {
+                    resultMsg.textContent =
+                        "Thank you, " +
+                        fullName.value.trim() +
+                        "! You are registered for " +
+                        course.value +
+                        ".";
+                    resultMsg.classList.remove("d-none");
+                    form.reset();
+                    form.querySelectorAll(".is-valid").forEach(function (el) {
+                        el.classList.remove("is-valid");
+                    });
+                } else {
+                    resultMsg.classList.add("d-none");
+                }
+            });
+
+            // Clear all messages when the form is reset
+            form.addEventListener("reset", function () {
+                form.querySelectorAll(".is-valid, .is-invalid").forEach(
+                    function (el) {
+                        el.classList.remove("is-valid", "is-invalid");
+                    },
+                );
+                resultMsg.classList.add("d-none");
+            });
+        </script>
+    </body>
+</html>

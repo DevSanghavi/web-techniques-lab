@@ -1,0 +1,820 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>jQuery Installation and Syntax | Swiss Poster Theme</title>
+        <style>
+            /* Theme: Swiss poster - off-white paper, black rules, signal red, bold sans-serif type (plain CSS, no Bootstrap) */
+            :root {
+                --paper: #f4f1ea;
+                --ink: #111;
+                --red: #d9261c;
+                --yellow: #ffe14d;
+                --grey: #8c8c84;
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                background: var(--paper);
+                color: var(--ink);
+                font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            }
+            header {
+                border-bottom: 8px solid var(--ink);
+                padding: 18px 16px 10px;
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+            header h1 {
+                margin: 0;
+                font-size: 2.2rem;
+                font-weight: 900;
+                letter-spacing: -1px;
+                line-height: 1;
+            }
+            header h1 span {
+                color: var(--red);
+            }
+            header p {
+                margin: 8px 0 0;
+                font-size: 0.85rem;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                color: var(--grey);
+            }
+            /* Responsive: panels wrap by available width */
+            main {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+                gap: 0 22px;
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 14px 16px 30px;
+                align-items: start;
+            }
+            .panel {
+                border-top: 4px solid var(--ink);
+                padding: 10px 0 18px;
+            }
+            .panel h2 {
+                margin: 0 0 10px;
+                font-size: 1rem;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+            .panel h2 b {
+                color: var(--red);
+                margin-right: 6px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 0.82rem;
+            }
+            td,
+            th {
+                border-bottom: 1px solid var(--ink);
+                padding: 5px 4px;
+                text-align: left;
+                word-break: break-word;
+            }
+            th {
+                font-size: 0.7rem;
+                text-transform: uppercase;
+                color: var(--grey);
+            }
+            code {
+                font-family: Consolas, "Courier New", monospace;
+                font-size: 0.8rem;
+                background: #fff;
+                border: 1px solid var(--ink);
+                padding: 0 4px;
+            }
+            .formula {
+                font-family: Consolas, monospace;
+                font-size: 1.5rem;
+                font-weight: bold;
+                margin: 6px 0;
+                word-break: break-all;
+            }
+            .formula .d {
+                color: var(--red);
+            }
+            .formula .s {
+                background: var(--yellow);
+            }
+            .formula .a {
+                text-decoration: underline;
+            }
+            .small {
+                font-size: 0.78rem;
+                color: #444;
+                margin: 5px 0;
+            }
+            /* The stage: elements that jQuery will select and change */
+            #stage {
+                border: 3px solid var(--ink);
+                background: #fff;
+                padding: 12px;
+            }
+            #stage h2 {
+                text-transform: none;
+                letter-spacing: 0;
+                font-size: 1.4rem;
+                margin: 0 0 6px;
+            }
+            #stage p {
+                margin: 6px 0;
+            }
+            #stage ul {
+                margin: 6px 0;
+                padding-left: 22px;
+            }
+            #stage input[type="text"] {
+                padding: 5px;
+                border: 2px solid var(--ink);
+                width: 60%;
+            }
+            #box {
+                width: 40px;
+                height: 20px;
+                background: var(--red);
+                margin-top: 10px;
+            }
+            .hit {
+                background: var(--yellow);
+                outline: 3px solid var(--ink);
+            }
+            .added {
+                color: var(--red);
+                font-weight: bold;
+            }
+            button {
+                background: var(--ink);
+                color: #fff;
+                border: none;
+                padding: 7px 10px;
+                margin: 3px 4px 3px 0;
+                font-weight: bold;
+                font-size: 0.8rem;
+                cursor: pointer;
+                font-family: inherit;
+            }
+            button:hover {
+                background: var(--red);
+            }
+            button.reset {
+                background: #fff;
+                color: var(--ink);
+                border: 2px solid var(--ink);
+            }
+            #log {
+                border: 3px solid var(--ink);
+                background: #fff;
+                height: 300px;
+                overflow-y: auto;
+                padding: 6px;
+                font-size: 0.8rem;
+            }
+            #log div {
+                border-bottom: 1px dotted var(--grey);
+                padding: 4px 0;
+                word-break: break-word;
+            }
+            #log .n {
+                color: var(--red);
+                font-weight: bold;
+                margin-right: 4px;
+            }
+        </style>
+
+        <!-- INSTALLATION: load the downloaded file from the local js folder (relative path) -->
+        <script src="js/jquery-4.0.0.min.js"></script>
+        <script>
+            // Remember where jQuery came from. If the local file is missing,
+            // window.jQuery is undefined, so load the official CDN copy instead (fallback).
+            var loadedFrom = window.jQuery
+                ? "Local file: js/jquery-4.0.0.min.js"
+                : "CDN: code.jquery.com (fallback)";
+            if (!window.jQuery) {
+                document.write(
+                    '<script src="https://code.jquery.com/jquery-4.0.0.min.js"><\/script>',
+                );
+            }
+        </script>
+    </head>
+    <body>
+        <header>
+            <h1>jQuery<span>.</span> Write less, do more</h1>
+            <p>Unit 4 | jQuery | Installation, syntax and core methods</p>
+        </header>
+
+        <main>
+            <!-- Panel 1: installation check (rows added by jQuery) -->
+            <section class="panel">
+                <h2><b>1</b>Installation check</h2>
+                <table id="install">
+                    <tr>
+                        <th>Item</th>
+                        <th>Value</th>
+                    </tr>
+                </table>
+                <p class="small">
+                    Local file path: <code>js/jquery-4.0.0.min.js</code>
+                </p>
+                <p class="small">
+                    Official link:
+                    <code>https://code.jquery.com/jquery-4.0.0.min.js</code>
+                </p>
+            </section>
+
+            <!-- Panel 2: the syntax formula -->
+            <section class="panel">
+                <h2><b>2</b>Basic syntax</h2>
+                <div class="formula">
+                    <span class="d">$</span>(<span class="s">selector</span
+                    >).<span class="a">action</span>()
+                </div>
+                <table>
+                    <tr>
+                        <td><code>$</code></td>
+                        <td>
+                            the jQuery function (same as <code>jQuery</code>)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>(selector)</code></td>
+                        <td>CSS-style query that finds the elements</td>
+                    </tr>
+                    <tr>
+                        <td><code>.action()</code></td>
+                        <td>
+                            what to do with them: hide, text, css, fadeIn ...
+                        </td>
+                    </tr>
+                </table>
+                <p class="small">
+                    Example used in this page:
+                    <code>$(".intro").hide(400)</code>
+                </p>
+            </section>
+
+            <!-- Panel 3: the stage -->
+            <section class="panel">
+                <h2><b>3</b>Stage (elements to select)</h2>
+                <div id="stage">
+                    <h2 id="title">Original Heading</h2>
+                    <p class="intro">Paragraph one, class intro.</p>
+                    <p class="intro">Paragraph two, class intro.</p>
+                    <p id="unique">Unique paragraph, id unique.</p>
+                    <ul id="list">
+                        <li>Item 1</li>
+                        <li class="special">Item 2 (special)</li>
+                        <li>Item 3</li>
+                    </ul>
+                    <input type="text" id="name" value="Rahul" />
+                    <a id="link" href="https://jquery.com">jQuery website</a>
+                    <div id="box" data-level="1"></div>
+                </div>
+            </section>
+
+            <!-- Panel 4: buttons (built by jQuery) -->
+            <section class="panel">
+                <h2><b>4</b>Controls</h2>
+                <div id="buttons"></div>
+            </section>
+
+            <!-- Panel 5: log -->
+            <section class="panel">
+                <h2><b>5</b>Code executed</h2>
+                <div id="log"></div>
+            </section>
+        </main>
+
+        <script>
+            // ===== READY EVENT, FULL FORM: runs when the DOM is ready =====
+            $(document).ready(function () {
+                // Fill the installation table using jQuery
+                var info = [
+                    ["Loaded from", loadedFrom],
+                    ["jQuery version ($.fn.jquery)", $.fn.jquery],
+                    ["typeof $", typeof $],
+                    ["$ === jQuery", $ === jQuery],
+                    ["Paragraphs on page ($('p').length)", $("p").length],
+                ];
+                $.each(info, function (i, row) {
+                    // $.each loops over an array
+                    $("<tr>")
+                        .append($("<td>").text(row[0]))
+                        .append(
+                            $("<td>")
+                                .text(String(row[1]))
+                                .css("font-weight", "bold"),
+                        )
+                        .appendTo("#install");
+                });
+            });
+
+            // ===== READY EVENT, SHORT FORM: $(function(){ ... }) =====
+            $(function () {
+                var original = $("#stage").html(); // saved copy for Reset
+                var step = 0,
+                    count = 3;
+
+                // ---------- helpers ----------
+                // log(code, note): adds one numbered line to the log
+                function log(code, note) {
+                    step++;
+                    $("<div>")
+                        .append(
+                            $("<span>")
+                                .addClass("n")
+                                .text(step + "."),
+                        )
+                        .append($("<code>").text(code))
+                        .append($("<span>").text("  " + note))
+                        .appendTo("#log");
+                    $("#log").scrollTop($("#log")[0].scrollHeight);
+                }
+                // flash($els): highlights elements, then removes the highlight (delay + queue)
+                function flash($els) {
+                    $els.addClass("hit")
+                        .delay(1500)
+                        .queue(function (next) {
+                            $(this).removeClass("hit");
+                            next();
+                        });
+                }
+
+                // ---------- the demonstrations (each is mostly jQuery methods) ----------
+                var actions = [
+                    [
+                        "1. Selectors",
+                        function () {
+                            flash($("p"));
+                            log(
+                                '$("p").length',
+                                $("p").length +
+                                    " paragraphs (element selector)",
+                            );
+                            log(
+                                '$(".intro").length',
+                                $(".intro").length +
+                                    " elements (class selector)",
+                            );
+                            log(
+                                '$("#unique").text()',
+                                '"' + $("#unique").text() + '" (id selector)',
+                            );
+                            log(
+                                '$("ul li.special").text()',
+                                '"' +
+                                    $("ul li.special").text() +
+                                    '" (descendant + class)',
+                            );
+                            log(
+                                '$("li:first").text()',
+                                '"' +
+                                    $("li:first").text() +
+                                    '" (:first filter)',
+                            );
+                            log(
+                                "$(\"input[type='text']\").val()",
+                                '"' +
+                                    $("input[type='text']").val() +
+                                    '" (attribute selector)',
+                            );
+                            log(
+                                '$("h2, ul").length',
+                                $("#stage").find("h2, ul").length +
+                                    " (multiple selectors)",
+                            );
+                        },
+                    ],
+
+                    [
+                        "2. Get content",
+                        function () {
+                            log(
+                                '$("#title").text()',
+                                '"' + $("#title").text() + '"',
+                            );
+                            log(
+                                '$("#unique").html()',
+                                '"' + $("#unique").html() + '"',
+                            );
+                            log(
+                                '$("#name").val()',
+                                '"' + $("#name").val() + '"',
+                            );
+                            log(
+                                '$("#link").attr("href")',
+                                '"' + $("#link").attr("href") + '"',
+                            );
+                            log(
+                                '$("#box").data("level")',
+                                String($("#box").data("level")) +
+                                    " (reads data-level)",
+                            );
+                        },
+                    ],
+
+                    [
+                        "3. Set content",
+                        function () {
+                            $("#title").text("Heading changed");
+                            $("#unique").html(
+                                "<b>Bold</b> text set with html()",
+                            );
+                            $("#name").val("Priya");
+                            $("#link").attr({
+                                href: "https://example.com",
+                                title: "Changed link",
+                            });
+                            $("#box").data("level", 5);
+                            log(
+                                '$("#title").text("Heading changed")',
+                                "text() sets plain text",
+                            );
+                            log(
+                                '$("#unique").html("<b>Bold</b> ...")',
+                                "html() sets HTML markup",
+                            );
+                            log(
+                                '$("#name").val("Priya")',
+                                "val() sets the input value",
+                            );
+                            log(
+                                '$("#link").attr({href:..., title:...})',
+                                "attr() with an object sets many attributes",
+                            );
+                            log(
+                                '$("#box").data("level", 5)',
+                                "data() now returns " + $("#box").data("level"),
+                            );
+                        },
+                    ],
+
+                    [
+                        "4. CSS and classes",
+                        function () {
+                            $("#title").css("color", "#d9261c");
+                            $("#unique").css({
+                                "background-color": "#ffe14d",
+                                "font-weight": "bold",
+                                padding: "4px",
+                            });
+                            $(".intro").addClass("added");
+                            log(
+                                '$("#title").css("color", "#d9261c")',
+                                'css() read back: "' +
+                                    $("#title").css("color") +
+                                    '"',
+                            );
+                            log(
+                                '$("#unique").css({...})',
+                                "css() with an object sets many properties",
+                            );
+                            log(
+                                '$(".intro").addClass("added")',
+                                "hasClass: " +
+                                    $(".intro").first().hasClass("added"),
+                            );
+                            log(
+                                '$(".intro").toggleClass("added")',
+                                "toggles on every click of this button",
+                            );
+                            $(".intro").toggleClass("added"); // second call toggles it back off: shows toggle
+                            $(".intro").toggleClass("added");
+                        },
+                    ],
+
+                    [
+                        "5. hide / show / toggle",
+                        function () {
+                            $(".intro").toggle(500);
+                            log(
+                                '$(".intro").toggle(500)',
+                                "hides if visible, shows if hidden. Click again.",
+                            );
+                        },
+                    ],
+
+                    [
+                        "6. fade effects",
+                        function () {
+                            $("#unique").fadeToggle(600);
+                            $("#title").fadeTo(500, 0.4).fadeTo(500, 1);
+                            log(
+                                '$("#unique").fadeToggle(600)',
+                                "fades out or in",
+                            );
+                            log(
+                                '$("#title").fadeTo(500, 0.4)',
+                                "fades to opacity 0.4, then back with fadeTo(500, 1)",
+                            );
+                        },
+                    ],
+
+                    [
+                        "7. slide effects",
+                        function () {
+                            $("#list").slideToggle(500);
+                            log(
+                                '$("#list").slideToggle(500)',
+                                "slides the list up or down. Click again.",
+                            );
+                        },
+                    ],
+
+                    [
+                        "8. animate()",
+                        function () {
+                            $("#box")
+                                .animate(
+                                    {
+                                        width: "85%",
+                                        height: "50px",
+                                        opacity: 0.6,
+                                    },
+                                    800,
+                                )
+                                .animate(
+                                    {
+                                        width: "40px",
+                                        height: "20px",
+                                        opacity: 1,
+                                    },
+                                    800,
+                                );
+                            log(
+                                '$("#box").animate({width:"85%", ...}, 800)',
+                                "custom animation of CSS properties",
+                            );
+                            log(
+                                ".animate({width:'40px'...}, 800)",
+                                "second animate() is queued and runs after the first",
+                            );
+                            log(
+                                '$("#box").is(":animated")',
+                                String($("#box").is(":animated")) +
+                                    " right now",
+                            );
+                        },
+                    ],
+
+                    [
+                        "9. Method chaining",
+                        function () {
+                            $("#title")
+                                .text("Chained!")
+                                .css("color", "#d9261c")
+                                .slideUp(300)
+                                .slideDown(300)
+                                .fadeOut(200)
+                                .fadeIn(200);
+                            log(
+                                '$("#title").text().css().slideUp().slideDown().fadeOut().fadeIn()',
+                                "many actions on one selection in one statement",
+                            );
+                        },
+                    ],
+
+                    [
+                        "10. append / prepend",
+                        function () {
+                            count++;
+                            $("#list").append(
+                                "<li class='added'>Appended " + count + "</li>",
+                            );
+                            $("#list").prepend(
+                                "<li class='added'>Prepended " +
+                                    count +
+                                    "</li>",
+                            );
+                            log(
+                                '$("#list").append("<li>...</li>")',
+                                "adds INSIDE, at the end",
+                            );
+                            log(
+                                '$("#list").prepend("<li>...</li>")',
+                                "adds INSIDE, at the start",
+                            );
+                            log(
+                                '$("#list li").length',
+                                $("#list li").length + " items now",
+                            );
+                        },
+                    ],
+
+                    [
+                        "11. before / after",
+                        function () {
+                            $("#unique").before(
+                                "<p class='added'>Inserted BEFORE</p>",
+                            );
+                            $("#unique").after(
+                                "<p class='added'>Inserted AFTER</p>",
+                            );
+                            log(
+                                '$("#unique").before("<p>...</p>")',
+                                "adds OUTSIDE, before the element",
+                            );
+                            log(
+                                '$("#unique").after("<p>...</p>")',
+                                "adds OUTSIDE, after the element",
+                            );
+                            $("<li>")
+                                .text("Made with $('<li>')")
+                                .appendTo("#list");
+                            log(
+                                "$('<li>').text(...).appendTo('#list')",
+                                "creates a new element and appends it",
+                            );
+                        },
+                    ],
+
+                    [
+                        "12. remove / empty",
+                        function () {
+                            log(
+                                '$("#list li:last").remove()',
+                                "removes the last item: " +
+                                    $("#list li:last").text(),
+                            );
+                            $("#list li:last").remove();
+                            $(".added").remove();
+                            log(
+                                '$(".added").remove()',
+                                "removes every element with class added",
+                            );
+                            $("#list").empty();
+                            log(
+                                '$("#list").empty()',
+                                "removes only the children, the ul stays",
+                            );
+                        },
+                    ],
+
+                    [
+                        "13. Traversal",
+                        function () {
+                            var $s = $("li.special");
+                            flash($s);
+                            log(
+                                '$("li.special").parent()',
+                                "tag: " + $s.parent().prop("tagName"),
+                            );
+                            log(
+                                '$("li.special").siblings().length',
+                                String($s.siblings().length),
+                            );
+                            log(
+                                '$("li.special").next().text()',
+                                '"' + $s.next().text() + '"',
+                            );
+                            log(
+                                '$("li.special").prev().text()',
+                                '"' + $s.prev().text() + '"',
+                            );
+                            log(
+                                '$("#list").children().length',
+                                String($("#list").children().length),
+                            );
+                            log(
+                                '$("#stage").find(".special").length',
+                                String($("#stage").find(".special").length),
+                            );
+                            log(
+                                '$("#list li").eq(2).text()',
+                                '"' +
+                                    $("#list li").eq(2).text() +
+                                    '" (zero-based index)',
+                            );
+                            log(
+                                '$("#list li").first() / .last()',
+                                '"' +
+                                    $("#list li").first().text() +
+                                    '" and "' +
+                                    $("#list li").last().text() +
+                                    '"',
+                            );
+                            log(
+                                '$("li.special").closest("div").attr("id")',
+                                $s.closest("div").attr("id"),
+                            );
+                        },
+                    ],
+
+                    [
+                        "14. each() loop",
+                        function () {
+                            $("#list li").each(function (index) {
+                                // 'this' is the current element
+                                $(this).css(
+                                    "color",
+                                    index % 2 ? "#d9261c" : "#111",
+                                );
+                                log(
+                                    "each: index " + index,
+                                    '"' + $(this).text() + '"',
+                                );
+                            });
+                            log(
+                                '$("#list li").filter(":even").length',
+                                String($("#list li").filter(":even").length) +
+                                    " even-position items",
+                            );
+                            flash($("#list li").filter(":odd"));
+                        },
+                    ],
+
+                    [
+                        "15. Events: on() + trigger()",
+                        function () {
+                            $("#title").off(".demo"); // avoid binding twice
+                            $("#title").on("click.demo", function () {
+                                $(this).toggleClass("hit");
+                                log(
+                                    "click handler ran",
+                                    "toggled class hit on the heading",
+                                );
+                            });
+                            $("#unique").on(
+                                "mouseenter.demo mouseleave.demo",
+                                function (e) {
+                                    $(this).css(
+                                        "background-color",
+                                        e.type === "mouseenter"
+                                            ? "#ffe14d"
+                                            : "",
+                                    );
+                                    log(
+                                        "event: " + e.type,
+                                        "on() handles two events in one call",
+                                    );
+                                },
+                            );
+                            log(
+                                '$("#title").on("click.demo", fn)',
+                                "handler attached. Click the heading, or hover the unique paragraph.",
+                            );
+                            $("#title").trigger("click"); // fire the event from code
+                            log(
+                                '$("#title").trigger("click")',
+                                "fires the click from code",
+                            );
+                        },
+                    ],
+
+                    [
+                        "16. Events: off()",
+                        function () {
+                            $("#title, #unique").off(".demo");
+                            log(
+                                '$("#title, #unique").off(".demo")',
+                                "removes all handlers added with the .demo namespace",
+                            );
+                        },
+                    ],
+
+                    [
+                        "Reset",
+                        function () {
+                            $("#stage").find("*").off().stop(true); // remove events, stop animations
+                            $("#stage").html(original);
+                            count = 3;
+                            log(
+                                '$("#stage").html(original)',
+                                "stage restored to the original state",
+                            );
+                        },
+                    ],
+                ];
+
+                // ---------- build the buttons with jQuery ----------
+                $.each(actions, function (i, a) {
+                    $("<button>")
+                        .text(a[0])
+                        .toggleClass("reset", a[0] === "Reset")
+                        .on("click", function () {
+                            if (a[0] === "Reset") {
+                                $("#log").empty();
+                                step = 0;
+                            }
+                            a[1]();
+                        })
+                        .appendTo("#buttons");
+                });
+
+                log(
+                    "Ready",
+                    "jQuery " + $.fn.jquery + " loaded from: " + loadedFrom,
+                );
+            });
+        </script>
+    </body>
+</html>
